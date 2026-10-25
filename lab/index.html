@@ -1,0 +1,1861 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Map Projection Lab</title>
+<meta name="description" content="Watch satellite imagery of the Earth morph between map projections, and see same-size circles change size and shape. Built with ArcGIS.">
+<meta name="theme-color" content="#0a1530">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@400;600&family=Atkinson+Hyperlegible+Next:ital,wght@0,400;0,600;0,700;1,400&family=Unbounded:wght@500..800&display=swap">
+<script type="module" src="https://js.arcgis.com/5.1/core.js"></script>
+<style>
+/* Layout: a night-time map room. The satellite Earth floats on a dark stage, a tray of nine
+   projection "lenses" runs underneath, and a tabbed field-notes panel sits to the right.
+   On phones everything stacks: map, the nine lenses in a 3×3 grid, then the notes. */
+:root {
+  --night: #0a1530;
+  --night-2: #0f1d3d;
+  --panel: #13234a;
+  --panel-2: #192c5a;
+  --line: #2a3d70;
+  --ink: #eef3ff;
+  --ink-soft: #aebbdc;
+  --sun: #ffc93c;
+  --sun-ink: #1d1500;
+  --coral: #ff5d73;
+  --sky: #5ce1e6;
+  --kept: #62de9e;
+  --nearly: #ffd166;
+  --partly: #93c8ff;
+  --changed: #ff8089;
+  --glass: rgba(10, 21, 48, 0.66);
+  --glass-line: rgba(255, 255, 255, 0.14);
+
+  --font-display: "Unbounded", "Arial Black", system-ui, sans-serif;
+  --font-body: "Atkinson Hyperlegible Next", "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-data: "Atkinson Hyperlegible Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --r: 16px;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  background:
+    radial-gradient(1200px 700px at 30% 40%, rgba(64, 104, 196, 0.22), transparent 70%),
+    radial-gradient(900px 600px at 85% 90%, rgba(255, 93, 115, 0.08), transparent 70%),
+    var(--night);
+}
+:focus-visible { outline: 3px solid var(--sun); outline-offset: 2px; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.skip { position: absolute; left: 12px; top: -60px; z-index: 50; background: var(--sun); color: var(--sun-ink); padding: 8px 14px; border-radius: 8px; font-weight: 700; }
+.skip:focus { top: 12px; }
+
+/* ---------- App frame ---------- */
+.app {
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 14px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: "top" "stage" "dial" "info";
+  gap: 10px;
+}
+@media (min-width: 900px) {
+  .app {
+    height: 100vh; height: 100dvh; min-height: 520px;
+    grid-template-columns: minmax(0, 1fr) clamp(320px, 31vw, 410px);
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    grid-template-areas: "top top" "stage info" "dial dial";
+    gap: 10px 14px;
+    padding-block: 0 12px;
+  }
+}
+
+/* ---------- Header ---------- */
+.top { grid-area: top; display: flex; align-items: center; justify-content: space-between; gap: 10px 18px; flex-wrap: wrap; padding-block: 12px 0; }
+.brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.mark { width: 42px; height: 42px; flex: none; }
+.mark .blob { transform-origin: 21px 21px; animation: squash 6s ease-in-out infinite; }
+@keyframes squash { 0%, 100% { transform: scale(1, 1); } 30% { transform: scale(1.45, 0.7); } 60% { transform: scale(0.75, 1.3); } }
+.brand h1 {
+  margin: 0; font-family: var(--font-display); font-weight: 700;
+  font-size: clamp(1.15rem, 0.9rem + 1.2vw, 1.65rem); line-height: 1.05; letter-spacing: -0.01em; text-wrap: balance;
+}
+.brand h1 span { color: var(--sun); }
+.brand p { margin: 3px 0 0; color: var(--ink-soft); font-size: 0.88rem; line-height: 1.3; }
+.actions { display: flex; gap: 8px; }
+.btn {
+  font: 700 0.9rem/1 var(--font-body); display: inline-flex; align-items: center; gap: 8px;
+  min-height: 42px; padding: 0 16px; border-radius: 999px; cursor: pointer;
+  border: 1.5px solid var(--line); background: var(--night-2); color: var(--ink);
+}
+.btn:hover { border-color: var(--ink-soft); }
+.btn.sun { background: var(--sun); border-color: var(--sun); color: var(--sun-ink); }
+.btn.sun:hover { filter: brightness(1.06); }
+.btn svg { width: 15px; height: 15px; flex: none; }
+
+/* ---------- Map stage ---------- */
+.stage {
+  grid-area: stage; position: relative; min-height: 0; overflow: hidden; container-type: inline-size;
+  height: clamp(280px, 50vh, 600px);
+  border-radius: 20px; border: 1px solid var(--line);
+  background:
+    radial-gradient(ellipse 70% 65% at 50% 48%, rgba(86, 132, 230, 0.24), transparent 72%),
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.025) 0 1px, transparent 1px 44px),
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.025) 0 1px, transparent 1px 44px),
+    var(--night-2);
+}
+@media (min-width: 900px) { .stage { height: auto; } }
+#gl, #map { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+#map { touch-action: none; cursor: crosshair; }
+#map:focus-visible { outline: 3px solid var(--sun); outline-offset: -3px; border-radius: 20px; }
+
+.glass { background: var(--glass); border: 1px solid var(--glass-line); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+.stage-top {
+  position: absolute; left: 0; right: 0; top: 0; z-index: 2;
+  display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; flex-wrap: wrap;
+  padding: 10px; pointer-events: none;
+}
+.stage-top > * { pointer-events: auto; }
+.toggles { display: flex; gap: 6px; flex-wrap: wrap; }
+.tog {
+  font: 700 0.82rem/1 var(--font-body); color: var(--ink);
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 36px; min-width: 36px; padding: 0 11px;
+  border-radius: 999px; cursor: pointer;
+}
+@container (max-width: 860px) { .tog { padding: 0; } .tog .lbl { display: none; } }
+.tog .sw { width: 13px; height: 13px; border-radius: 50%; flex: none; }
+.tog .sw.img { background: conic-gradient(#2a6e8f 0 25%, #c9b27a 0 50%, #3f7a45 0 75%, #e9eef5 0); }
+.tog .sw.circ { border: 2px solid var(--coral); background: rgba(255, 93, 115, 0.3); }
+.tog .sw.grid { border-radius: 3px; background:
+  linear-gradient(var(--ink-soft), var(--ink-soft)) 50% 0/1.5px 100% no-repeat,
+  linear-gradient(var(--ink-soft), var(--ink-soft)) 0 50%/100% 1.5px no-repeat; outline: 1.5px solid var(--ink-soft); }
+.tog[aria-pressed="true"] { border-color: rgba(255, 201, 60, 0.7); }
+.tog[aria-pressed="false"] { color: var(--ink-soft); }
+.tog[aria-pressed="false"] .sw { filter: grayscale(1); opacity: .45; }
+.status {
+  position: relative; flex: none; display: inline-flex; align-items: baseline; gap: 7px;
+  padding: 6px 10px 7px; border-radius: 8px; font-weight: 700; font-size: 0.78rem; line-height: 1; overflow: hidden; white-space: nowrap;
+}
+.status .arrow { color: var(--sun); }
+.status .ver { font: 400 0.74rem/1 var(--font-data); color: var(--ink-soft); }
+.status .prog { position: absolute; left: 0; bottom: 0; height: 3px; width: 100%; background: var(--sun); transform-origin: left; transform: scaleX(0); }
+
+.stage-bottom {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 2;
+  display: flex; flex-direction: column; align-items: flex-start; gap: 6px;
+  padding: 0 10px 10px; pointer-events: none;
+}
+.stage-foot { align-self: stretch; display: flex; justify-content: space-between; align-items: flex-end; gap: 8px; }
+.stage-foot > * { pointer-events: auto; }
+.attrib {
+  min-width: 0; font: 0.72rem/1.35 var(--font-body); color: var(--ink-soft); text-align: left;
+  padding: 4px 9px; border-radius: 7px; cursor: pointer;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.attrib[aria-expanded="true"] { white-space: normal; }
+.credit { flex: none; font: 700 0.74rem/1 var(--font-body); color: var(--ink); padding: 7px 10px; border-radius: 8px; background: var(--panel); border: 1px solid var(--line); }
+.tip {
+  position: absolute; z-index: 3; pointer-events: none; transform: translate(-50%, calc(-100% - 12px));
+  background: var(--sun); color: var(--sun-ink); font: 700 0.8rem/1.2 var(--font-body);
+  padding: 5px 9px; border-radius: 7px; white-space: nowrap;
+}
+.loading {
+  position: absolute; inset: 0; z-index: 4; display: grid; place-content: center; gap: 12px; text-align: center; padding: 24px;
+  background: radial-gradient(ellipse at center, #13285a, var(--night-2) 70%);
+}
+.loading p { margin: 0; font-weight: 700; }
+.loading .sub { font-weight: 400; color: var(--ink-soft); font-size: 0.9rem; }
+.loading .bar { width: min(280px, 70vw); height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; margin: 0 auto; }
+.loading .bar span { display: block; height: 100%; width: 8%; background: var(--sun); transition: width .35s ease; }
+.loading .btn { justify-self: center; }
+
+/* ---------- Projection tray ---------- */
+.dial { grid-area: dial; display: grid; grid-template-columns: 3fr 4fr 2fr; gap: 12px; min-width: 0; }
+.fam { display: grid; grid-template-rows: auto 1fr; gap: 6px; min-width: 0; }
+.fam-name {
+  display: flex; align-items: center; gap: 8px; margin: 0;
+  font: 700 0.68rem/1 var(--font-body); letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-soft);
+}
+.fam-name::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+.tiles { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 6px; }
+.tile {
+  position: relative; min-width: 0; display: grid; justify-items: center; align-content: start; gap: 3px;
+  padding: 7px 5px 8px; border-radius: 13px; cursor: pointer; color: var(--ink); font-family: var(--font-body);
+  border: 1px solid var(--line); background: linear-gradient(180deg, var(--panel), var(--night-2));
+  transition: transform .15s ease, border-color .15s ease;
+}
+.tile:hover { border-color: var(--ink-soft); transform: translateY(-1px); }
+.tile canvas { width: 100%; max-width: 112px; aspect-ratio: 5 / 3; height: auto; display: block; }
+.tile .nm { font-weight: 700; font-size: 0.8rem; line-height: 1.15; text-align: center; text-wrap: balance; }
+.tile .tg { font-size: 0.68rem; line-height: 1.2; color: var(--ink-soft); text-align: center; }
+.tile .key { position: absolute; top: 5px; left: 7px; font: 400 0.64rem/1 var(--font-data); color: var(--ink-soft); }
+.tile[aria-pressed="true"] {
+  border-color: var(--sun);
+  background: linear-gradient(180deg, rgba(255, 201, 60, 0.16), rgba(255, 201, 60, 0.04)), var(--night-2);
+  box-shadow: 0 0 0 1px var(--sun), 0 8px 22px -12px rgba(255, 201, 60, 0.8);
+}
+.tile[aria-pressed="true"] .nm, .tile[aria-pressed="true"] .key { color: var(--sun); }
+@media (min-width: 900px) and (max-height: 700px) {
+  .tile .tg { display: none; }
+  .tile canvas { max-width: 84px; }
+  .brand p { display: none; }
+}
+@media (max-width: 639px) {
+  .dial { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+  .fam, .tiles { display: contents; }
+  .fam-name, .tile .key, .tile .tg { display: none; }
+  .tile { grid-template-columns: 38px minmax(0, 1fr); justify-items: start; align-items: center; gap: 6px; padding: 6px; border-radius: 11px; }
+  .tile canvas { width: 38px; }
+  .tile .nm { font-size: 0.74rem; text-align: left; }
+}
+
+/* ---------- Notes panel ---------- */
+.info {
+  grid-area: info; min-width: 0; min-height: 0; display: flex; flex-direction: column;
+  background: linear-gradient(180deg, var(--panel), var(--night-2) 140%);
+  border: 1px solid var(--line); border-radius: 20px; overflow: hidden;
+}
+.tabs { display: flex; gap: 2px; padding: 6px; border-bottom: 1px solid var(--line); flex: none; }
+.tab {
+  flex: 1; min-height: 38px; border: 0; border-radius: 10px; background: transparent; color: var(--ink-soft);
+  font: 700 0.86rem/1 var(--font-body); cursor: pointer;
+}
+.tab:hover { color: var(--ink); background: var(--panel-2); }
+.tab[aria-selected="true"] { color: var(--sun-ink); background: var(--sun); }
+.panels { min-height: 0; flex: 1; overflow-y: auto; overscroll-behavior: contain; }
+.panel { padding: 16px 18px 20px; }
+.eyebrow { margin: 0 0 6px; font: 700 0.7rem/1.2 var(--font-body); letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-soft); }
+.pname { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: 1.45rem; line-height: 1.1; letter-spacing: -0.01em; text-wrap: balance; }
+.ver { font: 400 0.76rem/1 var(--font-data); color: var(--ink-soft); letter-spacing: 0; margin-left: 6px; vertical-align: middle; }
+.tagline { margin: 8px 0 0; font-size: 1.08rem; line-height: 1.4; }
+.badges { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+.badge { font: 700 0.68rem/1 var(--font-body); letter-spacing: 0.08em; text-transform: uppercase; padding: 5px 8px; border-radius: 6px; border: 1px solid var(--line); color: var(--ink); }
+.badge.ea { border-color: rgba(98, 222, 158, 0.6); color: var(--kept); }
+.props { list-style: none; padding: 0; margin: 14px 0 0; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.prop { display: grid; grid-template-columns: 24px minmax(0, 1fr); column-gap: 8px; align-items: center; padding: 9px 10px; border-radius: 12px; background: var(--night-2); border: 1px solid var(--line); }
+.prop .ico { grid-row: 1 / span 2; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; font: 700 0.82rem/1 var(--font-data); color: var(--night); }
+.prop .nm { font-weight: 700; font-size: 0.9rem; line-height: 1.2; }
+.prop .st { font-size: 0.78rem; line-height: 1.25; }
+.prop[data-s="kept"] .ico { background: var(--kept); } .prop[data-s="kept"] .st { color: var(--kept); }
+.prop[data-s="nearly"] .ico { background: var(--nearly); } .prop[data-s="nearly"] .st { color: var(--nearly); }
+.prop[data-s="partly"] .ico { background: var(--partly); } .prop[data-s="partly"] .st { color: var(--partly); }
+.prop[data-s="changed"] .ico { background: var(--changed); } .prop[data-s="changed"] .st { color: var(--changed); }
+details.glossary { margin-top: 10px; font-size: 0.88rem; }
+details.glossary summary { cursor: pointer; font-weight: 700; color: var(--sun); min-height: 30px; display: flex; align-items: center; }
+details.glossary dl { margin: 6px 0 0; display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; }
+details.glossary dt { font-weight: 700; }
+details.glossary dd { margin: 0; color: var(--ink-soft); }
+details.glossary p { margin: 8px 0 0; color: var(--ink-soft); }
+.panel h3 { margin: 18px 0 4px; font: 700 0.72rem/1.2 var(--font-body); letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-soft); }
+.panel p { margin: 0; max-width: 65ch; }
+.try { margin-top: 18px; padding: 12px 14px; border-radius: 14px; background: rgba(255, 201, 60, 0.1); border: 1px solid rgba(255, 201, 60, 0.45); }
+.try h3 { margin-top: 0; color: var(--sun); }
+.wkid { margin-top: 16px !important; font: 0.74rem/1.45 var(--font-data); color: var(--ink-soft); }
+.hint { color: var(--ink-soft); font-size: 0.9rem; }
+
+.viz { margin-top: 12px; border-radius: 14px; background: var(--night-2); border: 1px solid var(--line); padding: 8px; }
+.viz svg { width: 100%; height: auto; max-height: 130px; display: block; }
+.viz-key { display: flex; gap: 14px; justify-content: center; font-size: 0.78rem; color: var(--ink-soft); margin-top: 2px; }
+.viz-key i { display: inline-block; width: 18px; height: 10px; border-radius: 50%; vertical-align: -1px; margin-right: 5px; }
+.viz-key .k-true { border: 1.5px dashed var(--ink-soft); }
+.viz-key .k-map { background: rgba(255, 93, 115, 0.5); border: 1.5px solid var(--ink); }
+.readout { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+.metric { padding: 10px 12px; border-radius: 12px; background: var(--night-2); border: 1px solid var(--line); min-width: 0; }
+.metric .lbl { font-size: 0.76rem; color: var(--ink-soft); font-weight: 700; }
+.metric .val { font: 600 1.75rem/1.1 var(--font-data); font-variant-numeric: tabular-nums; color: var(--coral); }
+.metric .val small { font-size: 0.9rem; color: var(--ink-soft); }
+.metric .note { font-size: 0.8rem; line-height: 1.3; margin-top: 3px; }
+.where { margin-top: 10px !important; font-size: 0.88rem; color: var(--ink-soft); }
+.where b { color: var(--ink); font-family: var(--font-data); font-weight: 600; }
+.units { display: inline-flex; border: 1.5px solid var(--line); border-radius: 999px; overflow: hidden; margin-top: 12px; }
+.units button { font: 700 0.8rem/1 var(--font-body); min-height: 34px; padding: 0 14px; border: 0; background: transparent; color: var(--ink-soft); cursor: pointer; }
+.units button[aria-pressed="true"] { background: var(--sun); color: var(--sun-ink); }
+
+.pairs { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }
+.pair-btn { font: 700 0.82rem/1.15 var(--font-body); min-height: 36px; padding: 6px 12px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--night-2); color: var(--ink); cursor: pointer; }
+.pair-btn[aria-pressed="true"] { border-color: var(--sun); color: var(--sun); }
+.bars { margin-top: 14px; display: grid; gap: 12px; }
+.bar-group h4 { margin: 0 0 6px; font: 700 0.72rem/1.2 var(--font-body); letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-soft); }
+.bar-row { display: grid; grid-template-columns: 84px 1fr; align-items: center; gap: 8px; margin-top: 4px; }
+.bar-row .nm { font-size: 0.84rem; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bar-track { height: 16px; border-radius: 8px; background: var(--night-2); border: 1px solid var(--line); position: relative; overflow: hidden; }
+.bar-fill { position: absolute; inset: 0 auto 0 0; border-radius: 8px; transition: width .6s ease; min-width: 4px; }
+.bar-fill.a { background: var(--sun); } .bar-fill.b { background: var(--sky); }
+.cmp-text { margin-top: 12px !important; }
+.cmp-text strong { font-family: var(--font-data); color: var(--sun); }
+.verdict { margin-top: 10px !important; font-weight: 700; padding: 9px 12px; border-radius: 12px; background: var(--night-2); border: 1px solid var(--line); }
+
+/* ---------- About dialog ---------- */
+dialog { width: min(720px, calc(100vw - 32px)); max-height: calc(100dvh - 48px); border: 1px solid var(--line); border-radius: 20px; padding: 0; background: var(--panel); color: var(--ink); }
+dialog::backdrop { background: rgba(4, 10, 25, 0.7); }
+.dlg-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 16px 20px; border-bottom: 1px solid var(--line); position: sticky; top: 0; background: var(--panel); }
+.dlg-head h2 { margin: 0; font-family: var(--font-display); font-size: 1.2rem; }
+.dlg-body { padding: 16px 20px 22px; }
+.dlg-body h3 { font: 700 0.72rem/1.2 var(--font-body); letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-soft); margin: 18px 0 6px; }
+.dlg-body p, .dlg-body li { max-width: 65ch; }
+.dlg-body ul { padding-left: 1.2em; margin: 6px 0; }
+.dlg-body a { color: var(--sun); }
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 0.86rem; }
+th, td { text-align: left; padding: 7px 10px 7px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-weight: 700; color: var(--ink-soft); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; }
+td.v { font-family: var(--font-data); white-space: nowrap; color: var(--sun); }
+kbd { font-family: var(--font-data); font-size: 0.85em; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 5px; padding: 1px 6px; background: var(--night-2); }
+.icon-btn { width: 42px; height: 42px; border-radius: 50%; border: 1px solid var(--line); background: transparent; color: var(--ink); cursor: pointer; display: grid; place-items: center; }
+.icon-btn svg { width: 17px; height: 17px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .mark .blob { animation: none; }
+  .bar-fill, .loading .bar span, .tile { transition: none; }
+}
+@media (max-width: 520px) {
+  .status { display: none; }
+  .brand p { display: none; }
+  .btn { padding: 0 13px; }
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#info">Skip to projection facts</a>
+<div class="app">
+  <header class="top">
+    <div class="brand">
+      <svg class="mark" viewBox="0 0 42 42" aria-hidden="true">
+        <circle cx="21" cy="21" r="19" fill="#13285a" stroke="#2a3d70" stroke-width="1.5"/>
+        <path d="M2 21h38M21 2v38M6 11h30M6 31h30" stroke="rgba(255,255,255,.18)" stroke-width="1" fill="none"/>
+        <ellipse class="blob" cx="21" cy="21" rx="8" ry="8" fill="rgba(255,93,115,.45)" stroke="#ff5d73" stroke-width="2"/>
+      </svg>
+      <div>
+        <h1>Map <span>Projection</span> Lab</h1>
+        <p>Every flat map stretches the round Earth. Circles that are all the same real size show how.</p>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn sun" id="tourBtn" type="button" aria-pressed="false">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><path id="tourIcon" d="M4 2.5v11l9-5.5z" fill="currentColor"/></svg>
+        <span id="tourLabel">Play tour</span>
+      </button>
+      <button class="btn" id="aboutBtn" type="button">About</button>
+    </div>
+  </header>
+
+  <section class="stage" id="stage" aria-label="Map">
+    <canvas id="gl" aria-hidden="true"></canvas>
+    <canvas id="map" tabindex="0" role="application" aria-roledescription="interactive map" aria-label="World map loading" aria-describedby="mapHelp"></canvas>
+    <p id="mapHelp" class="sr-only">Select the map, then use the arrow keys to move the measuring circle. Hold Shift to move it further. Press 1 to 9 to choose a projection.</p>
+    <div class="stage-top" id="stageTop">
+      <div class="toggles" id="toggles">
+        <button class="tog glass" id="togImagery" type="button" aria-pressed="true" aria-label="Satellite imagery" title="Satellite imagery"><span class="sw img" aria-hidden="true"></span><span class="lbl" aria-hidden="true">Imagery</span></button>
+        <button class="tog glass" id="togCircles" type="button" aria-pressed="true" aria-label="Same-size circles" title="Same-size circles"><span class="sw circ" aria-hidden="true"></span><span class="lbl" aria-hidden="true">Circles</span></button>
+        <button class="tog glass" id="togGrid" type="button" aria-pressed="true" aria-label="Grid lines" title="Grid lines"><span class="sw grid" aria-hidden="true"></span><span class="lbl" aria-hidden="true">Grid lines</span></button>
+      </div>
+    </div>
+    <div class="tip" id="tip" hidden></div>
+    <div class="stage-bottom" id="stageBottom">
+      <div class="stage-foot" id="stageFoot">
+        <button class="attrib glass" id="attrib" type="button" aria-expanded="false">Powered by Esri · Imagery: Esri, Vantor, Earthstar Geographics, and the GIS User Community · Boundaries: Esri, Garmin, CIA World Factbook, National Geographic Society</button>
+        <div class="status glass" id="status" aria-hidden="true">
+          <span id="statusText">Loading…</span><span class="ver" id="statusVer"></span>
+          <span class="prog" id="prog"></span>
+        </div>
+        <div class="credit">Created by Jason Sawle</div>
+      </div>
+    </div>
+    <div class="loading" id="loading" role="status">
+      <p id="loadingMsg">Loading the ArcGIS projection engine…</p>
+      <p class="sub" id="loadingSub">Fetching satellite imagery and country outlines.</p>
+      <div class="bar" aria-hidden="true"><span id="loadingBar"></span></div>
+    </div>
+  </section>
+
+  <nav class="dial" id="dial" aria-label="Choose a map projection"></nav>
+
+  <aside class="info" id="info" tabindex="-1" aria-label="Projection facts and tools">
+    <div class="tabs" role="tablist" aria-label="Panels">
+      <button class="tab" role="tab" id="tab-proj" aria-controls="panel-proj" aria-selected="true" type="button">Projection</button>
+      <button class="tab" role="tab" id="tab-measure" aria-controls="panel-measure" aria-selected="false" tabindex="-1" type="button">Measure</button>
+      <button class="tab" role="tab" id="tab-compare" aria-controls="panel-compare" aria-selected="false" tabindex="-1" type="button">Compare</button>
+    </div>
+    <div class="panels">
+      <section class="panel" role="tabpanel" id="panel-proj" aria-labelledby="tab-proj" tabindex="0">
+        <p class="eyebrow" id="pFamily"></p>
+        <h2 class="pname" id="pName"></h2>
+        <p class="tagline" id="pTagline"></p>
+        <div class="badges" id="pBadges"></div>
+        <ul class="props" id="pProps" aria-label="What this map keeps and what it changes"></ul>
+        <details class="glossary">
+          <summary>What do these words mean?</summary>
+          <dl>
+            <dt>Area</dt><dd>How much space a place takes up.</dd>
+            <dt>Shape</dt><dd>The outline of a place, like the curve of a coastline.</dd>
+            <dt>Distance</dt><dd>How far apart two places are.</dd>
+            <dt>Direction</dt><dd>Which way one place is from another, like north or southeast.</dd>
+          </dl>
+          <p>You can’t flatten a ball without stretching or tearing it, so every flat map changes at least one of these.</p>
+        </details>
+        <h3>What the circles show</h3>
+        <p id="pCircles"></p>
+        <div class="try">
+          <h3>Try this</h3>
+          <p id="pTry"></p>
+        </div>
+        <h3>Where you’ll see it</h3>
+        <p id="pWhere"></p>
+        <h3>Its story</h3>
+        <p id="pHistory"></p>
+        <p class="wkid" id="pWkid"></p>
+      </section>
+
+      <section class="panel" role="tabpanel" id="panel-measure" aria-labelledby="tab-measure" tabindex="0" hidden>
+        <p class="eyebrow">Measuring circle <span class="ver" id="probeVer"></span></p>
+        <p class="hint">Drag the white circle on the map. Or select the map and use the arrow keys.</p>
+        <div class="readout">
+          <div class="metric">
+            <div class="lbl">Size on this map</div>
+            <div class="val" id="mArea">–</div>
+            <div class="note" id="mAreaNote"></div>
+          </div>
+          <div class="metric">
+            <div class="lbl">Shape on this map</div>
+            <div class="val" id="mShape">–</div>
+            <div class="note" id="mShapeNote"></div>
+          </div>
+        </div>
+        <div class="viz">
+          <svg id="shapeSvg" viewBox="0 0 260 124" role="img" aria-label="Shape of the measuring circle"></svg>
+          <div class="viz-key" aria-hidden="true"><span><i class="k-true"></i>True circle</span><span><i class="k-map"></i>On this map</span></div>
+        </div>
+        <p class="where" id="probeWhere"></p>
+        <p class="where" id="probeTrue"></p>
+        <div class="units" role="group" aria-label="Units">
+          <button type="button" id="uMi" aria-pressed="true">Miles</button>
+          <button type="button" id="uKm" aria-pressed="false">Kilometers</button>
+        </div>
+      </section>
+
+      <section class="panel" role="tabpanel" id="panel-compare" aria-labelledby="tab-compare" tabindex="0" hidden>
+        <p class="eyebrow">Compare sizes <span class="ver" id="cmpVer"></span></p>
+        <p class="hint">Highlight two places. Compare their real sizes with how big this map draws them.</p>
+        <div class="pairs" id="pairs" role="group" aria-label="Places to compare"></div>
+        <div id="cmpBody">
+          <div class="bars" aria-hidden="true">
+            <div class="bar-group">
+              <h4>Real Earth</h4>
+              <div class="bar-row"><span class="nm" id="bnA1"></span><span class="bar-track"><span class="bar-fill a" id="bReal1"></span></span></div>
+              <div class="bar-row"><span class="nm" id="bnB1"></span><span class="bar-track"><span class="bar-fill b" id="bReal2"></span></span></div>
+            </div>
+            <div class="bar-group">
+              <h4>On this map</h4>
+              <div class="bar-row"><span class="nm" id="bnA2"></span><span class="bar-track"><span class="bar-fill a" id="bMap1"></span></span></div>
+              <div class="bar-row"><span class="nm" id="bnB2"></span><span class="bar-track"><span class="bar-fill b" id="bMap2"></span></span></div>
+            </div>
+          </div>
+          <p class="cmp-text" id="cmpReal"></p>
+          <p class="cmp-text" id="cmpMap"></p>
+          <p class="verdict" id="cmpVerdict"></p>
+        </div>
+      </section>
+    </div>
+  </aside>
+</div>
+
+<p id="live" class="sr-only" aria-live="polite"></p>
+
+<dialog id="about" aria-labelledby="aboutTitle">
+  <div class="dlg-head">
+    <h2 id="aboutTitle">About Map Projection Lab</h2>
+    <button class="icon-btn" id="aboutClose" type="button" aria-label="Close">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+  <div class="dlg-body">
+    <p>A projection is the math that turns the round Earth into a flat map. This lab draws the same satellite picture of the Earth, and the same circles, in nine projections, and slides every point from one map to the next so you can see what each projection stretches.</p>
+    <h3>How it works</h3>
+    <ul>
+      <li>The satellite picture is the <a href="https://www.arcgis.com/home/item.html?id=10df2279f9684e4a9f6a7f08febac2a9" target="_blank" rel="noopener">World Imagery</a> basemap from Esri. It is stretched over a grid of points, every 2° of latitude and longitude, and the grid is projected like everything else.</li>
+      <li>Country boundaries come from the <a href="https://www.arcgis.com/home/item.html?id=2b93b06dc0dc4e809d3c8db5cb96ba69" target="_blank" rel="noopener">World Countries (Generalized)</a> layer in ArcGIS Living Atlas, simplified in the browser with the ArcGIS generalize operator.</li>
+      <li>Every circle is a true geodesic circle with a 500-mile radius, made with the ArcGIS geodesic buffer operator. On the real Earth they are all exactly the same size.</li>
+      <li>Every point is projected by the ArcGIS projection engine, using the same projection definitions as ArcGIS Pro and ArcGIS Online.</li>
+      <li>To morph, each point slides in a straight line from where it sits on one map to where it sits on the next. The graphics card moves the satellite picture.</li>
+      <li>Real areas are measured on the curved Earth with the ArcGIS geodetic area operator. Map areas are measured flat, on the projected map.</li>
+    </ul>
+    <h3>Keyboard</h3>
+    <ul>
+      <li><kbd>1</kbd> to <kbd>9</kbd>: choose a projection, in the order of the tray under the map.</li>
+      <li>Select the map, then use the arrow keys to move the measuring circle. Hold <kbd>Shift</kbd> to move it further.</li>
+      <li>The tour can be paused at any time. If your device is set to reduce motion, maps switch without animating.</li>
+    </ul>
+    <h3>Versions</h3>
+    <div class="table-wrap"><table id="verTable"></table></div>
+    <h3>Sources</h3>
+    <p id="srcText">Imagery: Esri, Vantor, Earthstar Geographics, and the GIS User Community. Country boundaries: Esri; Garmin International, Inc.; U.S. Central Intelligence Agency (The World Factbook); National Geographic Society. Built with the ArcGIS Maps SDK for JavaScript.</p>
+    <p style="margin-top:8px">Created by Jason Sawle.</p>
+  </div>
+</dialog>
+
+<noscript><p style="padding:16px">This lab needs JavaScript to draw the maps.</p></noscript>
+
+<script type="module">
+/* ==================================================================
+   Map Projection Lab
+   Versions: app + one version per model. Bump a model's version when
+   its maths or data handling changes, and the app version every release.
+   ================================================================== */
+const APP_VERSION = '1.1.0';
+const SDK_VERSION = '5.1';
+const MODELS = {
+  morph:   { name: 'Morph engine',      v: '1.2', what: 'Slides every projected point from one map to the next (eased, 2 seconds). The satellite picture is moved on the graphics card.' },
+  imagery: { name: 'Imagery basemap',   v: '1.0', what: 'Esri World Imagery, zoom level 3 tiles, reshaped to a latitude–longitude grid and draped over a 2° mesh.' },
+  circles: { name: 'Same-size circles', v: '1.0', what: '55 geodesic circles, 500-mile radius, every 30° of longitude at 60°S, 30°S, 0°, 30°N and 60°N.' },
+  probe:   { name: 'Measuring circle',  v: '1.1', what: 'Map area ÷ real area, compared with a circle at the center of the map; shape and tilt from the circle’s longest and shortest axes.' },
+  compare: { name: 'Compare sizes',     v: '1.0', what: 'Real (geodetic) area versus flat area on the projected map.' },
+  data:    { name: 'Country data',      v: '1.0', what: 'Living Atlas World Countries (Generalized), simplified to 0.1° and densified to 1° steps.' },
+};
+
+const COUNTRIES_URL = 'https://services.arcgis.com/P3ePLMYs2RVChkJx/arcgis/rest/services/World_Countries_(Generalized)/FeatureServer/0/query';
+const IMAGERY_URL = 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer';
+const IMAGERY_ZOOM = 3;
+const CIRCLE_RADIUS_MI = 500;
+const PROBE_MAX_LAT = 75;
+const MORPH_MS = 2000;
+const TOUR_HOLD_MS = 5000;
+const D2R = Math.PI / 180;
+const MI_TO_KM = 1.609344;
+const SQMI_PER_SQKM = 0.386102;
+
+const GALL_PETERS_WKT = 'PROJCS["World_Gall_Peters",GEOGCS["GCS_WGS_1984",DATUM["D_WGS_1984",SPHEROID["WGS_1984",6378137.0,298.257223563]],PRIMEM["Greenwich",0.0],UNIT["Degree",0.0174532925199433]],PROJECTION["Cylindrical_Equal_Area"],PARAMETER["False_Easting",0.0],PARAMETER["False_Northing",0.0],PARAMETER["Central_Meridian",0.0],PARAMETER["Standard_Parallel_1",45.0],UNIT["Meter",1.0]]';
+
+/* ---------- Projection definitions (each one is a "model" with its own version) ----------
+   Order = tray order and keys 1–9. Mercator and Equal Earth sit side by side. */
+const PROJECTIONS = [
+  {
+    id: 'plate-carree', name: 'Plate Carrée', short: 'Plate Carrée', v: '1.0', family: 'rect',
+    sr: { wkid: 54001 }, maxLat: 89.999, minLat: -89.999, ref: [0, 0],
+    wkidText: 'ArcGIS WKID 54001 · World Plate Carree',
+    familyText: 'Cylindrical', tags: [], tileTag: 'Simple grid',
+    tagline: 'The simplest grid: every line of latitude and longitude is evenly spaced.',
+    props: { area: ['changed'], shape: ['changed'], distance: ['partly', 'Along north–south lines'], direction: ['changed'] },
+    circles: 'Circles get wider as you go toward the poles, but they stay the same height. Near the poles they turn into wide ovals.',
+    where: 'Computers and satellites use it a lot, because each pixel can stand for the same step of latitude and longitude. The satellite picture in this lab starts out on this grid.',
+    history: 'It is one of the oldest projections. The geographer Marinus of Tyre is often credited with it, around the year 100.',
+    tryThis: 'Drag the measuring circle from the Equator toward the North Pole. Does it stretch up and down, or side to side?',
+    summary: 'Circles stay the same height but get wider toward the poles.'
+  },
+  {
+    id: 'gall-peters', name: 'Gall–Peters', short: 'Gall–Peters', v: '1.0', family: 'rect',
+    sr: { wkt: GALL_PETERS_WKT }, maxLat: 89.999, minLat: -89.999, ref: [0, 0],
+    wkidText: 'Custom ArcGIS definition · Cylindrical Equal Area, standard parallels 45° N and S',
+    familyText: 'Cylindrical · equal area', tags: ['Equal area'], tileTag: 'Equal area',
+    tagline: 'Shows every country at its true size compared with the others.',
+    props: { area: ['kept'], shape: ['changed'], distance: ['changed'], direction: ['changed'] },
+    circles: 'All the circles cover the same amount of map. Near the Equator they are tall, thin ovals. Near the poles they are short, wide ovals. They are round only at 45° north and south.',
+    where: 'Some schools and organizations use it to show the true sizes of countries. In 2017, Boston Public Schools started using it in classrooms.',
+    history: 'James Gall, a Scottish minister, described it in 1855. Arno Peters, a German historian, made it famous in 1973.',
+    tryThis: 'Drag the measuring circle along the Equator, then up to 60° north. Does its size change? Does its shape?',
+    summary: 'Circles all cover the same area but are tall near the Equator and flat near the poles.'
+  },
+  {
+    id: 'mercator', name: 'Mercator', short: 'Mercator', v: '1.0', family: 'rect',
+    sr: { wkid: 3857 }, maxLat: 85, minLat: -85, ref: [0, 0],
+    wkidText: 'ArcGIS WKID 3857 · WGS 1984 Web Mercator (Auxiliary Sphere)',
+    familyText: 'Cylindrical · conformal', tags: [], tileTag: 'Web maps',
+    tagline: 'Made for sailors in 1569. Today it is the map behind most online street maps.',
+    props: { area: ['changed'], shape: ['kept', 'For small areas'], distance: ['changed'], direction: ['kept', 'Compass headings'] },
+    circles: 'Every circle stays round, but circles get much bigger toward the poles. At 60° north a circle is drawn about 4 times bigger than at the Equator.',
+    where: 'Most web maps and phone map apps, because streets and buildings keep their shape when you zoom in. Ship navigators use it too: a straight line on this map follows one compass heading.',
+    history: 'Gerardus Mercator, a Flemish mapmaker, published it in 1569. The poles would be infinitely far away, so the web version cuts the map off at about 85° north and south.',
+    tryThis: 'Look at Greenland and Africa. Which looks bigger? Now press 4 to morph to Equal Earth, right next door, and watch them change.',
+    summary: 'Circles stay round but grow much bigger toward the poles.'
+  },
+  {
+    id: 'equal-earth', name: 'Equal Earth', short: 'Equal Earth', v: '1.0', family: 'oval',
+    sr: { wkid: 8857 }, maxLat: 89.999, minLat: -89.999, ref: [0, 0],
+    wkidText: 'ArcGIS WKID 8857 · WGS 1984 Equal Earth (Greenwich)',
+    familyText: 'Pseudocylindrical · equal area', tags: ['Equal area', 'New'], tileTag: 'Equal area',
+    tagline: 'A newer equal-area map, designed in 2018 to look more like a globe.',
+    props: { area: ['kept'], shape: ['changed', 'Less than Gall–Peters'], distance: ['changed'], direction: ['changed'] },
+    circles: 'All circles cover the same amount of map. They flatten toward the poles, but less than on Gall–Peters.',
+    where: 'World maps of data where fair sizes matter, such as climate or population maps.',
+    history: 'Bojan Šavrič (who works at Esri), Tom Patterson and Bernhard Jenny created it in 2018. News that Boston schools had switched to Gall–Peters inspired them to make an equal-area map with more familiar shapes.',
+    tryThis: 'Press 3 for Mercator and 4 for Equal Earth a few times. Watch Greenland shrink and Africa grow. Which map shows their true sizes?',
+    summary: 'Circles all cover the same area and flatten a little toward the poles.'
+  },
+  {
+    id: 'robinson', name: 'Robinson', short: 'Robinson', v: '1.0', family: 'oval',
+    sr: { wkid: 54030 }, maxLat: 89.999, minLat: -89.999, ref: [0, 0],
+    wkidText: 'ArcGIS WKID 54030 · World Robinson',
+    familyText: 'Pseudocylindrical · compromise', tags: ['Compromise'], tileTag: 'Compromise',
+    tagline: 'A compromise map: nothing is perfect, but nothing is badly wrong.',
+    props: { area: ['nearly'], shape: ['nearly'], distance: ['nearly'], direction: ['nearly'] },
+    circles: 'Circles near the poles are a bit bigger and a bit squashed, but much less than on Mercator.',
+    where: 'Atlases and classroom wall maps. National Geographic used it for its world maps from 1988 to 1998.',
+    history: 'Arthur Robinson designed it in 1963. Instead of starting from one math rule, he adjusted it by eye until the world looked right.',
+    tryThis: 'Put the measuring circle at 60° north, then switch to Mercator. How much bigger does it get?',
+    summary: 'Circles grow a little and flatten a little toward the poles.'
+  },
+  {
+    id: 'winkel-tripel', name: 'Winkel Tripel', short: 'Winkel Tripel', v: '1.0', family: 'oval',
+    sr: { wkid: 54042 }, maxLat: 89.999, minLat: -89.999, ref: [0, 0],
+    wkidText: 'ArcGIS WKID 54042 · World Winkel Tripel NGS',
+    familyText: 'Compromise · modified azimuthal', tags: ['Compromise'], tileTag: 'Compromise',
+    tagline: 'National Geographic’s choice for world maps since 1998.',
+    props: { area: ['nearly'], shape: ['nearly'], distance: ['nearly'], direction: ['nearly'] },
+    circles: 'Circles grow a little toward the poles and lean slightly near the edges. The changes are spread out, so no part of the map is badly wrong.',
+    where: 'National Geographic world maps, and many atlases and textbooks.',
+    history: 'Oswald Winkel, a German mapmaker, created it in 1921. “Tripel” is German for “triple”: it tries to keep three kinds of error small: area, direction and distance.',
+    tryThis: 'Switch between Robinson and Winkel Tripel. Watch Greenland and Antarctica. Which map makes them bigger?',
+    summary: 'Circles grow a little toward the poles and lean near the edges.'
+  },
+  {
+    id: 'mollweide', name: 'Mollweide', short: 'Mollweide', v: '1.0', family: 'oval',
+    sr: { wkid: 54009 }, maxLat: 89.999, minLat: -89.999, ref: [0, 0],
+    wkidText: 'ArcGIS WKID 54009 · World Mollweide',
+    familyText: 'Pseudocylindrical · equal area', tags: ['Equal area'], tileTag: 'Equal area',
+    tagline: 'An equal-area oval, twice as wide as it is tall.',
+    props: { area: ['kept'], shape: ['changed'], distance: ['changed'], direction: ['changed'] },
+    circles: 'Every circle covers the same amount of map. Near the left and right edges, and near the poles, they squash and lean.',
+    where: 'Scientists use it for maps of the whole sky, and for world maps of data where fair sizes matter.',
+    history: 'Karl Mollweide, a German mathematician and astronomer, published it in 1805.',
+    tryThis: 'Drag the measuring circle to the far left edge, near the top. What happens to its shape? Does its size change?',
+    summary: 'Circles all cover the same area but squash and lean near the edges.'
+  },
+  {
+    id: 'polar-equidistant', name: 'Polar Azimuthal Equidistant', short: 'Polar Equidistant', v: '1.0', family: 'disc',
+    sr: { wkid: 102016 }, maxLat: 89.999, minLat: -89.5, ref: [0, 88],
+    wkidText: 'ArcGIS WKID 102016 · North Pole Azimuthal Equidistant',
+    familyText: 'Azimuthal · centered on the North Pole', tags: ['Polar'], tileTag: 'Polar',
+    tagline: 'The world seen from above the North Pole, with true distances from the center.',
+    props: { area: ['changed'], shape: ['changed'], distance: ['partly', 'From the North Pole'], direction: ['partly', 'From the North Pole'] },
+    circles: 'Near the center, circles stay round and the right size. Farther out they stretch sideways more and more. The South Pole becomes the whole outer edge, so Antarctica wraps around the map like a ring.',
+    where: 'The flag of the United Nations shows the world this way. It also helps you measure how far places are from one point, here the North Pole.',
+    history: 'It is sometimes called the Postel projection, after the French scholar Guillaume Postel, who used it in 1581. The idea is even older than that.',
+    tryThis: 'Drag the measuring circle from near the North Pole down to South America. How does its shape change?',
+    summary: 'Circles near the center are right; farther out they stretch sideways.'
+  },
+  {
+    id: 'polar-equal-area', name: 'Lambert Azimuthal Equal-Area', short: 'Polar Equal-Area', v: '1.0', family: 'disc',
+    sr: { wkid: 102017 }, maxLat: 89.999, minLat: -89.5, ref: [0, 88],
+    wkidText: 'ArcGIS WKID 102017 · North Pole Lambert Azimuthal Equal Area',
+    familyText: 'Azimuthal · centered on the North Pole · equal area', tags: ['Polar', 'Equal area'], tileTag: 'Equal area',
+    tagline: 'A view from above the North Pole that keeps every area true.',
+    props: { area: ['kept'], shape: ['changed'], distance: ['changed'], direction: ['partly', 'From the North Pole'] },
+    circles: 'Every circle covers the same amount of map. Toward the edge they get flatter: stretched sideways and squeezed toward the center.',
+    where: 'Scientists use it for maps of the Arctic and Antarctic, such as snow and sea ice data, because areas stay fair.',
+    history: 'Johann Heinrich Lambert, a Swiss mathematician, described it in 1772.',
+    tryThis: 'Compare this map with Polar Equidistant, next door. Look at Antarctica around the outer edge. Which map makes it bigger?',
+    summary: 'Circles all cover the same area but flatten toward the edge.'
+  },
+];
+const PROJ = Object.fromEntries(PROJECTIONS.map(p => [p.id, p]));
+const FAMILIES = [
+  { id: 'rect', label: 'Rectangles' },
+  { id: 'oval', label: 'Rounded' },
+  { id: 'disc', label: 'Polar' },
+];
+const STATE_WORDS = { kept: 'Kept', nearly: 'Nearly kept', partly: 'Partly kept', changed: 'Distorted' };
+const STATE_ICONS = { kept: '✓', nearly: '≈', partly: '◐', changed: '✕' };
+
+/* ---------- Size comparison subjects ---------- */
+const AFRICA_ISO = ['DZ','AO','BJ','BW','BF','BI','CV','CM','CF','TD','KM','CG','CD','CI','DJ','EG','GQ','ER','SZ','ET','GA','GM','GH','GN','GW','KE','LS','LR','LY','MG','MW','ML','MR','MU','YT','MA','MZ','NA','NE','NG','RE','RW','SH','ST','SN','SC','SL','SO','ZA','SS','SD','TZ','TG','TN','UG','ZM','ZW','EH'];
+const SUBJECTS = {
+  GL: { label: 'Greenland', match: f => f.ISO === 'GL', anchor: [-41, 73] },
+  AF: { label: 'Africa', match: f => AFRICA_ISO.includes(f.ISO) || f.COUNTRY === 'Canarias', anchor: [19, 6] },
+  CD: { label: 'DR Congo', match: f => f.ISO === 'CD', anchor: [23.5, -2.5] },
+  RU: { label: 'Russia', match: f => f.ISO === 'RU', anchor: [98, 63] },
+};
+const PAIRS = [
+  { id: 'gl-af', a: 'GL', b: 'AF', label: 'Greenland vs Africa' },
+  { id: 'gl-cd', a: 'GL', b: 'CD', label: 'Greenland vs DR Congo' },
+  { id: 'ru-af', a: 'RU', b: 'AF', label: 'Russia vs Africa' },
+  { id: 'none', label: 'None' },
+];
+
+/* ---------- Map colors (single dark look) ---------- */
+const C = {
+  grat: 'rgba(255,255,255,0.2)', equator: 'rgba(255,255,255,0.5)',
+  borderImg: 'rgba(255,255,255,0.42)', borderFlat: 'rgba(40,52,40,0.55)',
+  ocean: '#1c3a6c', land: '#cdbf98',
+  edge: 'rgba(175,205,255,0.6)', glow: 'rgba(120,170,255,0.45)',
+  circle: '#ff5d73', circleFill: 'rgba(255,93,115,0.24)',
+  probeFill: 'rgba(255,93,115,0.42)', probeLine: '#ffffff', halo: 'rgba(8,16,38,0.92)',
+  hiA: 'rgba(255,201,60,0.34)', hiAline: '#ffc93c', hiB: 'rgba(92,225,230,0.28)', hiBline: '#5ce1e6',
+  label: '#ffffff',
+};
+
+/* ---------- App state ---------- */
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
+const state = {
+  current: 'mercator',
+  ready: false,
+  morph: null,
+  showImagery: true,
+  showCircles: true,
+  showGrid: true,
+  units: 'mi',
+  pair: 'gl-af',
+  probe: { lon: -105, lat: 45 },
+  touring: false,
+  tourTimer: null,
+  tab: 'proj',
+};
+const hashId = decodeURIComponent(location.hash.slice(1));
+if (PROJ[hashId]) state.current = hashId;
+
+/* ---------- DOM ---------- */
+const $ = id => document.getElementById(id);
+const canvas = $('map');
+const ctx = canvas.getContext('2d');
+const glCanvas = $('gl');
+const stage = $('stage');
+let W = 0, H = 0, DPR = 1;
+let fontsReady = false;
+
+/* ---------- Esri modules ---------- */
+let projectOperator, geodesicBufferOperator, geodeticAreaOperator, generalizeOperator;
+let SpatialReference, Point, Polygon, Multipoint, WGS;
+
+/* ---------- Geometry stores ---------- */
+const world = { ll: null, outline: [], gratMinor: [], gratMajor: [], countries: [], circles: [], anchors: {}, subjectTrueKm2: {} };
+const mesh = { ll: null, uv: null, idx: null, count: 0 };
+const probe = { ll: null, trueM2: 0, cache: {} };
+
+/* ================================================================
+   Startup
+   ================================================================ */
+buildDial();
+buildPairs();
+buildTabs();
+updateInfo();
+updateUnitsUI();
+$('probeVer').textContent = 'v' + MODELS.probe.v;
+$('cmpVer').textContent = 'v' + MODELS.compare.v;
+buildVersionTable();
+resize();
+new ResizeObserver(() => resize()).observe(stage);
+
+start().catch(err => { console.error(err); showLoadError(); });
+
+async function start() {
+  setLoading('Loading the ArcGIS projection engine…', 8);
+  const imageryJob = loadImagery().catch(e => { console.warn('Imagery unavailable', e); return null; });
+  const attribJob = fetch(IMAGERY_URL + '?f=json').then(r => r.json()).then(j => j.copyrightText).catch(() => null);
+
+  const t0 = performance.now();
+  while (!globalThis.$arcgis?.import) {
+    if (performance.now() - t0 > 30000) throw new Error('ArcGIS SDK did not load');
+    await new Promise(r => setTimeout(r, 40));
+  }
+  [projectOperator, geodesicBufferOperator, geodeticAreaOperator, generalizeOperator, SpatialReference, Point, Polygon, Multipoint] =
+    await $arcgis.import([
+      '@arcgis/core/geometry/operators/projectOperator.js',
+      '@arcgis/core/geometry/operators/geodesicBufferOperator.js',
+      '@arcgis/core/geometry/operators/geodeticAreaOperator.js',
+      '@arcgis/core/geometry/operators/generalizeOperator.js',
+      '@arcgis/core/geometry/SpatialReference.js',
+      '@arcgis/core/geometry/Point.js',
+      '@arcgis/core/geometry/Polygon.js',
+      '@arcgis/core/geometry/Multipoint.js',
+    ]);
+  setLoading('Loading the ArcGIS projection engine…', 25);
+  await Promise.all([projectOperator.load(), geodesicBufferOperator.load(), geodeticAreaOperator.load()]);
+  WGS = new SpatialReference({ wkid: 4326 });
+  for (const p of PROJECTIONS) p.srObj = new SpatialReference(p.sr);
+
+  setLoading('Fetching countries from ArcGIS Living Atlas…', 40);
+  const params = new URLSearchParams({ where: '1=1', outFields: 'COUNTRY,ISO', returnGeometry: 'true', outSR: '4326', geometryPrecision: '2', f: 'json' });
+  const resp = await fetch(COUNTRIES_URL + '?' + params.toString());
+  if (!resp.ok) throw new Error('Countries request failed: ' + resp.status);
+  const data = await resp.json();
+  if (!data.features?.length) throw new Error('No countries returned');
+
+  setLoading('Building the world and the circles…', 58);
+  await nextFrame();
+  buildWorld(data.features);
+  buildMesh();
+
+  setLoading('Projecting the world nine ways…', 72);
+  await nextFrame();
+  for (const p of PROJECTIONS) projectWorld(p);
+  setProbe(state.probe.lon, state.probe.lat, false);
+
+  setLoading('Draping the satellite imagery…', 88);
+  const imagery = await imageryJob;
+  const copyright = await attribJob;
+  if (copyright) {
+    $('attrib').textContent = `Powered by Esri · Imagery: ${copyright.replace(/^Source:\s*/i, '')} · Boundaries: Esri, Garmin, CIA World Factbook, National Geographic Society`;
+  }
+  initGL(imagery);
+  if (!glReady) {
+    state.showImagery = false;
+    $('togImagery').hidden = true;
+  }
+
+  state.ready = true;
+  resize();
+  drawThumbnails();
+  $('loading').hidden = true;
+  updateReadouts();
+  updateStatus();
+  updateAria();
+  render();
+  if (document.fonts?.ready) document.fonts.ready.then(() => { fontsReady = true; render(); });
+}
+
+function setLoading(msg, pct) { $('loadingMsg').textContent = msg; $('loadingBar').style.width = pct + '%'; }
+function showLoadError() {
+  const box = $('loading');
+  box.hidden = false;
+  $('loadingMsg').textContent = 'The maps couldn’t load.';
+  $('loadingSub').textContent = 'This lab needs an internet connection to reach ArcGIS. Check your connection, then try again.';
+  $('loadingBar').parentElement.hidden = true;
+  if (!$('retryBtn')) {
+    const b = document.createElement('button');
+    b.className = 'btn sun'; b.id = 'retryBtn'; b.type = 'button'; b.textContent = 'Try again';
+    b.addEventListener('click', () => location.reload());
+    box.appendChild(b);
+  }
+  $('statusText').textContent = 'Not loaded';
+}
+const nextFrame = () => new Promise(r => requestAnimationFrame(() => r()));
+
+/* ================================================================
+   Satellite imagery: Esri World Imagery tiles → lat/long picture
+   ================================================================ */
+async function loadImagery() {
+  const N = 2 ** IMAGERY_ZOOM, TS = 256, S = N * TS;
+  const merc = document.createElement('canvas'); merc.width = S; merc.height = S;
+  const mctx = merc.getContext('2d');
+  const jobs = [];
+  for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
+    jobs.push(new Promise((res, rej) => {
+      const im = new Image();
+      im.crossOrigin = 'anonymous';
+      im.onload = () => { mctx.drawImage(im, x * TS, y * TS); res(); };
+      im.onerror = () => rej(new Error('tile ' + y + '/' + x));
+      im.src = `${IMAGERY_URL}/tile/${IMAGERY_ZOOM}/${y}/${x}`;
+    }));
+  }
+  await Promise.all(jobs);
+  // Re-sample Web Mercator rows onto an even latitude grid (2:1 picture)
+  const EW = S, EH = S / 2;
+  const eq = document.createElement('canvas'); eq.width = EW; eq.height = EH;
+  const ectx = eq.getContext('2d', { willReadFrequently: true });
+  const MAXLAT = 85.0511287798;
+  let first = -1, last = -1;
+  for (let j = 0; j < EH; j++) {
+    const lat = 90 - (j + 0.5) * 180 / EH;
+    if (Math.abs(lat) > MAXLAT) continue;
+    const phi = lat * D2R;
+    const sy = (1 - Math.log(Math.tan(Math.PI / 4 + phi / 2)) / Math.PI) / 2 * S;
+    ectx.drawImage(merc, 0, Math.max(0, Math.min(S - 1, sy - 0.5)), S, 1, 0, j, EW, 1);
+    if (first < 0) first = j;
+    last = j;
+  }
+  // Web Mercator stops at 85°; blend the polar caps from the edge row toward its average color
+  const fillCap = (edgeRow, from, to) => {
+    if (from > to) return;
+    const edge = ectx.getImageData(0, edgeRow, EW, 1).data;
+    let r = 0, g = 0, b = 0;
+    for (let i = 0; i < EW; i++) { r += edge[4 * i]; g += edge[4 * i + 1]; b += edge[4 * i + 2]; }
+    r /= EW; g /= EW; b /= EW;
+    const n = to - from + 1;
+    const img = ectx.createImageData(EW, n);
+    for (let k = 0; k < n; k++) {
+      const row = from + k;
+      const t = Math.min(1, Math.abs(row - edgeRow) / n);
+      for (let i = 0; i < EW; i++) {
+        const o = 4 * (k * EW + i);
+        img.data[o] = edge[4 * i] + (r - edge[4 * i]) * t;
+        img.data[o + 1] = edge[4 * i + 1] + (g - edge[4 * i + 1]) * t;
+        img.data[o + 2] = edge[4 * i + 2] + (b - edge[4 * i + 2]) * t;
+        img.data[o + 3] = 255;
+      }
+    }
+    ectx.putImageData(img, 0, from);
+  };
+  fillCap(first, 0, first - 1);
+  fillCap(last, last + 1, EH - 1);
+  return eq;
+}
+
+/* ================================================================
+   Geometry building
+   ================================================================ */
+function buildWorld(features) {
+  const ll = [];
+  const pushRing = (ring, maxStep) => {
+    const start = ll.length / 2;
+    for (let i = 0; i < ring.length; i++) {
+      const x = ring[i][0], y = ring[i][1];
+      if (i > 0 && isFinite(maxStep)) {
+        const px = ring[i - 1][0], py = ring[i - 1][1];
+        const n = Math.ceil(Math.max(Math.abs(x - px), Math.abs(y - py)) / maxStep);
+        for (let k = 1; k < n; k++) ll.push(px + (x - px) * k / n, py + (y - py) * k / n);
+      }
+      ll.push(x, y);
+    }
+    return [start, ll.length / 2 - start];
+  };
+
+  const o = [];
+  for (let x = -180; x <= 180; x += 2) o.push([x, 90]);
+  for (let y = 90; y >= -90; y -= 1) o.push([180, y]);
+  for (let x = 180; x >= -180; x -= 2) o.push([x, -90]);
+  for (let y = -90; y <= 90; y += 1) o.push([-180, y]);
+  world.outline = [pushRing(o, Infinity)];
+
+  for (let lon = -180; lon <= 180; lon += 30) {
+    const line = []; for (let lat = -90; lat <= 90; lat += 2) line.push([lon, lat]);
+    world.gratMinor.push(pushRing(line, Infinity));
+  }
+  for (let lat = -60; lat <= 60; lat += 30) {
+    const line = []; for (let lon = -180; lon <= 180; lon += 2) line.push([lon, lat]);
+    (lat === 0 ? world.gratMajor : world.gratMinor).push(pushRing(line, Infinity));
+  }
+
+  // One call per country: executeMany drops empty results, which would shift names onto the wrong shapes.
+  features.forEach(f => {
+    const rings0 = f.geometry?.rings;
+    if (!rings0?.length) return;
+    const g = generalizeOperator.execute(new Polygon({ rings: rings0, spatialReference: WGS }), 0.1, { removeDegenerateParts: true });
+    if (!g || !g.rings?.length) return;
+    const rings = g.rings.filter(r => r.length >= 4).map(r => pushRing(r, 1));
+    if (!rings.length) return;
+    const attrs = f.attributes;
+    const c = { name: attrs.COUNTRY, iso: attrs.ISO, rings, subjects: [] };
+    for (const [sid, s] of Object.entries(SUBJECTS)) {
+      if (s.match(attrs)) {
+        c.subjects.push(sid);
+        world.subjectTrueKm2[sid] = (world.subjectTrueKm2[sid] || 0) + geodeticAreaOperator.execute(g, { unit: 'square-kilometers' });
+      }
+    }
+    world.countries.push(c);
+  });
+
+  for (const lat of [-60, -30, 0, 30, 60]) {
+    for (let lon = -150; lon <= 150; lon += 30) {
+      world.circles.push({ lon, lat, rings: [pushRing(circleRing(lon, lat, CIRCLE_RADIUS_MI), Infinity)] });
+    }
+  }
+
+  for (const [sid, s] of Object.entries(SUBJECTS)) {
+    world.anchors[sid] = ll.length / 2;
+    ll.push(s.anchor[0], s.anchor[1]);
+  }
+  world.ll = new Float64Array(ll);
+}
+
+/* A 2° grid of points that carries the satellite picture. Extra rows at ±85° keep the Mercator edge exact. */
+function buildMesh() {
+  const lons = []; for (let x = -180; x <= 180; x += 2) lons.push(x);
+  const lats = [90, 88, 86, 85]; for (let y = 84; y >= -84; y -= 2) lats.push(y); lats.push(-85, -86, -88, -90);
+  const cols = lons.length, rows = lats.length;
+  mesh.ll = new Float64Array(cols * rows * 2);
+  mesh.uv = new Float32Array(cols * rows * 2);
+  for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
+    const i = r * cols + c;
+    mesh.ll[2 * i] = lons[c]; mesh.ll[2 * i + 1] = lats[r];
+    mesh.uv[2 * i] = (lons[c] + 180) / 360; mesh.uv[2 * i + 1] = (90 - lats[r]) / 180;
+  }
+  const idx = [];
+  for (let r = 0; r < rows - 1; r++) for (let c = 0; c < cols - 1; c++) {
+    const a = r * cols + c, b = a + 1, d = a + cols, e = d + 1;
+    idx.push(a, d, b, b, d, e);
+  }
+  mesh.idx = new Uint16Array(idx);
+  mesh.count = idx.length;
+}
+
+function circleRing(lon, lat, radiusMi, step = 2) {
+  const poly = geodesicBufferOperator.execute(new Point({ x: lon, y: lat, spatialReference: WGS }), radiusMi, { unit: 'miles' });
+  const src = poly.rings[0];
+  const out = [];
+  for (let i = 0; i < src.length - 1; i += step) out.push(src[i]);
+  out.push(out[0]);
+  return out;
+}
+
+/* Project a flat lon/lat array with the ArcGIS projection engine. Coordinates are clamped to each
+   projection's valid range first, so every point projects and point order is kept (needed to morph). */
+function projectFlat(flat, p) {
+  const n = flat.length / 2;
+  const pts = new Array(n);
+  for (let i = 0; i < n; i++) {
+    const lon = Math.max(-179.999, Math.min(179.999, flat[2 * i]));
+    const lat = Math.max(p.minLat, Math.min(p.maxLat, flat[2 * i + 1]));
+    pts[i] = [lon, lat];
+  }
+  const out = new Float64Array(2 * n);
+  const mp = projectOperator.execute(new Multipoint({ points: pts, spatialReference: WGS }), p.srObj);
+  if (mp && mp.points.length === n) {
+    for (let i = 0; i < n; i++) { out[2 * i] = mp.points[i][0]; out[2 * i + 1] = mp.points[i][1]; }
+  } else {
+    for (let i = 0; i < n; i++) {
+      const q = projectOperator.execute(new Point({ x: pts[i][0], y: pts[i][1], spatialReference: WGS }), p.srObj);
+      out[2 * i] = q ? q.x : NaN; out[2 * i + 1] = q ? q.y : NaN;
+    }
+  }
+  return out;
+}
+
+function projectWorld(p) {
+  p.xy = projectFlat(world.ll, p);
+  p.meshXY = projectFlat(mesh.ll, p);
+  let xmin = Infinity, ymin = Infinity, xmax = -Infinity, ymax = -Infinity;
+  for (const [s, c] of world.outline) for (let i = s; i < s + c; i++) {
+    const x = p.xy[2 * i], y = p.xy[2 * i + 1];
+    if (!isFinite(x) || !isFinite(y)) continue;
+    if (x < xmin) xmin = x; if (x > xmax) xmax = x; if (y < ymin) ymin = y; if (y > ymax) ymax = y;
+  }
+  p.bbox = { xmin, ymin, xmax, ymax };
+  const ring = circleRing(p.ref[0], p.ref[1], 40, 1);
+  const xy = projectFlat(new Float64Array(ring.flat()), p);
+  const realM2 = geodeticAreaOperator.execute(new Polygon({ rings: [ring], spatialReference: WGS }), { unit: 'square-kilometers' }) * 1e6;
+  p.kRef = Math.abs(shoelace(xy, 0, xy.length / 2)) / realM2;
+  p.subjectMapM2 = {};
+  for (const c of world.countries) {
+    if (!c.subjects.length) continue;
+    let a = 0;
+    for (const [s, n] of c.rings) a += shoelace(p.xy, s, n);
+    for (const sid of c.subjects) p.subjectMapM2[sid] = (p.subjectMapM2[sid] || 0) + Math.abs(a);
+  }
+}
+
+function shoelace(xy, s, n) {
+  let a = 0;
+  const x0 = xy[2 * s], y0 = xy[2 * s + 1];
+  for (let i = 0; i < n; i++) {
+    const j = s + i, k = s + ((i + 1) % n);
+    const x1 = xy[2 * j] - x0, y1 = xy[2 * j + 1] - y0, x2 = xy[2 * k] - x0, y2 = xy[2 * k + 1] - y0;
+    a += x1 * y2 - x2 * y1;
+  }
+  return a / 2;
+}
+
+/* Area, principal axes and tilt of a polygon from its second moments.
+   For a filled ellipse the variance along an axis is (semi-axis)² / 4. */
+function polyShape(xy) {
+  const n = xy.length / 2;
+  const x0 = xy[0], y0 = xy[1];
+  let A = 0, Cx = 0, Cy = 0, Sxx = 0, Syy = 0, Sxy = 0;
+  for (let i = 0; i < n; i++) {
+    const j = (i + 1) % n;
+    const xi = xy[2 * i] - x0, yi = xy[2 * i + 1] - y0, xj = xy[2 * j] - x0, yj = xy[2 * j + 1] - y0;
+    const c = xi * yj - xj * yi;
+    A += c; Cx += (xi + xj) * c; Cy += (yi + yj) * c;
+    Sxx += (xi * xi + xi * xj + xj * xj) * c;
+    Syy += (yi * yi + yi * yj + yj * yj) * c;
+    Sxy += (xi * yj + 2 * xi * yi + 2 * xj * yj + xj * yi) * c;
+  }
+  A /= 2; Cx /= (6 * A); Cy /= (6 * A);
+  const vxx = Sxx / (12 * A) - Cx * Cx, vyy = Syy / (12 * A) - Cy * Cy, vxy = Sxy / (24 * A) - Cx * Cy;
+  const tr = vxx + vyy, det = vxx * vyy - vxy * vxy;
+  const disc = Math.sqrt(Math.max(0, tr * tr / 4 - det));
+  const l1 = tr / 2 + disc, l2 = Math.max(0, tr / 2 - disc);
+  return { area: Math.abs(A), a: 2 * Math.sqrt(l1), b: 2 * Math.sqrt(l2), angle: 0.5 * Math.atan2(2 * vxy, vxx - vyy) };
+}
+
+/* ================================================================
+   Measuring circle
+   ================================================================ */
+function clampProbe(lon, lat) {
+  lat = Math.max(-PROBE_MAX_LAT, Math.min(PROBE_MAX_LAT, lat));
+  const r = CIRCLE_RADIUS_MI / 3958.8;
+  const half = Math.asin(Math.min(1, Math.sin(r) / Math.cos(lat * D2R))) / D2R;
+  const lim = 180 - half - 0.5;
+  return [Math.max(-lim, Math.min(lim, lon)), lat];
+}
+function setProbe(lon, lat, redraw = true) {
+  [lon, lat] = clampProbe(lon, lat);
+  state.probe = { lon, lat };
+  const ring = circleRing(lon, lat, CIRCLE_RADIUS_MI);
+  probe.ll = new Float64Array(ring.flat());
+  probe.trueM2 = geodeticAreaOperator.execute(new Polygon({ rings: [ring], spatialReference: WGS }), { unit: 'square-kilometers' }) * 1e6;
+  probe.cache = {};
+  if (redraw) { updateProbeReadout(); render(); }
+}
+function probeFor(p) {
+  let c = probe.cache[p.id];
+  if (!c) c = probe.cache[p.id] = { xy: projectFlat(probe.ll, p), screen: null };
+  if (!c.screen && p.fit) c.screen = toScreen(c.xy, p.fit);
+  return c;
+}
+function probeStats(p) {
+  const sh = polyShape(probeFor(p).xy);
+  const area = (sh.area / probe.trueM2) / p.kRef;
+  const lin = Math.sqrt(probe.trueM2 / Math.PI) * Math.sqrt(p.kRef);
+  return { area, long: sh.a / lin, short: sh.b / lin, angle: sh.angle };
+}
+
+/* ================================================================
+   Fitting and screen coordinates
+   ================================================================ */
+function resize() {
+  const r = stage.getBoundingClientRect();
+  W = Math.max(1, Math.round(r.width)); H = Math.max(1, Math.round(r.height));
+  DPR = Math.min(2, window.devicePixelRatio || 1);
+  canvas.width = Math.round(W * DPR); canvas.height = Math.round(H * DPR);
+  glCanvas.width = canvas.width; glCanvas.height = canvas.height;
+  if (!state.ready) return;
+  if (state.morph) { state.morph = null; afterArrive(); }
+  for (const p of PROJECTIONS) {
+    p.fit = computeFit(p);
+    p.screen = toScreen(p.xy, p.fit);
+    p.meshScreen = toScreen(p.meshXY, p.fit);
+    p.countryBoxes = null;
+  }
+  for (const id in probe.cache) probe.cache[id].screen = null;
+  glUpload('to', PROJ[state.current].meshScreen);
+  render();
+}
+/* Fit the map as large as possible: the bottom row (sources, credit) is always kept clear;
+   the toggles in the top-left corner are avoided by whichever choice leaves the biggest map. */
+function overlayBox(el) {
+  if (!el || !el.offsetParent) return null;
+  const s = stage.getBoundingClientRect(), r = el.getBoundingClientRect();
+  return { l: r.left - s.left, t: r.top - s.top, r: r.right - s.left, b: r.bottom - s.top };
+}
+function fitInto(p, a) {
+  const { xmin, ymin, xmax, ymax } = p.bbox;
+  const bw = xmax - xmin, bh = ymax - ymin;
+  const s = Math.max(1e-9, Math.min((a.R - a.L) / bw, (a.B - a.T) / bh));
+  const cx = (a.L + a.R) / 2, cy = (a.T + a.B) / 2;
+  return { s, tx: cx - s * (xmin + xmax) / 2, ty: cy + s * (ymin + ymax) / 2,
+           rect: { l: cx - s * bw / 2, r: cx + s * bw / 2, t: cy - s * bh / 2, b: cy + s * bh / 2 } };
+}
+function computeFit(p) {
+  const tg = overlayBox($('toggles'));
+  const foot = overlayBox($('stageFoot'));
+  const pad = Math.max(10, W * 0.015);
+  const area = { L: pad, R: W - pad, T: pad, B: (foot ? foot.t : H) - 8 };
+  const options = [area];
+  if (tg) options.push({ ...area, T: tg.b + 8 }, { ...area, L: tg.r + 8 });
+  let best = null;
+  for (const a of options) {
+    const f = fitInto(p, a);
+    if (a === area && tg && f.rect.l < tg.r && f.rect.r > tg.l && f.rect.t < tg.b && f.rect.b > tg.t) continue;
+    if (!best || f.s > best.s) best = f;
+  }
+  return best;
+}
+function toScreen(xy, f) {
+  const out = new Float32Array(xy.length);
+  for (let i = 0; i < xy.length; i += 2) { out[i] = f.tx + f.s * xy[i]; out[i + 1] = f.ty - f.s * xy[i + 1]; }
+  return out;
+}
+
+/* ================================================================
+   WebGL: the satellite picture on a moving mesh
+   ================================================================ */
+let gl = null, glReady = false, glProg = null, glLoc = {}, glBuf = {};
+function initGL(imageCanvas) {
+  if (!imageCanvas) return;
+  try {
+    gl = glCanvas.getContext('webgl', { antialias: true, alpha: true, premultipliedAlpha: true });
+    if (!gl) return;
+    const vs = `attribute vec2 aFrom; attribute vec2 aTo; attribute vec2 aUV;
+      uniform vec2 uRes; uniform float uT; varying vec2 vUV;
+      void main() { vec2 p = mix(aFrom, aTo, uT); vec2 c = p / uRes * 2.0 - 1.0; gl_Position = vec4(c.x, -c.y, 0.0, 1.0); vUV = aUV; }`;
+    const fs = `precision mediump float; varying vec2 vUV; uniform sampler2D uTex;
+      void main() { gl_FragColor = vec4(texture2D(uTex, vUV).rgb, 1.0); }`;
+    const sh = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s)); return s; };
+    glProg = gl.createProgram();
+    gl.attachShader(glProg, sh(gl.VERTEX_SHADER, vs));
+    gl.attachShader(glProg, sh(gl.FRAGMENT_SHADER, fs));
+    gl.linkProgram(glProg);
+    if (!gl.getProgramParameter(glProg, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(glProg));
+    gl.useProgram(glProg);
+    for (const n of ['aFrom', 'aTo', 'aUV']) glLoc[n] = gl.getAttribLocation(glProg, n);
+    for (const n of ['uRes', 'uT', 'uTex']) glLoc[n] = gl.getUniformLocation(glProg, n);
+    glBuf.from = gl.createBuffer(); glBuf.to = gl.createBuffer(); glBuf.uv = gl.createBuffer(); glBuf.idx = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, glBuf.uv); gl.bufferData(gl.ARRAY_BUFFER, mesh.uv, gl.STATIC_DRAW);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, glBuf.idx); gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, mesh.idx, gl.STATIC_DRAW);
+    const empty = new Float32Array(mesh.uv.length);
+    gl.bindBuffer(gl.ARRAY_BUFFER, glBuf.from); gl.bufferData(gl.ARRAY_BUFFER, empty, gl.DYNAMIC_DRAW);
+    gl.bindBuffer(gl.ARRAY_BUFFER, glBuf.to); gl.bufferData(gl.ARRAY_BUFFER, empty, gl.DYNAMIC_DRAW);
+    const tex = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, tex);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, imageCanvas);
+    gl.generateMipmap(gl.TEXTURE_2D);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.uniform1i(glLoc.uTex, 0);
+    glReady = true;
+    glCanvas.addEventListener('webglcontextlost', e => { e.preventDefault(); glReady = false; state.showImagery = false; updateToggles(); render(); });
+  } catch (e) {
+    console.warn('WebGL unavailable', e);
+    glReady = false;
+  }
+}
+function glUpload(which, arr) {
+  if (!glReady || !arr) return;
+  gl.bindBuffer(gl.ARRAY_BUFFER, glBuf[which]);
+  gl.bufferSubData(gl.ARRAY_BUFFER, 0, arr);
+}
+function glDraw(t, resW, resH) {
+  if (!glReady) return;
+  gl.viewport(0, 0, glCanvas.width, glCanvas.height);
+  gl.clearColor(0, 0, 0, 0);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+  if (!state.showImagery) return;
+  gl.useProgram(glProg);
+  gl.uniform2f(glLoc.uRes, resW, resH);
+  gl.uniform1f(glLoc.uT, t);
+  const bind = (buf, loc) => { gl.bindBuffer(gl.ARRAY_BUFFER, buf); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0); };
+  bind(glBuf.from, glLoc.aFrom); bind(glBuf.to, glLoc.aTo); bind(glBuf.uv, glLoc.aUV);
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, glBuf.idx);
+  gl.drawElements(gl.TRIANGLES, mesh.count, gl.UNSIGNED_SHORT, 0);
+}
+
+/* ================================================================
+   Morphing
+   ================================================================ */
+const ease = t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+function morphE() {
+  const m = state.morph;
+  if (!m) return 1;
+  const t = Math.min(1, (performance.now() - m.t0) / m.dur);
+  return { t, e: ease(t) };
+}
+function currentFrame() {
+  const m = state.morph;
+  if (!m) {
+    const p = PROJ[state.current];
+    return { world: p.screen, probe: probeFor(p).screen, t: 1, e: 1 };
+  }
+  const { t, e } = morphE();
+  const to = PROJ[m.to];
+  const A = m.fromScreen, B = to.screen, out = m.buf;
+  for (let i = 0; i < out.length; i++) out[i] = A[i] + (B[i] - A[i]) * e;
+  const PA = m.fromProbe, PB = probeFor(to).screen, pout = m.pbuf;
+  for (let i = 0; i < pout.length; i++) pout[i] = PA[i] + (PB[i] - PA[i]) * e;
+  return { world: out, probe: pout, t, e };
+}
+function currentMesh() {
+  const m = state.morph;
+  if (!m) return PROJ[state.current].meshScreen;
+  const { e } = morphE();
+  const A = m.fromMesh, B = PROJ[m.to].meshScreen, out = new Float32Array(A.length);
+  for (let i = 0; i < out.length; i++) out[i] = A[i] + (B[i] - A[i]) * e;
+  return out;
+}
+
+function goTo(id, opts = {}) {
+  if (!PROJ[id]) return;
+  if (!opts.fromTour && state.touring) stopTour();
+  if (id === state.current && !state.morph) return;
+  const prev = state.current;
+  // Capture where the map is now BEFORE switching, so the morph starts from the old projection
+  let frame = null, meshNow = null;
+  if (state.ready) {
+    const f = currentFrame();
+    frame = { world: Float32Array.from(f.world), probe: Float32Array.from(f.probe) };
+    meshNow = Float32Array.from(currentMesh());
+  }
+  state.current = id;
+  history.replaceState(null, '', '#' + id);
+  updateDial();
+  updateInfo();
+  announce(`${PROJ[id].name} projection. ${PROJ[id].summary}`);
+  if (!state.ready) return;
+
+  const dur = reduceMotion.matches ? 0 : MORPH_MS;
+  glUpload('to', PROJ[id].meshScreen);
+  if (dur === 0) { state.morph = null; afterArrive(); return; }
+  glUpload('from', meshNow);
+  state.morph = {
+    from: prev, to: id, t0: performance.now(), dur,
+    fromScreen: frame.world, fromProbe: frame.probe, fromMesh: meshNow,
+    buf: new Float32Array(frame.world.length), pbuf: new Float32Array(frame.probe.length),
+  };
+  hideTip();
+  updateStatus();
+  updateReadouts();
+  requestAnimationFrame(tick);
+}
+function tick() {
+  if (!state.morph) return;
+  const f = render();
+  $('prog').style.transform = `scaleX(${f ? f.t : 1})`;
+  if (f && f.t >= 1) { state.morph = null; afterArrive(); return; }
+  requestAnimationFrame(tick);
+}
+function afterArrive() {
+  $('prog').style.transform = 'scaleX(0)';
+  updateStatus();
+  updateReadouts();
+  updateAria();
+  render();
+  if (state.touring) scheduleTour();
+}
+
+/* ---------- Tour ---------- */
+function startTour() {
+  state.touring = true;
+  updateTourUI();
+  const i = PROJECTIONS.findIndex(p => p.id === state.current);
+  goTo(PROJECTIONS[(i + 1) % PROJECTIONS.length].id, { fromTour: true });
+}
+function scheduleTour() {
+  clearTimeout(state.tourTimer);
+  state.tourTimer = setTimeout(() => {
+    if (!state.touring) return;
+    const i = PROJECTIONS.findIndex(p => p.id === state.current);
+    goTo(PROJECTIONS[(i + 1) % PROJECTIONS.length].id, { fromTour: true });
+  }, TOUR_HOLD_MS);
+}
+function stopTour() { state.touring = false; clearTimeout(state.tourTimer); updateTourUI(); }
+function updateTourUI() {
+  $('tourBtn').setAttribute('aria-pressed', String(state.touring));
+  $('tourLabel').textContent = state.touring ? 'Pause tour' : 'Play tour';
+  $('tourIcon').setAttribute('d', state.touring ? 'M4 2.5h3v11H4zM9 2.5h3v11H9z' : 'M4 2.5v11l9-5.5z');
+}
+
+/* ================================================================
+   Drawing the vector layer (on top of the imagery)
+   ================================================================ */
+function traceRings(g, cur, rings, close, step = 1) {
+  for (const [s, n] of rings) {
+    const st = n < 24 ? 1 : step;
+    let started = false;
+    const last = s + n - 1;
+    for (let i = s; i <= last; i = (i + st > last && i !== last) ? last : i + st) {
+      const x = cur[2 * i], y = cur[2 * i + 1];
+      if (!isFinite(x) || !isFinite(y)) { started = false; continue; }
+      if (!started) { g.moveTo(x, y); started = true; } else g.lineTo(x, y);
+    }
+    if (close) g.closePath();
+  }
+}
+
+function drawScene(g, cur, morphing) {
+  const step = morphing ? 3 : 1;
+  const imagery = state.showImagery && glReady;
+  g.lineJoin = 'bevel';
+
+  if (!imagery) {
+    g.beginPath(); traceRings(g, cur, world.outline, true);
+    g.fillStyle = C.ocean; g.fill();
+  }
+  if (state.showGrid) {
+    g.beginPath(); traceRings(g, cur, world.gratMinor, false);
+    g.lineWidth = 0.8; g.strokeStyle = C.grat; g.stroke();
+    g.beginPath(); traceRings(g, cur, world.gratMajor, false);
+    g.lineWidth = 1.3; g.strokeStyle = C.equator; g.stroke();
+  }
+  if (!imagery || !morphing) {
+    g.beginPath();
+    for (const c of world.countries) traceRings(g, cur, c.rings, true, step);
+    if (!imagery) { g.fillStyle = C.land; g.fill(); }
+    if (!morphing) { g.lineWidth = imagery ? 0.6 : 0.5; g.strokeStyle = imagery ? C.borderImg : C.borderFlat; g.stroke(); }
+  }
+
+  const pair = PAIRS.find(p => p.id === state.pair);
+  if (pair && pair.a) {
+    for (const [sid, fill, line] of [[pair.a, C.hiA, C.hiAline], [pair.b, C.hiB, C.hiBline]]) {
+      g.beginPath();
+      for (const c of world.countries) if (c.subjects.includes(sid)) traceRings(g, cur, c.rings, true, step);
+      g.fillStyle = fill; g.fill();
+      if (!morphing) { g.lineWidth = 1.4; g.strokeStyle = line; g.stroke(); }
+    }
+  }
+
+  if (state.showCircles) {
+    g.beginPath();
+    for (const c of world.circles) traceRings(g, cur, c.rings, true, morphing ? 2 : 1);
+    g.fillStyle = C.circleFill; g.fill();
+    g.lineWidth = 1.3; g.strokeStyle = C.circle; g.stroke();
+  }
+
+  g.beginPath(); traceRings(g, cur, world.outline, true);
+  g.lineWidth = 1.4; g.strokeStyle = C.edge;
+  if (!morphing) { g.shadowColor = C.glow; g.shadowBlur = 16; }
+  g.stroke();
+  g.shadowBlur = 0;
+
+  if (pair && pair.a) {
+    g.font = `700 ${W < 520 ? 11 : 13}px "Atkinson Hyperlegible Next", system-ui, sans-serif`;
+    g.textAlign = 'center'; g.textBaseline = 'middle'; g.lineJoin = 'round';
+    for (const sid of [pair.a, pair.b]) {
+      const i = world.anchors[sid];
+      const x = cur[2 * i], y = cur[2 * i + 1];
+      if (!isFinite(x)) continue;
+      g.lineWidth = 4; g.strokeStyle = C.halo; g.strokeText(SUBJECTS[sid].label, x, y);
+      g.fillStyle = C.label; g.fillText(SUBJECTS[sid].label, x, y);
+    }
+  }
+}
+
+function drawProbe(g, pc) {
+  if (!pc) return;
+  g.lineJoin = 'round';
+  g.beginPath();
+  let started = false, cx = 0, cy = 0, n = 0;
+  for (let i = 0; i < pc.length; i += 2) {
+    if (!isFinite(pc[i])) continue;
+    if (!started) { g.moveTo(pc[i], pc[i + 1]); started = true; } else g.lineTo(pc[i], pc[i + 1]);
+    if (i < pc.length - 2) { cx += pc[i]; cy += pc[i + 1]; n++; }
+  }
+  g.closePath();
+  g.fillStyle = C.probeFill; g.fill();
+  g.lineWidth = 6; g.strokeStyle = C.halo; g.stroke();
+  g.lineWidth = 2.5; g.strokeStyle = C.probeLine; g.stroke();
+  if (n) {
+    g.beginPath(); g.arc(cx / n, cy / n, 4.5, 0, Math.PI * 2);
+    g.fillStyle = C.probeLine; g.fill(); g.lineWidth = 2; g.strokeStyle = C.halo; g.stroke();
+  }
+}
+
+const base = { canvas: document.createElement('canvas'), key: '' };
+base.ctx = base.canvas.getContext('2d');
+
+function render() {
+  if (!state.ready) return null;
+  const f = currentFrame();
+  if (!f.world) return null;
+  glDraw(state.morph ? f.e : 1, W, H);
+  if (state.morph) {
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+    drawScene(ctx, f.world, true);
+  } else {
+    const key = [state.current, W, H, DPR, state.showCircles, state.showGrid, state.showImagery, glReady, state.pair, fontsReady].join('|');
+    if (key !== base.key) {
+      base.canvas.width = canvas.width; base.canvas.height = canvas.height;
+      base.ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+      base.ctx.clearRect(0, 0, W, H);
+      drawScene(base.ctx, f.world, false);
+      base.key = key;
+    }
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(base.canvas, 0, 0);
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  }
+  drawProbe(ctx, f.probe);
+  if (!state.morph) drawProbeLabel(ctx, f.probe);
+  return f;
+}
+
+/* The measuring circle's reading, written beside it on the map */
+function drawProbeLabel(g, pc) {
+  if (!pc || !probe.label) return;
+  let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+  for (let i = 0; i < pc.length; i += 2) {
+    if (!isFinite(pc[i])) continue;
+    x0 = Math.min(x0, pc[i]); x1 = Math.max(x1, pc[i]); y0 = Math.min(y0, pc[i + 1]); y1 = Math.max(y1, pc[i + 1]);
+  }
+  if (!isFinite(x0)) return;
+  const big = W < 520 ? 13 : 15, small = W < 520 ? 11 : 12;
+  g.font = `700 ${big}px "Atkinson Hyperlegible Next", system-ui, sans-serif`;
+  const w1 = g.measureText(probe.label[0]).width;
+  g.font = `600 ${small}px "Atkinson Hyperlegible Next", system-ui, sans-serif`;
+  const w2 = g.measureText(probe.label[1]).width;
+  const w = Math.max(w1, w2);
+  let x = x1 + 10, align = 'left';
+  if (x + w > W - 8) { x = x0 - 10; align = 'right'; }
+  const yc = Math.max(big + 6, Math.min(H - 40, (y0 + y1) / 2));
+  g.textAlign = align; g.textBaseline = 'alphabetic'; g.lineJoin = 'round';
+  g.font = `700 ${big}px "Atkinson Hyperlegible Next", system-ui, sans-serif`;
+  g.lineWidth = 4; g.strokeStyle = C.halo; g.strokeText(probe.label[0], x, yc);
+  g.fillStyle = '#ffffff'; g.fillText(probe.label[0], x, yc);
+  g.font = `600 ${small}px "Atkinson Hyperlegible Next", system-ui, sans-serif`;
+  g.strokeText(probe.label[1], x, yc + small + 3);
+  g.fillStyle = '#ffd9df'; g.fillText(probe.label[1], x, yc + small + 3);
+}
+
+/* Small pictures of each projection for the tray, made with the same imagery mesh */
+function drawThumbnails() {
+  const TW = 160, TH = 96;
+  for (const p of PROJECTIONS) {
+    const cv = document.querySelector(`.tile[data-id="${p.id}"] canvas`);
+    if (!cv) continue;
+    cv.width = TW; cv.height = TH;
+    const c = cv.getContext('2d');
+    c.clearRect(0, 0, TW, TH);
+    const { xmin, ymin, xmax, ymax } = p.bbox;
+    const s = Math.min((TW - 6) / (xmax - xmin), (TH - 6) / (ymax - ymin));
+    const fit = { s, tx: TW / 2 - s * (xmin + xmax) / 2, ty: TH / 2 + s * (ymin + ymax) / 2 };
+    const scr = toScreen(p.xy, fit);
+    if (glReady && glCanvas.width >= TW && glCanvas.height >= TH) {
+      glUpload('to', toScreen(p.meshXY, fit));
+      glDraw(1, glCanvas.width, glCanvas.height);
+      c.drawImage(glCanvas, 0, 0, TW, TH, 0, 0, TW, TH);
+    } else {
+      c.beginPath(); traceRings(c, scr, world.outline, true); c.fillStyle = C.ocean; c.fill();
+      c.beginPath(); for (const k of world.countries) traceRings(c, scr, k.rings, true); c.fillStyle = C.land; c.fill();
+    }
+    c.beginPath(); traceRings(c, scr, world.outline, true);
+    c.lineWidth = 1.2; c.strokeStyle = C.edge; c.stroke();
+  }
+  glUpload('to', PROJ[state.current].meshScreen);
+}
+
+/* ================================================================
+   UI: tray, tabs, info, readouts
+   ================================================================ */
+function buildDial() {
+  const nav = $('dial');
+  let key = 1;
+  for (const fam of FAMILIES) {
+    const list = PROJECTIONS.filter(p => p.family === fam.id);
+    const div = document.createElement('div');
+    div.className = 'fam'; div.setAttribute('role', 'group'); div.setAttribute('aria-labelledby', 'fam-' + fam.id);
+    div.innerHTML = `<p class="fam-name" id="fam-${fam.id}">${fam.label}</p><div class="tiles" style="--n:${list.length}"></div>`;
+    const tiles = div.querySelector('.tiles');
+    for (const p of list) {
+      p.key = key++;
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'tile'; b.dataset.id = p.id;
+      b.innerHTML = `<span class="key" aria-hidden="true">${p.key}</span><canvas aria-hidden="true"></canvas><span class="nm">${p.short}</span><span class="tg">${p.tileTag}</span>`;
+      b.setAttribute('aria-label', `${p.name}${p.tags.length ? ', ' + p.tags.join(', ') : ''}`);
+      b.setAttribute('aria-keyshortcuts', String(p.key));
+      b.addEventListener('click', () => goTo(p.id));
+      tiles.appendChild(b);
+    }
+    nav.appendChild(div);
+  }
+  updateDial();
+}
+function updateDial() {
+  document.querySelectorAll('.tile').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.id === state.current)));
+}
+
+function buildTabs() {
+  const tabs = [...document.querySelectorAll('.tab')];
+  const select = (tab, focus) => {
+    for (const t of tabs) {
+      const on = t === tab;
+      t.setAttribute('aria-selected', String(on));
+      t.tabIndex = on ? 0 : -1;
+      $(t.getAttribute('aria-controls')).hidden = !on;
+    }
+    if (focus) tab.focus();
+  };
+  tabs.forEach((t, i) => {
+    t.addEventListener('click', () => select(t, false));
+    t.addEventListener('keydown', e => {
+      let j = null;
+      if (e.key === 'ArrowRight') j = (i + 1) % tabs.length;
+      else if (e.key === 'ArrowLeft') j = (i - 1 + tabs.length) % tabs.length;
+      else if (e.key === 'Home') j = 0;
+      else if (e.key === 'End') j = tabs.length - 1;
+      if (j !== null) { e.preventDefault(); select(tabs[j], true); }
+    });
+  });
+}
+
+function updateInfo() {
+  const p = PROJ[state.current];
+  $('pFamily').textContent = p.familyText;
+  $('pName').innerHTML = `${p.name}<span class="ver" title="Projection model version">v${p.v}</span>`;
+  $('pTagline').textContent = p.tagline;
+  $('pBadges').innerHTML = p.tags.map(t => `<span class="badge${t === 'Equal area' ? ' ea' : ''}">${t}</span>`).join('');
+  $('pBadges').hidden = !p.tags.length;
+  const props = $('pProps');
+  props.innerHTML = '';
+  for (const [k, label] of [['area', 'Area'], ['shape', 'Shape'], ['distance', 'Distance'], ['direction', 'Direction']]) {
+    const [s, note] = p.props[k];
+    const li = document.createElement('li');
+    li.className = 'prop'; li.dataset.s = s;
+    li.innerHTML = `<span class="ico" aria-hidden="true">${STATE_ICONS[s]}</span><span class="nm">${label}</span><span class="st">${STATE_WORDS[s]}${note ? ' · ' + note : ''}</span>`;
+    props.appendChild(li);
+  }
+  $('pCircles').textContent = p.circles;
+  $('pWhere').textContent = p.where;
+  $('pHistory').textContent = p.history;
+  $('pTry').textContent = p.tryThis;
+  $('pWkid').textContent = p.wkidText;
+}
+
+function updateStatus() {
+  if (!state.ready) return;
+  const m = state.morph;
+  if (m) {
+    $('statusText').innerHTML = `${PROJ[m.from].short} <span class="arrow">→</span> ${PROJ[m.to].short}`;
+    $('statusVer').textContent = 'morph v' + MODELS.morph.v;
+  } else {
+    const p = PROJ[state.current];
+    $('statusText').textContent = p.short;
+    $('statusVer').textContent = 'v' + p.v;
+  }
+}
+
+function fmtX(x) { return x >= 9.95 ? Math.round(x).toLocaleString('en-US') : x.toFixed(1); }
+function fmtLat(lat) { const a = Math.abs(lat); return a < 0.5 ? '0°' : `${Math.round(a)}°${lat > 0 ? 'N' : 'S'}`; }
+function fmtLon(lon) { const a = Math.abs(lon); return a < 0.5 ? '0°' : `${Math.round(a)}°${lon > 0 ? 'E' : 'W'}`; }
+function fmtArea(km2) {
+  const v = state.units === 'mi' ? km2 * SQMI_PER_SQKM : km2;
+  const u = state.units === 'mi' ? 'sq mi' : 'km²';
+  if (v >= 1e6) return `${(v / 1e6).toFixed(1)} million ${u}`;
+  return `${(Math.round(v / 1000) * 1000).toLocaleString('en-US')} ${u}`;
+}
+
+function updateReadouts() { updateProbeReadout(); updateCompare(); }
+
+function updateProbeReadout() {
+  if (!state.ready) return;
+  const p = PROJ[state.current];
+  if (!p.fit) return;
+  const st = probeStats(p);
+  const ratio = st.long / Math.max(1e-9, st.short);
+  const center = p.family === 'disc' ? ' (the North Pole)' : ' (0°, 0°)';
+  let areaWords;
+  if (st.area > 1.6) areaWords = 'Much bigger than';
+  else if (st.area > 1.1) areaWords = 'A bit bigger than';
+  else if (st.area >= 0.9) areaWords = 'About the same size as';
+  else if (st.area >= 0.6) areaWords = 'A bit smaller than';
+  else areaWords = 'Much smaller than';
+  let shapeWords;
+  if (ratio < 1.12) shapeWords = 'Still round';
+  else if (ratio < 1.5) shapeWords = 'A little squashed';
+  else if (ratio < 2.5) shapeWords = 'Stretched into an oval';
+  else shapeWords = 'Very stretched';
+  $('mArea').innerHTML = `${fmtX(st.area)}<small>×</small>`;
+  $('mAreaNote').textContent = `${areaWords} the same circle at the center of the map${center}`;
+  $('mShape').innerHTML = `${ratio.toFixed(1)}<small> : 1</small>`;
+  $('mShapeNote').textContent = `${shapeWords}. Longest way across is ${st.long.toFixed(1)}×, shortest is ${st.short.toFixed(1)}× a true circle.`;
+  $('probeWhere').innerHTML = `Circle center: <b>${fmtLat(state.probe.lat)}, ${fmtLon(state.probe.lon)}</b>`;
+  const across = state.units === 'mi' ? `${(CIRCLE_RADIUS_MI * 2).toLocaleString('en-US')} miles` : `${Math.round(CIRCLE_RADIUS_MI * 2 * MI_TO_KM).toLocaleString('en-US')} km`;
+  $('probeTrue').innerHTML = `On the real Earth every circle is <b>${across}</b> across and covers <b>${fmtArea(probe.trueM2 / 1e6)}</b>.`;
+  probe.label = [`${fmtX(st.area)}× size`, shapeWords.toLowerCase()];
+  drawShapeViz(st, shapeWords);
+}
+
+/* True circle (dashed) next to the circle as this map draws it, same scale, real tilt */
+function drawShapeViz(st, shapeWords) {
+  const svg = $('shapeSvg');
+  const r0 = 26;
+  let rx = r0 * st.long, ry = r0 * st.short, rr = r0;
+  const maxR = 56;
+  const k = Math.min(1, maxR / Math.max(rx, rr));
+  rx *= k; ry *= k; rr *= k;
+  const deg = -st.angle * 180 / Math.PI;
+  svg.innerHTML = `
+    <circle cx="70" cy="62" r="${rr.toFixed(1)}" fill="none" stroke="#aebbdc" stroke-width="1.5" stroke-dasharray="4 4"/>
+    <g transform="translate(185 62) rotate(${deg.toFixed(1)})">
+      <ellipse rx="${rx.toFixed(1)}" ry="${ry.toFixed(1)}" fill="rgba(255,93,115,0.42)" stroke="#ffffff" stroke-width="2"/>
+      <line x1="${(-rx).toFixed(1)}" y1="0" x2="${rx.toFixed(1)}" y2="0" stroke="rgba(255,255,255,0.5)" stroke-width="1"/>
+    </g>`;
+  svg.setAttribute('aria-label', `The measuring circle on this map: ${fmtX(st.area)} times the size, ${shapeWords.toLowerCase()}. Longest way across ${st.long.toFixed(1)} times, shortest ${st.short.toFixed(1)} times a true circle.`);
+}
+
+function updateCompare() {
+  const pair = PAIRS.find(p => p.id === state.pair);
+  document.querySelectorAll('.pair-btn').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.id === state.pair)));
+  const body = $('cmpBody');
+  if (!pair.a) { body.hidden = true; return; }
+  body.hidden = false;
+  const A = SUBJECTS[pair.a], B = SUBJECTS[pair.b];
+  ['bnA1', 'bnA2'].forEach(id => $(id).textContent = A.label);
+  ['bnB1', 'bnB2'].forEach(id => $(id).textContent = B.label);
+  if (!state.ready) { $('cmpReal').textContent = 'Loading real sizes…'; $('cmpMap').textContent = ''; $('cmpVerdict').textContent = ''; return; }
+  const p = PROJ[state.current];
+  const ta = world.subjectTrueKm2[pair.a], tb = world.subjectTrueKm2[pair.b];
+  const ma = p.subjectMapM2[pair.a], mb = p.subjectMapM2[pair.b];
+  const realMax = Math.max(ta, tb), mapMax = Math.max(ma, mb);
+  $('bReal1').style.width = (100 * ta / realMax) + '%';
+  $('bReal2').style.width = (100 * tb / realMax) + '%';
+  $('bMap1').style.width = (100 * ma / mapMax) + '%';
+  $('bMap2').style.width = (100 * mb / mapMax) + '%';
+  const realRatio = tb / ta, mapRatio = mb / ma;
+  const sentence = (r, a, b, verb) => {
+    if (r >= 1.05) return `${b.label} ${verb} <strong>${fmtX(r)}×</strong> bigger than ${a.label}`;
+    if (r <= 1 / 1.05) return `${a.label} ${verb} <strong>${fmtX(1 / r)}×</strong> bigger than ${b.label}`;
+    return `${a.label} and ${b.label} ${verb === 'is' ? 'are' : 'look'} about the same size`;
+  };
+  $('cmpReal').innerHTML = `<b>Real Earth:</b> ${sentence(realRatio, A, B, 'is')}. ${A.label}: about ${fmtArea(ta)}. ${B.label}: about ${fmtArea(tb)}.`;
+  $('cmpMap').innerHTML = `<b>On this ${p.short} map:</b> ${sentence(mapRatio, A, B, 'looks')}.`;
+  const off = mapRatio / realRatio;
+  $('cmpVerdict').textContent = Math.abs(off - 1) < 0.05
+    ? 'Same as real life. This map keeps area.'
+    : `This map changes their sizes: ${off < 1 ? A.label : B.label} is drawn too big compared with ${off < 1 ? B.label : A.label}.`;
+}
+
+function buildPairs() {
+  const box = $('pairs');
+  for (const pr of PAIRS) {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'pair-btn'; b.dataset.id = pr.id; b.textContent = pr.label;
+    b.addEventListener('click', () => {
+      state.pair = pr.id;
+      updateCompare(); updateAria(); render();
+      if (pr.a) announce(`${pr.label}. ${$('cmpReal').textContent} ${$('cmpMap').textContent}`);
+    });
+    box.appendChild(b);
+  }
+  updateCompare();
+}
+
+function updateUnitsUI() {
+  $('uMi').setAttribute('aria-pressed', String(state.units === 'mi'));
+  $('uKm').setAttribute('aria-pressed', String(state.units === 'km'));
+}
+$('uMi').addEventListener('click', () => { state.units = 'mi'; updateUnitsUI(); updateReadouts(); });
+$('uKm').addEventListener('click', () => { state.units = 'km'; updateUnitsUI(); updateReadouts(); });
+
+function updateAria() {
+  const p = PROJ[state.current];
+  const pair = PAIRS.find(x => x.id === state.pair);
+  canvas.setAttribute('aria-label',
+    `${state.showImagery && glReady ? 'Satellite map' : 'Map'} of the world in the ${p.name} projection, with ${world.circles.length || 55} circles that are all the same real size. ${p.summary}` +
+    (pair.a ? ` ${SUBJECTS[pair.a].label} and ${SUBJECTS[pair.b].label} are highlighted.` : '') +
+    ` The measuring circle is at ${fmtLat(state.probe.lat)}, ${fmtLon(state.probe.lon)}.`);
+}
+
+let announceTimer = null;
+function announce(msg, delay = 0) {
+  clearTimeout(announceTimer);
+  announceTimer = setTimeout(() => { $('live').textContent = ''; setTimeout(() => { $('live').textContent = msg; }, 30); }, delay);
+}
+
+/* ---------- Toggles, header buttons, dialog ---------- */
+function updateToggles() {
+  $('togImagery').setAttribute('aria-pressed', String(state.showImagery));
+  $('togCircles').setAttribute('aria-pressed', String(state.showCircles));
+  $('togGrid').setAttribute('aria-pressed', String(state.showGrid));
+}
+$('togImagery').addEventListener('click', () => { if (!glReady) return; state.showImagery = !state.showImagery; updateToggles(); updateAria(); render(); });
+$('togCircles').addEventListener('click', () => { state.showCircles = !state.showCircles; updateToggles(); render(); });
+$('togGrid').addEventListener('click', () => { state.showGrid = !state.showGrid; updateToggles(); render(); });
+$('tourBtn').addEventListener('click', () => state.touring ? stopTour() : startTour());
+$('aboutBtn').addEventListener('click', () => { if (state.touring) stopTour(); $('about').showModal(); });
+$('aboutClose').addEventListener('click', () => $('about').close());
+$('about').addEventListener('click', e => { if (e.target === $('about')) $('about').close(); });
+$('attrib').addEventListener('click', e => {
+  const b = e.currentTarget;
+  b.setAttribute('aria-expanded', String(b.getAttribute('aria-expanded') !== 'true'));
+  resize();
+});
+
+function buildVersionTable() {
+  const rows = [
+    ['Map Projection Lab (app)', APP_VERSION, 'Whole app. Changes with every release.'],
+    ...Object.values(MODELS).map(m => [m.name, m.v, m.what]),
+    ...PROJECTIONS.map(p => [`Projection: ${p.name}`, p.v, p.wkidText]),
+    ['ArcGIS Maps SDK for JavaScript', SDK_VERSION, 'Projection engine, geodesic buffer, geodetic area and generalize operators.'],
+  ];
+  $('verTable').innerHTML = '<thead><tr><th scope="col">Part</th><th scope="col">Version</th><th scope="col">What it does</th></tr></thead><tbody>' +
+    rows.map(r => `<tr><td>${r[0]}</td><td class="v">v${r[1]}</td><td>${r[2]}</td></tr>`).join('') + '</tbody>';
+}
+
+/* ================================================================
+   Map interaction: drag the measuring circle, hover for names, keyboard
+   ================================================================ */
+function screenToLonLat(px, py) {
+  const p = PROJ[state.current];
+  if (!p.fit) return null;
+  if (!insideRings(p.screen, world.outline, px, py)) return null;
+  const x = (px - p.fit.tx) / p.fit.s, y = (p.fit.ty - py) / p.fit.s;
+  const q = projectOperator.execute(new Point({ x, y, spatialReference: p.srObj }), WGS);
+  if (!q || !isFinite(q.x) || !isFinite(q.y)) return null;
+  return [q.x, q.y];
+}
+function insideRings(scr, rings, px, py) {
+  let inside = false;
+  for (const [s, n] of rings) {
+    for (let i = 0, j = n - 1; i < n; j = i++) {
+      const xi = scr[2 * (s + i)], yi = scr[2 * (s + i) + 1], xj = scr[2 * (s + j)], yj = scr[2 * (s + j) + 1];
+      if (((yi > py) !== (yj > py)) && (px < (xj - xi) * (py - yi) / (yj - yi) + xi)) inside = !inside;
+    }
+  }
+  return inside;
+}
+function countryAt(px, py) {
+  const p = PROJ[state.current];
+  if (!p.countryBoxes) {
+    p.countryBoxes = world.countries.map(c => {
+      let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+      for (const [s, n] of c.rings) for (let i = s; i < s + n; i++) {
+        const x = p.screen[2 * i], y = p.screen[2 * i + 1];
+        if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y;
+      }
+      return [x0, y0, x1, y1];
+    });
+  }
+  for (let k = 0; k < world.countries.length; k++) {
+    const b = p.countryBoxes[k];
+    if (px < b[0] || px > b[2] || py < b[1] || py > b[3]) continue;
+    if (insideRings(p.screen, world.countries[k].rings, px, py)) return world.countries[k];
+  }
+  return null;
+}
+
+let dragging = false, pending = null;
+function localPoint(e) { const r = canvas.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; }
+function moveProbeTo(px, py) {
+  const ll = screenToLonLat(px, py);
+  if (!ll) return false;
+  pending = ll;
+  requestAnimationFrame(() => { if (!pending) return; const [lon, lat] = pending; pending = null; setProbe(lon, lat); });
+  return true;
+}
+canvas.addEventListener('pointerdown', e => {
+  if (!state.ready || state.morph) return;
+  if (state.touring) stopTour();
+  const [px, py] = localPoint(e);
+  if (moveProbeTo(px, py)) { dragging = true; canvas.setPointerCapture(e.pointerId); hideTip(); }
+});
+canvas.addEventListener('pointermove', e => {
+  if (!state.ready || state.morph) return;
+  const [px, py] = localPoint(e);
+  if (dragging) { moveProbeTo(px, py); return; }
+  if (e.pointerType === 'mouse') { const c = countryAt(px, py); if (c) showTip(c.name, px, py); else hideTip(); }
+});
+const endDrag = () => { if (!dragging) return; dragging = false; updateAria(); announce(probeAnnouncement(), 200); };
+canvas.addEventListener('pointerup', endDrag);
+canvas.addEventListener('pointercancel', endDrag);
+canvas.addEventListener('pointerleave', () => { if (!dragging) hideTip(); });
+canvas.addEventListener('keydown', e => {
+  if (!state.ready || state.morph) return;
+  const step = e.shiftKey ? 10 : 2;
+  let { lon, lat } = state.probe;
+  if (e.key === 'ArrowLeft') lon -= step;
+  else if (e.key === 'ArrowRight') lon += step;
+  else if (e.key === 'ArrowUp') lat += step;
+  else if (e.key === 'ArrowDown') lat -= step;
+  else return;
+  e.preventDefault();
+  if (state.touring) stopTour();
+  setProbe(lon, lat);
+  updateAria();
+  announce(probeAnnouncement(), 350);
+});
+function probeAnnouncement() {
+  const st = probeStats(PROJ[state.current]);
+  return `Measuring circle at ${fmtLat(state.probe.lat)}, ${fmtLon(state.probe.lon)}. Drawn ${fmtX(st.area)} times the size of the same circle at the center of the map. ${$('mShapeNote').textContent}`;
+}
+document.addEventListener('keydown', e => {
+  if (e.target.closest('input, textarea, select, dialog[open], [role="tab"]') || e.altKey || e.ctrlKey || e.metaKey) return;
+  const n = Number(e.key);
+  if (n >= 1 && n <= PROJECTIONS.length) {
+    const p = PROJECTIONS.find(x => x.key === n);
+    if (p) { e.preventDefault(); goTo(p.id); }
+  }
+});
+function showTip(text, x, y) {
+  const t = $('tip');
+  t.textContent = text; t.hidden = false;
+  t.style.left = Math.max(40, Math.min(W - 40, x)) + 'px';
+  t.style.top = y + 'px';
+}
+function hideTip() { $('tip').hidden = true; }
+
+/* Small test hook for checking the maths */
+window.__lab = { state, PROJ, probeStats: id => probeStats(PROJ[id]), setProbe, goTo, world, render, screenToLonLat, isGL: () => glReady };
+</script>
+</body>
+</html>
