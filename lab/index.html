@@ -137,6 +137,7 @@ body {
 .tog .sw { width: 13px; height: 13px; border-radius: 50%; flex: none; }
 .tog .sw.img { background: conic-gradient(#2a6e8f 0 25%, #c9b27a 0 50%, #3f7a45 0 75%, #e9eef5 0); }
 .tog .sw.circ { border: 2px solid var(--coral); background: rgba(255, 93, 115, 0.3); }
+.tog .sw.anim { width: 16px; height: 16px; border-radius: 0; color: var(--sun); }
 .tog .sw.grid { border-radius: 3px; background:
   linear-gradient(var(--ink-soft), var(--ink-soft)) 50% 0/1.5px 100% no-repeat,
   linear-gradient(var(--ink-soft), var(--ink-soft)) 0 50%/100% 1.5px no-repeat; outline: 1.5px solid var(--ink-soft); }
@@ -359,6 +360,7 @@ kbd { font-family: var(--font-data); font-size: 0.85em; border: 1px solid var(--
         <button class="tog glass" id="togImagery" type="button" aria-pressed="true" aria-label="Satellite imagery" title="Satellite imagery"><span class="sw img" aria-hidden="true"></span><span class="lbl" aria-hidden="true">Imagery</span></button>
         <button class="tog glass" id="togCircles" type="button" aria-pressed="true" aria-label="Same-size circles" title="Same-size circles"><span class="sw circ" aria-hidden="true"></span><span class="lbl" aria-hidden="true">Circles</span></button>
         <button class="tog glass" id="togGrid" type="button" aria-pressed="true" aria-label="Grid lines" title="Grid lines"><span class="sw grid" aria-hidden="true"></span><span class="lbl" aria-hidden="true">Grid lines</span></button>
+        <button class="tog glass" id="togAnimate" type="button" aria-pressed="true" aria-label="Animate map changes" title="Animate map changes"><svg class="sw anim" viewBox="0 0 16 16" aria-hidden="true"><path d="M1.5 11c2.5 0 2.5-6 5-6s2.5 6 5 6 2-3 3-3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span class="lbl" aria-hidden="true">Animate</span></button>
       </div>
     </div>
     <div class="tip" id="tip" hidden></div>
@@ -494,8 +496,10 @@ kbd { font-family: var(--font-data); font-size: 0.85em; border: 1px solid var(--
     <ul>
       <li><kbd>1</kbd> to <kbd>9</kbd>: choose a projection, in the order of the tray under the map.</li>
       <li>Select the map, then use the arrow keys to move the measuring circle. Hold <kbd>Shift</kbd> to move it further.</li>
-      <li>The tour can be paused at any time. If your device is set to reduce motion, maps switch without animating.</li>
+      <li>The tour can be paused at any time. If your device is set to reduce motion, maps switch without animating until you turn on Animate (the wave button on the map).</li>
     </ul>
+    <h3>Animation check</h3>
+    <p id="motionCheck">Choose a projection to measure the last morph.</p>
     <h3>Versions</h3>
     <div class="table-wrap"><table id="verTable"></table></div>
     <h3>Sources</h3>
@@ -512,10 +516,10 @@ kbd { font-family: var(--font-data); font-size: 0.85em; border: 1px solid var(--
    Versions: app + one version per model. Bump a model's version when
    its maths or data handling changes, and the app version every release.
    ================================================================== */
-const APP_VERSION = '1.1.0';
+const APP_VERSION = '1.1.1';
 const SDK_VERSION = '5.1';
 const MODELS = {
-  morph:   { name: 'Morph engine',      v: '1.2', what: 'Slides every projected point from one map to the next (eased, 2 seconds). The satellite picture is moved on the graphics card.' },
+  morph:   { name: 'Morph engine',      v: '1.3', what: 'Slides every projected point from one map to the next (eased, 2 seconds). The satellite picture is moved on the graphics card. Can be switched off; counts frames for each morph.' },
   imagery: { name: 'Imagery basemap',   v: '1.0', what: 'Esri World Imagery, zoom level 3 tiles, reshaped to a latitude–longitude grid and draped over a 2° mesh.' },
   circles: { name: 'Same-size circles', v: '1.0', what: '55 geodesic circles, 500-mile radius, every 30° of longitude at 60°S, 30°S, 0°, 30°N and 60°N.' },
   probe:   { name: 'Measuring circle',  v: '1.1', what: 'Map area ÷ real area, compared with a circle at the center of the map; shape and tilt from the circle’s longest and shortest axes.' },
@@ -708,7 +712,11 @@ const state = {
   touring: false,
   tourTimer: null,
   tab: 'proj',
+  animate: !reduceMotion.matches,
+  animateChosen: false,
+  lastMorph: null,
 };
+reduceMotion.addEventListener?.('change', () => { if (!state.animateChosen) { state.animate = !reduceMotion.matches; updateToggles(); } });
 const hashId = decodeURIComponent(location.hash.slice(1));
 if (PROJ[hashId]) state.current = hashId;
 
@@ -738,6 +746,7 @@ buildPairs();
 buildTabs();
 updateInfo();
 updateUnitsUI();
+updateToggles();
 $('probeVer').textContent = 'v' + MODELS.probe.v;
 $('cmpVer').textContent = 'v' + MODELS.compare.v;
 buildVersionTable();
@@ -1272,7 +1281,7 @@ function goTo(id, opts = {}) {
   announce(`${PROJ[id].name} projection. ${PROJ[id].summary}`);
   if (!state.ready) return;
 
-  const dur = reduceMotion.matches ? 0 : MORPH_MS;
+  const dur = state.animate ? MORPH_MS : 0;
   glUpload('to', PROJ[id].meshScreen);
   if (dur === 0) { state.morph = null; afterArrive(); return; }
   glUpload('from', meshNow);
@@ -1280,6 +1289,7 @@ function goTo(id, opts = {}) {
     from: prev, to: id, t0: performance.now(), dur,
     fromScreen: frame.world, fromProbe: frame.probe, fromMesh: meshNow,
     buf: new Float32Array(frame.world.length), pbuf: new Float32Array(frame.probe.length),
+    frames: 0,
   };
   hideTip();
   updateStatus();
@@ -1287,10 +1297,15 @@ function goTo(id, opts = {}) {
   requestAnimationFrame(tick);
 }
 function tick() {
-  if (!state.morph) return;
+  const m = state.morph;
+  if (!m) return;
   const f = render();
+  m.frames++;
   $('prog').style.transform = `scaleX(${f ? f.t : 1})`;
-  if (f && f.t >= 1) { state.morph = null; afterArrive(); return; }
+  if (f && f.t >= 1) {
+    state.lastMorph = { from: m.from, to: m.to, frames: m.frames, ms: performance.now() - m.t0 };
+    state.morph = null; afterArrive(); return;
+  }
   requestAnimationFrame(tick);
 }
 function afterArrive() {
@@ -1727,12 +1742,25 @@ function updateToggles() {
   $('togImagery').setAttribute('aria-pressed', String(state.showImagery));
   $('togCircles').setAttribute('aria-pressed', String(state.showCircles));
   $('togGrid').setAttribute('aria-pressed', String(state.showGrid));
+  $('togAnimate').setAttribute('aria-pressed', String(state.animate));
 }
 $('togImagery').addEventListener('click', () => { if (!glReady) return; state.showImagery = !state.showImagery; updateToggles(); updateAria(); render(); });
 $('togCircles').addEventListener('click', () => { state.showCircles = !state.showCircles; updateToggles(); render(); });
 $('togGrid').addEventListener('click', () => { state.showGrid = !state.showGrid; updateToggles(); render(); });
+$('togAnimate').addEventListener('click', () => { state.animate = !state.animate; state.animateChosen = true; updateToggles(); announce(state.animate ? 'Map changes will animate.' : 'Map changes will switch without animating.'); });
 $('tourBtn').addEventListener('click', () => state.touring ? stopTour() : startTour());
-$('aboutBtn').addEventListener('click', () => { if (state.touring) stopTour(); $('about').showModal(); });
+$('aboutBtn').addEventListener('click', () => { if (state.touring) stopTour(); updateMotionCheck(); $('about').showModal(); });
+function updateMotionCheck() {
+  const lm = state.lastMorph;
+  const rm = reduceMotion.matches ? 'on' : 'off';
+  const anim = state.animate ? 'on' : 'off';
+  let last = state.animate ? 'No morph yet. Choose another projection, then open this again.' : 'Animate is off, so maps switch straight away. Turn it on with the wave button on the map.';
+  if (lm) {
+    const sec = lm.ms / 1000;
+    last = `Last morph: ${PROJ[lm.from].short} → ${PROJ[lm.to].short}, ${lm.frames} frames in ${sec.toFixed(1)} s (${Math.round(lm.frames / sec)} frames per second).`;
+  }
+  $('motionCheck').textContent = `App v${APP_VERSION}. Animate: ${anim}. Device “Reduce motion” setting: ${rm}. ${last}`;
+}
 $('aboutClose').addEventListener('click', () => $('about').close());
 $('about').addEventListener('click', e => { if (e.target === $('about')) $('about').close(); });
 $('attrib').addEventListener('click', e => {
