@@ -4,6 +4,8 @@ A browser app for middle school students. The world morphs between nine map proj
 
 **Live app:** https://jsawle.github.io/projection-lab/
 
+**Lab version (testing):** https://jsawle.github.io/projection-lab/lab/ — new design with Esri World Imagery that morphs with the map. Moves to the main URL once approved.
+
 ## Projections
 
 | Family | Projections |
