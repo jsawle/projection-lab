@@ -514,10 +514,10 @@ kbd { font-family: var(--font-data); font-size: 0.85em; border: 1px solid var(--
    Versions: app + one version per model. Bump a model's version when
    its maths or data handling changes, and the app version every release.
    ================================================================== */
-const APP_VERSION = '1.0.0';
+const APP_VERSION = '1.0.1';
 const SDK_VERSION = '5.1';
 const MODELS = {
-  morph:   { name: 'Morph engine',       v: '1.0', what: 'Slides every projected point from one map to the next (eased, about 2 seconds).' },
+  morph:   { name: 'Morph engine',       v: '1.1', what: 'Slides every projected point from one map to the next (eased, about 2 seconds).' },
   circles: { name: 'Same-size circles',  v: '1.0', what: '55 geodesic circles, 500-mile radius, every 30° of longitude at 60°S, 30°S, 0°, 30°N and 60°N.' },
   probe:   { name: 'Measuring circle',   v: '1.0', what: 'Map area ÷ real area, compared with a circle at the center of the map; shape from the circle’s longest and shortest axes.' },
   compare: { name: 'Compare sizes',      v: '1.0', what: 'Real (geodetic) area versus flat area on the projected map.' },
@@ -1074,6 +1074,8 @@ function goTo(id, opts = {}) {
   if (!opts.fromTour && state.touring) stopTour();
   if (id === state.current && !state.morph) return;
   const prev = state.current;
+  // Capture where the map is now BEFORE switching, so the morph starts from the old projection
+  const frame = state.ready ? currentFrame() : null;
   state.current = id;
   history.replaceState(null, '', '#' + id);
   updatePicker();
@@ -1087,8 +1089,7 @@ function goTo(id, opts = {}) {
     afterArrive();
     return;
   }
-  // Start from wherever the map is right now (works mid-morph too)
-  const frame = currentFrame();
+  // Start from wherever the map was (works mid-morph too)
   state.morph = {
     fromScreen: Float32Array.from(frame.world),
     fromProbe: Float32Array.from(frame.probe),
