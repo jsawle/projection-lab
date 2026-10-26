@@ -187,7 +187,7 @@ body {
 .loading .btn { justify-self: center; }
 
 /* ---------- Projection tray ---------- */
-.dial { grid-area: dial; display: grid; grid-template-columns: 3fr 4fr 2fr; gap: 12px; min-width: 0; }
+.dial { grid-area: dial; display: grid; grid-template-columns: 3fr 3fr 1fr 2fr; gap: 12px; min-width: 0; }
 .fam { display: grid; grid-template-rows: auto 1fr; gap: 6px; min-width: 0; }
 .fam-name {
   display: flex; align-items: center; gap: 8px; margin: 0;
@@ -712,17 +712,17 @@ kbd { font-family: var(--font-data); font-size: 0.85em; border: 1px solid var(--
    Versions: app + one version per model. Bump a model's version when
    its maths or data handling changes, and the app version every release.
    ================================================================== */
-const APP_VERSION = '1.3.6';
+const APP_VERSION = '1.4.0';
 const SDK_VERSION = '5.1';
 const MODELS = {
-  morph:   { name: 'Morph engine',       v: '1.4', what: 'Slides every projected point from one map to the next (eased, 2 seconds). The satellite picture is moved on the graphics card. Can be switched off.' },
+  morph:   { name: 'Morph engine',       v: '1.5', what: 'Slides every projected point from one map to the next (eased, 2 seconds). The satellite picture is moved on the graphics card. Can be switched off. Morphs to and from Spilhaus use the satellite triangles split along its cut, so the world opens along that line.' },
   view:    { name: 'Zoom and centering', v: '1.1', what: 'All nine maps are fitted around one shared center and use the whole map area (the buttons sit below the map). Mercator is fitted to 82.5° N and S and drawn to 85°. Zoom 1–12×. The place in the middle of the view stays in the middle while the map morphs.' },
-  imagery: { name: 'Imagery basemap',    v: '1.1', what: 'Esri World Imagery, zoom level 3 tiles (level 4 once you zoom in past 2×), reshaped to a latitude–longitude grid and draped over a 2° mesh.' },
-  circles: { name: 'Same-size circles',  v: '1.0', what: '55 geodesic circles, 500-mile radius, every 30° of longitude at 60°S, 30°S, 0°, 30°N and 60°N.' },
-  probe:   { name: 'Measuring circle',   v: '1.1', what: 'Map area ÷ real area, compared with a circle at the center of the map; shape and tilt from the circle’s longest and shortest axes.' },
-  country: { name: 'Country mover',      v: '1.0', what: 'Turns the country over the globe (a rotation, so its real size and shape never change), then projects it. Its size on the map compared with its real size, and with its size in its real place.' },
+  imagery: { name: 'Imagery basemap',    v: '1.1', what: 'Esri World Imagery, zoom level 3 tiles (level 4 once you zoom in past 2×), reshaped to a latitude–longitude grid and draped over a 2° mesh. For Spilhaus the mesh is also split along its cut and made finer wherever an edge would be longer than 1% of the square (its corners magnify hugely); the very ends of the cut are drawn in the corners.' },
+  circles: { name: 'Same-size circles',  v: '1.1', what: '55 geodesic circles, 500-mile radius, every 30° of longitude at 60°S, 30°S, 0°, 30°N and 60°N. Split along the Spilhaus cut.' },
+  probe:   { name: 'Measuring circle',   v: '1.2', what: 'Map area ÷ real area, compared with a circle at the center of the map; shape and tilt from the circle’s longest and shortest axes. On Spilhaus the circle is kept off the edge of the square.' },
+  country: { name: 'Country mover',      v: '1.0', what: 'Turns the country over the globe (a rotation, so its real size and shape never change), then projects it. Its size on the map compared with its real size, and with its size in its real place. Split along the Spilhaus cut and the 180° line; the card shows the biggest piece.' },
   compare: { name: 'Compare sizes',      v: '1.0', what: 'Real (geodetic) area versus flat area on the projected map.' },
-  data:    { name: 'Country data',       v: '1.1', what: 'Living Atlas World Countries (Generalized). Map: simplified to 0.1°. Your country: finer detail (0.01°–0.1°, by size), joined across the 180° line.' },
+  data:    { name: 'Country data',       v: '1.2', what: 'Living Atlas World Countries (Generalized). Map: simplified to 0.1°, and split along the Spilhaus cut (half a great circle on the conformal sphere from 115°E 30°N through 113°W 50°N to 65°W 30°S). Points on the cut are nudged to their own side only for Spilhaus, by the smallest amount the projection engine accepts. Your country: finer detail (0.01°–0.1°, by size), joined across the 180° line.' },
 };
 
 const COUNTRIES_URL = 'https://services.arcgis.com/P3ePLMYs2RVChkJx/arcgis/rest/services/World_Countries_(Generalized)/FeatureServer/0/query';
@@ -822,17 +822,17 @@ const PROJECTIONS = [
     summary: 'Circles grow a little toward the poles and lean near the edges.'
   },
   {
-    id: 'mollweide', name: 'Mollweide', short: 'Mollweide', v: '1.0', family: 'oval',
-    sr: { wkid: 54009 }, maxLat: 89.999, minLat: -89.999, ref: [0, 0],
-    wkidText: 'ArcGIS WKID 54009 · World Mollweide',
-    familyText: 'Pseudocylindrical · equal area', tags: ['Equal area'], tileTag: 'Equal area',
-    tagline: 'An equal-area oval, twice as wide as it is tall.',
-    props: { area: ['kept'], shape: ['changed'], distance: ['changed'], direction: ['changed'] },
-    circles: 'Every circle covers the same amount of map. Near the left and right edges, and near the poles, they squash and lean.',
-    where: 'Scientists use it for maps of the whole sky, and for world maps of data where fair sizes matter.',
-    history: 'Karl Mollweide, a German mathematician and astronomer, published it in 1805.',
-    tryThis: 'Drag the measuring circle to the far left edge, near the top. What happens to its shape? Does its size change?',
-    summary: 'Circles all cover the same area but squash and lean near the edges.'
+    id: 'spilhaus', name: 'Spilhaus World Ocean Map', short: 'Spilhaus', v: '1.0', family: 'square', spil: true,
+    sr: { wkid: 54099 }, maxLat: 89.999, minLat: -89.999, ref: [66.94970198, -49.56371678], centerLabel: ' (50°S, 67°E)',
+    wkidText: 'ArcGIS WKID 54099 · WGS 1984 Spilhaus Ocean Map in Square (a tilted Adams World in a Square II)',
+    familyText: 'World in a square, tilted to center the oceans · conformal', tags: ['Ocean map'], tileTag: 'Ocean map',
+    tagline: 'Shows all the world’s oceans as one body of water.',
+    props: { area: ['changed'], shape: ['kept', 'Not at the corners'], distance: ['changed'], direction: ['changed'] },
+    circles: 'Circles stay round, but their size changes a lot. They are smallest in the Southern Ocean, 2 to 3 times bigger in the middle of the Atlantic and Pacific, and 15 to over 40 times bigger near the corners.',
+    where: 'Ocean scientists use it to show currents, sea temperature and sea ice. In 2025 the National Maritime Museum in Greenwich, London, opened a giant ocean floor map drawn this way.',
+    history: 'Athelstan Spilhaus (1911–1998), an ocean scientist born in South Africa, drew maps with the oceans in the middle from 1942. This square version is from 1979. It is built on a world-in-a-square map by Oscar Adams, an American mapmaker. After it went viral online in 2018, Esri mapmakers Bojan Šavrič and David Burrows worked out the math so computers can draw it, and ArcGIS added it in 2020.',
+    tryThis: 'Drag the measuring circle from the middle of the ocean toward a corner. Does it stay round? How big does it get?',
+    summary: 'Circles stay round but grow bigger toward the edges, and huge in the corners.'
   },
   {
     id: 'polar-equidistant', name: 'Polar Azimuthal Equidistant', short: 'Polar Equidistant', v: '1.0', family: 'disc',
@@ -865,6 +865,7 @@ const PROJ = Object.fromEntries(PROJECTIONS.map(p => [p.id, p]));
 const FAMILIES = [
   { id: 'rect', label: 'Rectangles' },
   { id: 'oval', label: 'Rounded' },
+  { id: 'square', label: 'Square' },
   { id: 'disc', label: 'Polar' },
 ];
 const STATE_WORDS = { kept: 'Kept', nearly: 'Nearly kept', partly: 'Partly kept', changed: 'Distorted' };
@@ -998,6 +999,8 @@ async function start() {
   await Promise.all([projectOperator.load(), geodesicBufferOperator.load(), geodeticAreaOperator.load()]);
   WGS = new SpatialReference({ wkid: 4326 });
   for (const p of PROJECTIONS) p.srObj = new SpatialReference(p.sr);
+  const spilP = PROJECTIONS.find(p => p.spil);
+  if (spilP) spilCalibrate(spilP);
 
   setLoading('Fetching countries from ArcGIS Living Atlas…', 40);
   const params = new URLSearchParams({ where: '1=1', outFields: 'COUNTRY,ISO', returnGeometry: 'true', outSR: '4326', geometryPrecision: '2', f: 'json' });
@@ -1140,12 +1143,199 @@ function densifyInto(out, ring, maxStep) {
   return out;
 }
 
+/* ================================================================
+   The Spilhaus cut. Spilhaus is an oblique Adams World in a Square II: on the conformal sphere it
+   is cut along half a great circle from 115°E 30°N, through 113°W 50°N, to 65°W 30°S, and that cut
+   becomes the edge of its square. Shapes are split along the cut so no piece spans the square.
+   Points on the cut keep one position for every other map; only when projecting to Spilhaus are
+   they nudged 12 km to their own side (the engine can't project points within about 8 km of it).
+   ================================================================ */
+const E_ECC = Math.sqrt(0.00669437999014);
+const confLat = f => 2 * Math.atan(Math.tan(Math.PI / 4 + f / 2) * Math.pow((1 - E_ECC * Math.sin(f)) / (1 + E_ECC * Math.sin(f)), E_ECC / 2)) - Math.PI / 2;
+function geoLat(c) {
+  let f = c;
+  for (let i = 0; i < 8; i++) f = 2 * Math.atan(Math.tan(Math.PI / 4 + c / 2) * Math.pow((1 + E_ECC * Math.sin(f)) / (1 - E_ECC * Math.sin(f)), E_ECC / 2)) - Math.PI / 2;
+  return f;
+}
+// Oblique frame from the projection's own parameters: x' = the square's center, z' = the end of the
+// cut (90° from the center along the azimuth). The cut is then the line of oblique longitude ±180°.
+const SPIL = (() => {
+  const v = (lon, chi) => [Math.cos(chi) * Math.cos(lon), Math.cos(chi) * Math.sin(lon), Math.sin(chi)];
+  const lat0 = confLat(-49.56371678 * D2R), lon0 = 66.94970198 * D2R, az = 40.17823482 * D2R;
+  const plat = Math.asin(Math.cos(lat0) * Math.cos(az));
+  const plon = lon0 + Math.atan2(Math.sin(az) * Math.cos(lat0), -Math.sin(lat0) * Math.sin(plat));
+  const C = v(lon0, lat0), P = v(plon, plat);
+  return { C, P, Y: [P[1] * C[2] - P[2] * C[1], P[2] * C[0] - P[0] * C[2], P[0] * C[1] - P[1] * C[0]] };
+})();
+const SPIL_END_LIM = 89.9;   // keep points about 11 km from the two ends of the cut (corners of the square)
+/* How far (in oblique longitude) a point must sit from the cut for the engine to project it, on each side,
+   for every degree of oblique latitude. Measured against the engine at startup, with a 30% margin. */
+const SPIL_EPS = { 1: new Float64Array(181).fill(0.5), [-1]: new Float64Array(181).fill(0.5) };
+function spilCalibrate(p) {
+  let half = 0;
+  const ok = (L, F) => {
+    const [lon, lat] = fromObl(L, F);
+    const q = projectOperator.execute(new Point({ x: lon, y: lat, spatialReference: WGS }), p.srObj);
+    if (!(q && isFinite(q.x))) return false;
+    half = Math.max(half, Math.abs(q.x), Math.abs(q.y));
+    return true;
+  };
+  for (const s of [1, -1]) for (let k = 0; k <= 180; k++) {
+    const F = clamp(k - 90, -SPIL_END_LIM, SPIL_END_LIM);
+    let lo = 1e-6, hi = 2;
+    if (!ok(s * (180 - hi), F)) { SPIL_EPS[s][k] = 3; continue; }
+    for (let i = 0; i < 20; i++) { const m = Math.sqrt(lo * hi); if (ok(s * (180 - m), F)) hi = m; else lo = m; }
+    SPIL_EPS[s][k] = hi * 1.3 + 0.002;
+  }
+  // Use the larger neighbour too, so values between whole degrees are covered
+  for (const s of [1, -1]) { const a = Float64Array.from(SPIL_EPS[s]); for (let k = 0; k <= 180; k++) SPIL_EPS[s][k] = Math.max(a[k], a[Math.max(0, k - 1)], a[Math.min(180, k + 1)]); }
+  p.spilHalf = half;   // half the side of the square
+}
+const spilEps = (s, F) => SPIL_EPS[s][clamp(Math.round(F + 90), 0, 180)];
+function toObl(lon, lat) {
+  const c = confLat(lat * D2R), l = lon * D2R, cc = Math.cos(c);
+  const u0 = cc * Math.cos(l), u1 = cc * Math.sin(l), u2 = Math.sin(c), { C, P, Y } = SPIL;
+  return [Math.atan2(u0 * Y[0] + u1 * Y[1] + u2 * Y[2], u0 * C[0] + u1 * C[1] + u2 * C[2]) / D2R,
+          Math.asin(clamp(u0 * P[0] + u1 * P[1] + u2 * P[2], -1, 1)) / D2R];
+}
+function fromObl(L, F) {
+  const l = L * D2R, f = F * D2R, cf = Math.cos(f), { C, P, Y } = SPIL;
+  const x = cf * Math.cos(l), y = cf * Math.sin(l), z = Math.sin(f);
+  const u0 = x * C[0] + y * Y[0] + z * P[0], u1 = x * C[1] + y * Y[1] + z * P[1], u2 = x * C[2] + y * Y[2] + z * P[2];
+  return [Math.atan2(u1, u0) / D2R, geoLat(Math.asin(clamp(u2, -1, 1))) / D2R];
+}
+/* Where to project a point on the Spilhaus map: off the cut by 12 km, on side s (+1, −1, or 0 = its own side) */
+function spilSafe(lon, lat, s) {
+  let [L, F] = toObl(lon, lat);
+  const Fc = clamp(F, -SPIL_END_LIM, SPIL_END_LIM);
+  const sgn = s || (L >= 0 ? 1 : -1), eps = spilEps(sgn, Fc);
+  let Ln = L;
+  if (s || 180 - Math.abs(L) < eps) Ln = sgn * (180 - eps);
+  const out = (Ln === L && Fc === F) ? [lon, lat] : fromObl(Ln, Fc);
+  out.end = Math.abs(F) >= SPIL_END_LIM - 1e-6;   // at an end of the cut: Spilhaus draws it at a corner of the square
+  return out;
+}
+
+/* Sutherland–Hodgman clip of a closed polygon to xmin ≤ x ≤ xmax, keeping two things per vertex:
+   e = 1 if the edge leaving it is not a real border (new edges along the clip lines get e = 1),
+   s = which side of the Spilhaus cut it sits on (0 = not on it). */
+function clipBandAttr(poly, xmin, xmax) {
+  const pass = (inp, inside, X) => {
+    const out = [];
+    for (let i = 0; i < inp.length; i++) {
+      const cur = inp[i], prv = inp[(i + inp.length - 1) % inp.length];
+      const ci = inside(cur), pi = inside(prv);
+      const at = e => { const t = (X - prv.x) / (cur.x - prv.x); return { x: X, y: prv.y + t * (cur.y - prv.y), e, s: prv.s && prv.s === cur.s ? prv.s : 0 }; };
+      if (ci) { if (!pi) out.push(at(prv.e)); out.push(cur); }
+      else if (pi) out.push(at(1));
+    }
+    return out;
+  };
+  let r = pass(poly, q => q.x >= xmin, xmin);
+  if (r.length) r = pass(r, q => q.x <= xmax, xmax);
+  return r;
+}
+/* Clip a polygon (x unwrapped across ±180) into the band [−180, 180], one piece per 360° shift */
+function bandPieces(poly) {
+  let lo = Infinity, hi = -Infinity;
+  for (const q of poly) { if (q.x < lo) lo = q.x; if (q.x > hi) hi = q.x; }
+  if (lo >= -180 && hi <= 180) return [poly];
+  const out = [];
+  for (let k = -2; k <= 2; k++) {
+    if (hi - 360 * k <= -180 || lo - 360 * k >= 180) continue;
+    const r = clipBandAttr(poly.map(q => ({ ...q, x: q.x - 360 * k })), -180, 180);
+    if (r.length >= 3) out.push(r);
+  }
+  return out;
+}
+const isGeoSeam = (a, b) => (Math.abs(a[0]) >= 179.99 && Math.abs(b[0]) >= 179.99 && a[0] * b[0] > 0) || (Math.abs(a[1]) >= 89.99 && Math.abs(b[1]) >= 89.99);
+/* Split a closed ring of [lon, lat] points (densified, no repeated last point) along the Spilhaus cut,
+   and along the 180° line where a new edge crosses it. Returns pieces { pts, seam, side }:
+   seam[i] = 1 means the edge from point i to the next is not a real border, so it isn't stroked. */
+function splitRing(pts, seamIn) {
+  const n = pts.length;
+  const seam = seamIn || Uint8Array.from(pts, (p, i) => isGeoSeam(p, pts[(i + 1) % n]) ? 1 : 0);
+  const o = pts.map(([lon, lat]) => toObl(lon, lat));
+  const U = new Float64Array(n); U[0] = o[0][0];
+  for (let i = 1; i < n; i++) U[i] = U[i - 1] + wrapDelta(o[i][0] - o[i - 1][0]);
+  const net = U[n - 1] + wrapDelta(o[0][0] - o[n - 1][0]) - U[0];
+  const encircles = Math.abs(net) > 180;
+  let lo = Infinity, hi = -Infinity;
+  for (const u of U) { if (u < lo) lo = u; if (u > hi) hi = u; }
+  if (!encircles && lo >= -180 && hi <= 180) return [{ pts, seam, side: new Int8Array(n) }];
+  let poly = pts.map((p, i) => ({ x: U[i], y: o[i][1], e: seam[i], s: 0 }));
+  if (encircles) {
+    // The ring goes round one end of the cut: close it through that end point (an edge that isn't a border)
+    const Fp = o.reduce((a, q) => a + q[1], 0) > 0 ? 90 : -90, Ue = U[0] + net, F0 = o[0][1];
+    const steps = Math.max(1, Math.ceil(Math.abs(Fp - F0)));
+    for (let k = 0; k <= steps; k++) poly.push({ x: Ue, y: F0 + (Fp - F0) * k / steps, e: 1, s: 0 });
+    for (let k = 0; k < steps; k++) poly.push({ x: U[0], y: Fp + (F0 - Fp) * k / steps, e: 1, s: 0 });
+  }
+  const out = [];
+  for (const piece of bandPieces(poly)) {
+    // Mark points on the cut with their side, and give the cut edges points every 1° so they follow the great circle
+    const dense = [];
+    for (let i = 0; i < piece.length; i++) {
+      const a = piece[i], b = piece[(i + 1) % piece.length];
+      const onA = Math.abs(a.x) === 180, onB = Math.abs(b.x) === 180;
+      const sA = onA ? Math.sign(a.x) : a.s;
+      dense.push({ ...a, s: sA });
+      if (onA && onB && a.x === b.x) {
+        const k = Math.ceil(Math.abs(b.y - a.y));
+        for (let j = 1; j < k; j++) dense.push({ x: a.x, y: a.y + (b.y - a.y) * j / k, e: a.e, s: sA });
+      }
+    }
+    // Back to lon/lat, then split again at the 180° line if a new edge crosses it
+    const g = dense.map(q => { const [lon, lat] = fromObl(q.x, q.y); return { x: lon, y: lat, e: q.e, s: q.s }; });
+    for (let i = 1; i < g.length; i++) g[i].x = g[i - 1].x + wrapDelta(g[i].x - g[i - 1].x);
+    for (const gp of bandPieces(g)) out.push({ pts: gp.map(q => [q.x, q.y]), seam: Uint8Array.from(gp, q => q.e), side: Int8Array.from(gp, q => q.s) });
+  }
+  return out;
+}
+/* Split an open line of [lon, lat] points where it crosses the Spilhaus cut. Returns { pts, side } lines. */
+function splitLine(pts) {
+  const o = pts.map(([lon, lat]) => toObl(lon, lat));
+  const lines = [{ pts: [pts[0]], side: [0] }];
+  let u = o[0][0];
+  for (let i = 1; i < pts.length; i++) {
+    const v = u + wrapDelta(o[i][0] - o[i - 1][0]);
+    const ka = Math.floor((u + 180) / 360), kb = Math.floor((v + 180) / 360);
+    if (ka !== kb) {
+      const X = 180 + 360 * Math.min(ka, kb), t = (X - u) / (v - u), F = o[i - 1][1] + t * (o[i][1] - o[i - 1][1]);
+      const p = fromObl(X, F), s = v > u ? 1 : -1;
+      lines[lines.length - 1].pts.push(p); lines[lines.length - 1].side.push(s);
+      lines.push({ pts: [p], side: [-s] });
+    }
+    lines[lines.length - 1].pts.push(pts[i]); lines[lines.length - 1].side.push(0);
+    u = v;
+  }
+  return lines;
+}
+
 function buildWorld(features) {
-  const ll = [];
+  const ll = [], seamArr = [], sideArr = [];
   const pushRing = (ring, maxStep) => {
     const start = ll.length / 2;
-    for (const [x, y] of densifyInto([], ring, maxStep)) ll.push(x, y);
+    for (const [x, y] of densifyInto([], ring, maxStep)) { ll.push(x, y); seamArr.push(0); sideArr.push(0); }
     return [start, ll.length / 2 - start];
+  };
+  // A closed ring, split along the Spilhaus cut: one entry per piece
+  const pushSplit = (ring, maxStep) => {
+    let d = densifyInto([], ring, maxStep);
+    if (d.length > 1 && d[0][0] === d[d.length - 1][0] && d[0][1] === d[d.length - 1][1]) d = d.slice(0, -1);
+    return splitRing(d).map(pc => {
+      const start = ll.length / 2;
+      pc.pts.forEach(([x, y], i) => { ll.push(x, y); seamArr.push(pc.seam[i]); sideArr.push(pc.side[i]); });
+      return [start, pc.pts.length];
+    });
+  };
+  // An open line, split where it crosses the cut
+  const pushLine = (line, list) => {
+    for (const ln of splitLine(line)) {
+      const start = ll.length / 2;
+      ln.pts.forEach(([x, y], i) => { ll.push(x, y); seamArr.push(0); sideArr.push(ln.side[i]); });
+      list.push([start, ln.pts.length]);
+    }
   };
 
   const o = [];
@@ -1157,18 +1347,18 @@ function buildWorld(features) {
 
   for (let lon = -180; lon <= 180; lon += 30) {
     const line = []; for (let lat = -90; lat <= 90; lat += 2) line.push([lon, lat]);
-    world.gratMinor.push(pushRing(line, Infinity));
+    pushLine(line, world.gratMinor);
   }
   for (let lat = -60; lat <= 60; lat += 30) {
     const line = []; for (let lon = -180; lon <= 180; lon += 2) line.push([lon, lat]);
-    (lat === 0 ? world.gratMajor : world.gratMinor).push(pushRing(line, Infinity));
+    pushLine(line, lat === 0 ? world.gratMajor : world.gratMinor);
   }
 
   // One call per country: executeMany drops empty results, which would shift names onto the wrong shapes.
   features.forEach((f, fi) => {
     const g = generalizeOperator.execute(new Polygon({ rings: f.geometry.rings, spatialReference: WGS }), 0.1, { removeDegenerateParts: true });
     if (!g || !g.rings?.length) return;
-    const rings = g.rings.filter(r => r.length >= 4).map(r => pushRing(r, 1));
+    const rings = g.rings.filter(r => r.length >= 4).flatMap(r => pushSplit(r, 1));
     if (!rings.length) return;
     const attrs = f.attributes;
     const c = { name: attrs.COUNTRY, iso: attrs.ISO, fi, rings, subjects: [] };
@@ -1183,15 +1373,17 @@ function buildWorld(features) {
 
   for (const lat of [-60, -30, 0, 30, 60]) {
     for (let lon = -150; lon <= 150; lon += 30) {
-      world.circles.push({ lon, lat, rings: [pushRing(circleRing(lon, lat, CIRCLE_RADIUS_MI), Infinity)] });
+      world.circles.push({ lon, lat, rings: pushSplit(circleRing(lon, lat, CIRCLE_RADIUS_MI), Infinity) });
     }
   }
 
   for (const [sid, s] of Object.entries(SUBJECTS)) {
     world.anchors[sid] = ll.length / 2;
-    ll.push(s.anchor[0], s.anchor[1]);
+    ll.push(s.anchor[0], s.anchor[1]); seamArr.push(0); sideArr.push(0);
   }
   world.ll = new Float64Array(ll);
+  world.seam = Uint8Array.from(seamArr);
+  world.side = Int8Array.from(sideArr);
 }
 
 /* A 2° grid of points that carries the satellite picture. Extra rows at ±85° keep the Mercator edge exact. */
@@ -1213,25 +1405,170 @@ function buildMesh() {
   }
   mesh.idx = new Uint16Array(idx);
   mesh.count = idx.length;
+  buildSpilMesh();
+}
+/* A second triangle list for Spilhaus. Triangles that cross the cut are split along it; triangles round
+   each end of the cut are fanned from the end; then edges longer than about 1% of the square are split
+   (Spilhaus's scale soars near its corners). Every new point joins the shared point list, so all maps still
+   morph point for point; the other maps use the plain list. Edges are split by length alone, so the two
+   triangles that share an edge always agree and no cracks open. */
+function buildSpilMesh() {
+  const SP = PROJECTIONS.find(p => p.spil);
+  const n0 = mesh.ll.length / 2;
+  const ll = Array.from(mesh.ll), uv = Array.from(mesh.uv), side = new Array(n0).fill(0);
+  const OL = [], OF = [];                     // oblique position of every point (as built)
+  for (let i = 0; i < n0; i++) { const [L, F] = toObl(mesh.ll[2 * i], mesh.ll[2 * i + 1]); OL.push(L); OF.push(F); }
+  const keys = new Map();
+  const keyOf = (lon, lat, s, L, F) => `${lon.toFixed(5)}|${lat.toFixed(5)}|${s}|${Math.abs(F) >= SPIL_END_LIM ? L.toFixed(3) : ''}`;
+  for (let i = 0; i < n0; i++) keys.set(keyOf(mesh.ll[2 * i], mesh.ll[2 * i + 1], 0, OL[i], OF[i]), i);
+  // A point given in oblique coordinates (L may be unwrapped), near the triangle's longitude lonRef
+  const pointAt = (L, F, s, lonRef) => {
+    if (Math.abs(L) === 180 && !s) s = Math.sign(L);
+    if (Math.abs(F) > SPIL_END_LIM) F = Math.sign(F) * SPIL_END_LIM;   // the ends of the cut: keep the direction, so Spilhaus can fan its corner
+    let [lon, lat] = fromObl(L, F);
+    lon = lonRef + wrapDelta(lon - lonRef);
+    const k = keyOf(lon, lat, s, ((L + 540) % 360) - 180, F);
+    let id = keys.get(k);
+    if (id === undefined) {
+      id = ll.length / 2; keys.set(k, id);
+      ll.push(lon, lat); uv.push(clamp((lon + 180) / 360, 0, 1), (90 - lat) / 180); side.push(s);
+      OL.push(L); OF.push(F);
+    }
+    return id;
+  };
+  const vec = i => { const c = confLat(ll[2 * i + 1] * D2R), l = ll[2 * i] * D2R; return [Math.cos(c) * Math.cos(l), Math.cos(c) * Math.sin(l), Math.sin(c)]; };
+  const det = (a, b, c) => a[0] * (b[1] * c[2] - b[2] * c[1]) - a[1] * (b[0] * c[2] - b[2] * c[0]) + a[2] * (b[0] * c[1] - b[1] * c[0]);
+  // Is end point q inside triangle abc? (q must also face the triangle: the sign test alone can't tell q from its opposite point)
+  const holds = (q, a, b, c) => {
+    if (q[0] * (a[0] + b[0] + c[0]) + q[1] * (a[1] + b[1] + c[1]) + q[2] * (a[2] + b[2] + c[2]) <= 0) return false;
+    // distance (as sin of the angle) from q to each edge's great circle; an end on or very near an edge counts as inside
+    const nrm = (u, v) => Math.hypot(u[1] * v[2] - u[2] * v[1], u[2] * v[0] - u[0] * v[2], u[0] * v[1] - u[1] * v[0]);
+    const s1 = det(q, a, b) / nrm(a, b), s2 = det(q, b, c) / nrm(b, c), s3 = det(q, c, a) / nrm(c, a), t = 1e-4;
+    return (s1 >= -t && s2 >= -t && s3 >= -t) || (s1 <= t && s2 <= t && s3 <= t);
+  };
+  const P = SPIL.P, Pm = SPIL.P.map(x => -x);
+  // Triangles as [id, x, y] corners, x = oblique longitude unwrapped within the triangle
+  const tris = [];
+  const addPiece = (poly, lonRef) => {
+    for (const piece of bandPieces(poly)) {
+      const c = piece.map(q => {
+        const s = Math.abs(q.x) === 180 ? Math.sign(q.x) : 0;
+        const id = (!s && q.i !== undefined && Math.abs(q.x - OL[q.i]) < 1e-9) ? q.i : pointAt(q.x, q.y, s, lonRef);
+        return [id, q.x, q.y, lonRef];
+      });
+      for (let k = 1; k < c.length - 1; k++) tris.push([c[0], c[k], c[k + 1]]);
+    }
+  };
+  const corner = i => ({ x: OL[i], y: OF[i], i, e: 0, s: 0 });
+  for (let t = 0; t < mesh.idx.length; t += 3) {
+    const tri = [mesh.idx[t], mesh.idx[t + 1], mesh.idx[t + 2]];
+    const lonRef = (mesh.ll[2 * tri[0]] + mesh.ll[2 * tri[1]] + mesh.ll[2 * tri[2]]) / 3;
+    const V = tri.map(vec);
+    const end = holds(P, ...V) ? 90 : holds(Pm, ...V) ? -90 : 0;
+    if (end) {
+      // Fan from the end of the cut: each slice becomes a thin quad up to the end, along both sides' meridians.
+      // The three slices go round the end the same way (one gap can be more than 180°, so no "short way round").
+      const fwd = [0, 1, 2].map(k => ((OL[tri[(k + 1) % 3]] - OL[tri[k]]) % 360 + 360) % 360);
+      const dir = Math.abs(fwd[0] + fwd[1] + fwd[2] - 360) < 1e-6 ? 1 : -1;
+      for (let k = 0; k < 3; k++) {
+        const a = corner(tri[k]), b = corner(tri[(k + 1) % 3]);
+        b.x = a.x + (dir > 0 ? fwd[k] : fwd[k] - 360);
+        addPiece([a, b, { x: b.x, y: end, e: 0, s: 0 }, { x: a.x, y: end, e: 0, s: 0 }], lonRef);
+      }
+      continue;
+    }
+    const q = tri.map(corner);
+    q[1].x = q[0].x + wrapDelta(q[1].x - q[0].x);
+    q[2].x = q[0].x + wrapDelta(q[2].x - q[0].x);
+    if (Math.min(q[0].x, q[1].x, q[2].x) >= -180 && Math.max(q[0].x, q[1].x, q[2].x) <= 180) { tris.push(q.map(v => [v.i, v.x, v.y, lonRef])); continue; }
+    addPiece(q, lonRef);
+  }
+  // Refine where Spilhaus draws an edge longer than 1% of its square
+  let xy = new Float64Array(0), done = 0;
+  const projectNew = () => {
+    const n = ll.length / 2;
+    if (n === done) return;
+    const part = projectFlat(Float64Array.from(ll.slice(2 * done)), SP, Int8Array.from(side.slice(done)));
+    const all = new Float64Array(2 * n); all.set(xy); all.set(part, 2 * done); xy = all; done = n;
+  };
+  projectNew();
+  let W = 0; for (let i = 0; i < xy.length; i += 2) if (isFinite(xy[i])) W = Math.max(W, Math.abs(xy[i]), Math.abs(xy[i + 1]));
+  const T = 2 * W * 0.01;
+  // Lines into an end of the cut run straight into the corner on the map, so they are never split
+  const atEnd = i => Math.abs(OF[i]) >= SPIL_END_LIM - 1e-6;
+  const len = (a, b) => { if (atEnd(a) || atEnd(b)) return 0; const d = Math.hypot(xy[2 * a] - xy[2 * b], xy[2 * a + 1] - xy[2 * b + 1]); return isFinite(d) ? d : 0; };
+  let list = tris;
+  for (let level = 0; level < 7; level++) {
+    const mids = new Map();
+    const mid = (A, B) => {
+      const k = A[0] < B[0] ? `${A[0]}|${B[0]}` : `${B[0]}|${A[0]}`;
+      let m = mids.get(k);
+      if (!m) {
+        // The great-circle midpoint: the same whichever triangle asks, so neighbours always agree (no cracks).
+        // Edges along the cut stay on it, on their own side.
+        const v = (L, F) => [Math.cos(F * D2R) * Math.cos(L * D2R), Math.cos(F * D2R) * Math.sin(L * D2R), Math.sin(F * D2R)];
+        const a = v(A[1], A[2]), b = v(B[1], B[2]), sx = a[0] + b[0], sy = a[1] + b[1], sz = a[2] + b[2];
+        let x = Math.atan2(sy, sx) / D2R;
+        const y = Math.atan2(sz, Math.hypot(sx, sy)) / D2R;
+        const sA = side[A[0]], sB = side[B[0]], s = sA && sA === sB ? sA : 0;
+        if (s) x = s * 180;
+        m = [pointAt(x, y, s, A[3]), x, y, A[3]];
+        mids.set(k, m);
+      }
+      return m;
+    };
+    const next = [];
+    let changed = false;
+    for (const t of list) {
+      const [a, b, c] = t;
+      const sab = len(a[0], b[0]) > T, sbc = len(b[0], c[0]) > T, sca = len(c[0], a[0]) > T;
+      const n = sab + sbc + sca;
+      if (!n) { next.push(t); continue; }
+      changed = true;
+      if (n === 3) { const m1 = mid(a, b), m2 = mid(b, c), m3 = mid(c, a); next.push([a, m1, m3], [m1, b, m2], [m3, m2, c], [m1, m2, m3]); continue; }
+      // rotate so the first split edge starts at a
+      let [p0, p1, p2] = sab ? (sbc || !sca ? [a, b, c] : [c, a, b]) : sbc ? [b, c, a] : [c, a, b];
+      const s01 = len(p0[0], p1[0]) > T, s12 = len(p1[0], p2[0]) > T, s20 = len(p2[0], p0[0]) > T;
+      if (n === 1) { const m = mid(p0, p1); next.push([p0, m, p2], [m, p1, p2]); continue; }
+      if (s01 && s12) { const m1 = mid(p0, p1), m2 = mid(p1, p2); next.push([m1, p1, m2], [p0, m1, m2], [p0, m2, p2]); continue; }
+      if (s01 && s20) { const m1 = mid(p0, p1), m3 = mid(p2, p0); next.push([p0, m1, m3], [m1, p1, p2], [m1, p2, m3]); continue; }
+      next.push(t);
+    }
+    list = next;
+    if (!changed) break;
+    projectNew();
+  }
+  const idx = [];
+  for (const t of list) idx.push(t[0][0], t[1][0], t[2][0]);
+  if (ll.length / 2 > 65535) console.warn('Spilhaus mesh too large', ll.length / 2);
+  mesh.ll = new Float64Array(ll);
+  mesh.uv = new Float32Array(uv);
+  mesh.side = Int8Array.from(side);
+  mesh.idxSpil = new Uint16Array(idx);
+  mesh.countSpil = idx.length;
 }
 
+/* A geodesic circle. It is buffered at longitude 0 and then slid east (exact, since the Earth is the same all
+   the way round), so a circle that crosses the 180° line stays one ring instead of being split there. */
 function circleRing(lon, lat, radiusMi, step = 2) {
-  const poly = geodesicBufferOperator.execute(new Point({ x: lon, y: lat, spatialReference: WGS }), radiusMi, { unit: 'miles' });
+  const poly = geodesicBufferOperator.execute(new Point({ x: 0, y: lat, spatialReference: WGS }), radiusMi, { unit: 'miles' });
   const src = poly.rings[0];
   const out = [];
-  for (let i = 0; i < src.length - 1; i += step) out.push(src[i]);
+  for (let i = 0; i < src.length - 1; i += step) out.push([src[i][0] + lon, src[i][1]]);
   out.push(out[0]);
   return out;
 }
 
 /* Project a flat lon/lat array with the ArcGIS projection engine. Coordinates are clamped to each
    projection's valid range first, so every point projects and point order is kept (needed to morph). */
-function projectFlat(flat, p) {
+function projectFlat(flat, p, side) {
   const n = flat.length / 2;
-  const pts = new Array(n);
+  const pts = new Array(n), ends = [];
   for (let i = 0; i < n; i++) {
-    const lon = Math.max(-179.999, Math.min(179.999, flat[2 * i]));
-    const lat = Math.max(p.minLat, Math.min(p.maxLat, flat[2 * i + 1]));
+    let lon = flat[2 * i], lat = flat[2 * i + 1];
+    if (p.spil) { const q = spilSafe(lon, lat, side ? side[i] : 0); if (q.end) ends.push(i); [lon, lat] = q; lon = wrapLon(lon); }   // 180° is not an edge on Spilhaus
+    lon = Math.max(-179.999, Math.min(179.999, lon));
+    lat = Math.max(p.minLat, Math.min(p.maxLat, lat));
     pts[i] = [lon, lat];
   }
   const out = new Float64Array(2 * n);
@@ -1244,6 +1581,8 @@ function projectFlat(flat, p) {
       out[2 * i] = q ? q.x : NaN; out[2 * i + 1] = q ? q.y : NaN;
     }
   }
+  // Spilhaus's corners magnify the ends of its cut enormously (the last few km fill a corner): put those points in the corner
+  if (p.spilHalf) for (const i of ends) { out[2 * i] = Math.sign(out[2 * i]) * p.spilHalf; out[2 * i + 1] = Math.sign(out[2 * i + 1]) * p.spilHalf; }
   return out;
 }
 
@@ -1258,14 +1597,12 @@ function invProj(p, X, Y) {
 }
 
 function projectWorld(p) {
-  p.xy = projectFlat(world.ll, p);
-  p.meshXY = projectFlat(mesh.ll, p);
+  p.xy = projectFlat(world.ll, p, world.side);
+  p.meshXY = projectFlat(mesh.ll, p, mesh.side);
   let xmin = Infinity, ymin = Infinity, xmax = -Infinity, ymax = -Infinity;
-  for (const [s, c] of world.outline) for (let i = s; i < s + c; i++) {
-    const x = p.xy[2 * i], y = p.xy[2 * i + 1];
-    if (!isFinite(x) || !isFinite(y)) continue;
-    if (x < xmin) xmin = x; if (x > xmax) xmax = x; if (y < ymin) ymin = y; if (y > ymax) ymax = y;
-  }
+  const grow = (x, y) => { if (!isFinite(x) || !isFinite(y)) return; if (x < xmin) xmin = x; if (x > xmax) xmax = x; if (y < ymin) ymin = y; if (y > ymax) ymax = y; };
+  if (p.spil) { for (let i = 0; i < p.meshXY.length; i += 2) grow(p.meshXY[i], p.meshXY[i + 1]); }  // the square
+  else for (const [s, c] of world.outline) for (let i = s; i < s + c; i++) grow(p.xy[2 * i], p.xy[2 * i + 1]);
   p.bbox = { xmin, ymin, xmax, ymax };
   if (p.fitLat) {
     // Fit the opening view to a narrower band of latitude; the map is still drawn beyond it
@@ -1324,6 +1661,15 @@ function polyShape(xy) {
    Measuring circle
    ================================================================ */
 function clampProbe(lon, lat) {
+  if (PROJ[state.current]?.spil) {
+    // On Spilhaus, keep the whole circle off the cut, which is the edge of the square
+    const r = CIRCLE_RADIUS_MI / 3958.8 / D2R + 0.5;
+    let [L, F] = toObl(lon, lat);
+    F = clamp(F, -(90 - r), 90 - r);
+    const lim = Math.asin(Math.min(1, Math.sin(r * D2R) / Math.cos(F * D2R))) / D2R;
+    if (Math.abs(L) > 180 - lim) L = (L < 0 ? -1 : 1) * (180 - lim);
+    return fromObl(L, F);
+  }
   lat = clamp(lat, -PROBE_MAX_LAT, PROBE_MAX_LAT);
   const r = CIRCLE_RADIUS_MI / 3958.8;
   const half = Math.asin(Math.min(1, Math.sin(r) / Math.cos(lat * D2R))) / D2R;
@@ -1335,7 +1681,7 @@ function setProbe(lon, lat, redraw = true) {
   state.probe = { lon, lat };
   const ring = circleRing(lon, lat, CIRCLE_RADIUS_MI);
   probe.ll = new Float64Array(ring.flat());
-  probe.trueM2 = geodeticAreaOperator.execute(new Polygon({ rings: [ring], spatialReference: WGS }), { unit: 'square-kilometers' }) * 1e6;
+  probe.trueM2 = geodeticAreaOperator.execute(new Polygon({ rings: [ring.map(([x, y]) => [x - lon, y])], spatialReference: WGS }), { unit: 'square-kilometers' }) * 1e6;
   probe.cache = {};
   if (redraw) { updateProbeReadout(); requestRender(); }
 }
@@ -1466,33 +1812,33 @@ function buildMovedGeo(pos) {
     if (Math.abs(ring[n - 1][0] - ring[0][0]) > 180) return null;  // goes round a pole
     rings.push(ring);
   }
-  const ll = [], out = [], seam = [];
+  const ll = [], out = [], seam = [], side = [];
   for (const r0 of rings) {
     const r = r0.slice(0, -1);  // open ring
-    let mn = Infinity, mx = -Infinity;
-    for (const p of r) { if (p[0] < mn) mn = p[0]; if (p[0] > mx) mx = p[0]; }
-    for (const k of [-360, 0, 360]) {
-      if (mx + k <= -180 || mn + k >= 180) continue;
-      const shifted = k ? r.map(p => [p[0] + k, p[1]]) : r;
-      const pts = (mn + k >= -180 && mx + k <= 180) ? shifted : clipBand(shifted, -180, 180);
-      if (pts.length < 3) continue;
-      const start = ll.length / 2;
-      for (let i = 0; i < pts.length; i++) {
-        const a = pts[i], b = pts[(i + 1) % pts.length];
-        const onSeam = (a[0] <= -180 && b[0] <= -180) || (a[0] >= 180 && b[0] >= 180);
-        const steps = Math.max(1, Math.ceil(Math.max(Math.abs(b[0] - a[0]), Math.abs(b[1] - a[1])) / 1));
-        for (let s = 0; s < steps; s++) {
-          ll.push(a[0] + (b[0] - a[0]) * s / steps, a[1] + (b[1] - a[1]) * s / steps);
-          seam.push(onSeam ? 1 : 0);
+    // Split along the Spilhaus cut, then at the 180° line; edges made by the splits are seams
+    for (const pc of splitRing(r, Uint8Array.from(r, () => 0))) {
+      const un = pc.pts.map((p, i) => ({ x: p[0], y: p[1], e: pc.seam[i], s: pc.side[i] }));
+      for (let i = 1; i < un.length; i++) un[i].x = un[i - 1].x + wrapDelta(un[i].x - un[i - 1].x);
+      for (const pts of bandPieces(un)) {
+        if (pts.length < 3) continue;
+        const start = ll.length / 2;
+        for (let i = 0; i < pts.length; i++) {
+          const a = pts[i], b = pts[(i + 1) % pts.length];
+          const steps = Math.max(1, Math.ceil(Math.max(Math.abs(b.x - a.x), Math.abs(b.y - a.y)) / 1));
+          for (let k = 0; k < steps; k++) {
+            ll.push(a.x + (b.x - a.x) * k / steps, a.y + (b.y - a.y) * k / steps);
+            seam.push(a.e ? 1 : 0);
+            side.push(k === 0 ? a.s : (a.s && a.s === b.s ? a.s : 0));
+          }
         }
+        out.push([start, ll.length / 2 - start]);
       }
-      out.push([start, ll.length / 2 - start]);
     }
   }
   const centre = ll.length / 2;
   ll.push(wrapLon(pos.lon), pos.lat);
-  seam.push(0);
-  return { ll: Float64Array.from(ll), rings: out, seam: Uint8Array.from(seam), centre };
+  seam.push(0); side.push(0);
+  return { ll: Float64Array.from(ll), rings: out, seam: Uint8Array.from(seam), side: Int8Array.from(side), centre };
 }
 function clipBand(pts, xmin, xmax) {
   const pass = (inp, inside, X) => {
@@ -1554,7 +1900,7 @@ function countryCache(p, which) {
   const geo = which === 'moved' ? CM.moved : CM.home;
   if (!geo) return null;
   let c = store[p.id];
-  if (!c) c = store[p.id] = { xy: projectFlat(geo.ll, p), screen: null };
+  if (!c) c = store[p.id] = { xy: projectFlat(geo.ll, p, geo.side), screen: null };
   if (!c.screen && p.fit) c.screen = toScreen(c.xy, p.fit);
   return c;
 }
@@ -1563,11 +1909,38 @@ function countryStats(p) {
   const am = ringsArea(m.xy, CM.moved.rings), ah = ringsArea(h.xy, CM.home.rings);
   return { vsHome: am / ah, vsTrue: am / (CM.drawnKm2 * 1e6 * p.kRef), mapM2: am };
 }
+/* On Spilhaus a moved country can be cut into pieces on different edges of the square. Rings that sit
+   together on the map are grouped; the group with the most map area is the one drawn on the card and labelled. */
+function countryGroups(p) {
+  const c = countryCache(p, 'moved'), geo = CM.moved;
+  if (c.groups) return c.groups;
+  // Only shapes that were cut (at the 180° line or the Spilhaus edge) are grouped; islands far apart stay together
+  let cut = false;
+  outer: for (const [s, n] of geo.rings) for (let i = s; i < s + n; i++) if (geo.seam[i]) { cut = true; break outer; }
+  if (!cut || geo.rings.length < 2) return (c.groups = { main: geo.rings, split: false });
+  const xy = c.xy, tol = (p.bbox.xmax - p.bbox.xmin) * 0.03;
+  const boxes = geo.rings.map(([s, n]) => {
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    for (let i = s; i < s + n; i++) { const x = xy[2 * i], y = xy[2 * i + 1]; if (!isFinite(x)) continue; x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); }
+    return [x0, y0, x1, y1];
+  });
+  const parent = geo.rings.map((_, i) => i), find = i => parent[i] === i ? i : (parent[i] = find(parent[i]));
+  for (let i = 0; i < boxes.length; i++) for (let j = i + 1; j < boxes.length; j++) {
+    const a = boxes[i], b = boxes[j];
+    if (a[0] - tol <= b[2] && b[0] - tol <= a[2] && a[1] - tol <= b[3] && b[1] - tol <= a[3]) parent[find(i)] = find(j);
+  }
+  const groups = new Map();
+  geo.rings.forEach((r, i) => { const k = find(i); if (!groups.has(k)) groups.set(k, []); groups.get(k).push(r); });
+  let main = null, best = -1, total = 0;
+  for (const g of groups.values()) { const a = ringsArea(xy, g); total += a; if (a > best) { best = a; main = g; } }
+  // Only say it's cut into pieces when the cut-off pieces matter (at least 5% of it), not for a few islands
+  return (c.groups = { main, split: groups.size > 1 && total > 0 && (total - best) / total >= 0.05 });
+}
 function countryBBoxBase(p) {
   const s = countryCache(p, 'moved')?.screen;
   if (!s) return null;
   let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
-  for (const [st, n] of CM.moved.rings) for (let i = st; i < st + n; i++) {
+  for (const [st, n] of countryGroups(p).main) for (let i = st; i < st + n; i++) {
     const x = s[2 * i], y = s[2 * i + 1];
     if (!isFinite(x)) continue;
     if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y;
@@ -1827,9 +2200,10 @@ function initGL(imageCanvas) {
     gl.useProgram(glProg);
     for (const n of ['aFrom', 'aTo', 'aUV']) glLoc[n] = gl.getAttribLocation(glProg, n);
     for (const n of ['uRes', 'uT', 'uTex', 'uZoom', 'uOff']) glLoc[n] = gl.getUniformLocation(glProg, n);
-    glBuf.from = gl.createBuffer(); glBuf.to = gl.createBuffer(); glBuf.uv = gl.createBuffer(); glBuf.idx = gl.createBuffer();
+    glBuf.from = gl.createBuffer(); glBuf.to = gl.createBuffer(); glBuf.uv = gl.createBuffer(); glBuf.idx = gl.createBuffer(); glBuf.idxSpil = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, glBuf.uv); gl.bufferData(gl.ARRAY_BUFFER, mesh.uv, gl.STATIC_DRAW);
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, glBuf.idx); gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, mesh.idx, gl.STATIC_DRAW);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, glBuf.idxSpil); gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, mesh.idxSpil, gl.STATIC_DRAW);
     const empty = new Float32Array(mesh.uv.length);
     gl.bindBuffer(gl.ARRAY_BUFFER, glBuf.from); gl.bufferData(gl.ARRAY_BUFFER, empty, gl.DYNAMIC_DRAW);
     gl.bindBuffer(gl.ARRAY_BUFFER, glBuf.to); gl.bufferData(gl.ARRAY_BUFFER, empty, gl.DYNAMIC_DRAW);
@@ -1857,7 +2231,7 @@ function glUpload(which, arr) {
   gl.bindBuffer(gl.ARRAY_BUFFER, glBuf[which]);
   gl.bufferSubData(gl.ARRAY_BUFFER, 0, arr);
 }
-function glDraw(t, resW, resH, z = 1, kx = 0, ky = 0) {
+function glDraw(t, resW, resH, z = 1, kx = 0, ky = 0, spil = false) {
   if (!glReady) return;
   gl.viewport(0, 0, glCanvas.width, glCanvas.height);
   gl.clearColor(0, 0, 0, 0);
@@ -1872,8 +2246,9 @@ function glDraw(t, resW, resH, z = 1, kx = 0, ky = 0) {
   gl.bindTexture(gl.TEXTURE_2D, glTex);
   const bind = (buf, loc) => { gl.bindBuffer(gl.ARRAY_BUFFER, buf); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0); };
   bind(glBuf.from, glLoc.aFrom); bind(glBuf.to, glLoc.aTo); bind(glBuf.uv, glLoc.aUV);
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, glBuf.idx);
-  gl.drawElements(gl.TRIANGLES, mesh.count, gl.UNSIGNED_SHORT, 0);
+  // Spilhaus (and morphs to or from it) uses the triangle list that is split along its cut
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, spil ? glBuf.idxSpil : glBuf.idx);
+  gl.drawElements(gl.TRIANGLES, spil ? mesh.countSpil : mesh.count, gl.UNSIGNED_SHORT, 0);
 }
 
 /* ================================================================
@@ -1939,6 +2314,7 @@ function goTo(id, opts = {}) {
     if (view.A) view.A = carryAnchor(PROJ[prev], PROJ[id], view.A);
   }
   state.current = id;
+  if (state.ready && (PROJ[prev].spil || PROJ[id].spil)) setProbe(state.probe.lon, state.probe.lat, false);  // Spilhaus keeps the circle off its edge
   history.replaceState(null, '', '#' + id);
   updateDial();
   updateInfo();
@@ -1983,8 +2359,26 @@ function afterArrive() {
 /* ================================================================
    Drawing the vector layer (on top of the imagery), in view coordinates
    ================================================================ */
-function traceRings(g, cur, rings, close, step = 1) {
+function traceRings(g, cur, rings, close, step = 1, seam = null) {
   const z = VT.z, kx = VT.kx, ky = VT.ky;
+  if (seam) {
+    // Outline only: leave out edges that aren't real borders (cuts made by the 180° line or the Spilhaus edge)
+    for (const [s, n] of rings) {
+      const st = n < 24 ? 1 : step;
+      const at = i => [cur[2 * (s + i)] * z + kx, cur[2 * (s + i) + 1] * z + ky];
+      let pen = false, j = 0;
+      while (j < n) {
+        if (!pen) { const [x, y] = at(j); if (isFinite(x) && isFinite(y)) { g.moveTo(x, y); pen = true; } }
+        if (!pen || seam[s + j]) { pen = false; j++; continue; }   // edge j → j+1 isn't drawn
+        let k = j + 1;
+        while (k < j + st && k < n && !seam[s + k]) k++;           // stride, but never across a seam
+        const [x, y] = at(k % n);
+        if (isFinite(x) && isFinite(y)) g.lineTo(x, y); else pen = false;
+        j = k;
+      }
+    }
+    return;
+  }
   for (const [s, n] of rings) {
     const st = n < 24 ? 1 : step;
     let started = false;
@@ -2015,6 +2409,15 @@ function visibleTest() {
   return k => { const b = p.countryBoxes[k]; return !(b[2] < x0 || b[0] > x1 || b[3] < y0 || b[1] > y1); };
 }
 
+/* The map's outer edge: the lat/long frame, or the Spilhaus square. Nothing while morphing to or from Spilhaus. */
+function spilInvolved() { const m = state.morph; return m ? !!(PROJ[m.from].spil || PROJ[m.to].spil) : !!PROJ[state.current].spil; }
+function traceOutline(g, cur) {
+  if (state.morph && spilInvolved()) return false;
+  const p = PROJ[state.current];
+  if (p.spil) { const r = p.fit.rect; g.rect(r.l * VT.z + VT.kx, r.t * VT.z + VT.ky, (r.r - r.l) * VT.z, (r.b - r.t) * VT.z); return true; }
+  traceRings(g, cur, world.outline, true);
+  return true;
+}
 function drawScene(g, cur, morphing, cull) {
   const step = morphing ? 3 : 1;
   const imagery = state.showImagery && glReady;
@@ -2022,8 +2425,8 @@ function drawScene(g, cur, morphing, cull) {
   g.lineJoin = 'bevel';
 
   if (!imagery) {
-    g.beginPath(); traceRings(g, cur, world.outline, true);
-    g.fillStyle = C.ocean; g.fill();
+    g.beginPath();
+    if (traceOutline(g, cur)) { g.fillStyle = C.ocean; g.fill(); }
   }
   if (state.showGrid) {
     g.beginPath(); traceRings(g, cur, world.gratMinor, false);
@@ -2033,10 +2436,16 @@ function drawScene(g, cur, morphing, cull) {
   }
   if (!imagery || !morphing) {
     const vis = cull ? visibleTest() : null;
-    g.beginPath();
-    world.countries.forEach((c, k) => { if (!vis || vis(k)) traceRings(g, cur, c.rings, true, step); });
-    if (!imagery) { g.fillStyle = C.land; g.fill(); }
-    if (!morphing) { g.lineWidth = imagery ? 0.6 : 0.5; g.strokeStyle = imagery ? C.borderImg : C.borderFlat; g.stroke(); }
+    if (!imagery) {
+      g.beginPath();
+      world.countries.forEach((c, k) => { if (!vis || vis(k)) traceRings(g, cur, c.rings, true, step); });
+      g.fillStyle = C.land; g.fill();
+    }
+    if (!morphing) {
+      g.beginPath();
+      world.countries.forEach((c, k) => { if (!vis || vis(k)) traceRings(g, cur, c.rings, true, step, world.seam); });
+      g.lineWidth = imagery ? 0.6 : 0.5; g.strokeStyle = imagery ? C.borderImg : C.borderFlat; g.stroke();
+    }
   }
 
   const pair = PAIRS.find(p => p.id === state.pair);
@@ -2045,21 +2454,29 @@ function drawScene(g, cur, morphing, cull) {
       g.beginPath();
       for (const c of world.countries) if (c.subjects.includes(sid)) traceRings(g, cur, c.rings, true, step);
       g.fillStyle = fill; g.fill();
-      if (!morphing) { g.lineWidth = 1.4; g.strokeStyle = line; g.stroke(); }
+      if (!morphing) {
+        g.beginPath();
+        for (const c of world.countries) if (c.subjects.includes(sid)) traceRings(g, cur, c.rings, true, step, world.seam);
+        g.lineWidth = 1.4; g.strokeStyle = line; g.stroke();
+      }
     }
   }
   if (circlesMode && state.showCircles) {
     g.beginPath();
     for (const c of world.circles) traceRings(g, cur, c.rings, true, morphing ? 2 : 1);
     g.fillStyle = C.circleFill; g.fill();
+    g.beginPath();
+    for (const c of world.circles) traceRings(g, cur, c.rings, true, morphing ? 2 : 1, world.seam);
     g.lineWidth = 1.3; g.strokeStyle = C.circle; g.stroke();
   }
 
-  g.beginPath(); traceRings(g, cur, world.outline, true);
-  g.lineWidth = 1.4; g.strokeStyle = C.edge;
-  if (!morphing) { g.shadowColor = C.glow; g.shadowBlur = 16; }
-  g.stroke();
-  g.shadowBlur = 0;
+  g.beginPath();
+  if (traceOutline(g, cur)) {
+    g.lineWidth = 1.4; g.strokeStyle = C.edge;
+    if (!morphing) { g.shadowColor = C.glow; g.shadowBlur = 16; }
+    g.stroke();
+    g.shadowBlur = 0;
+  }
 
   if (circlesMode && pair && pair.a) {
     g.font = `700 ${W < 520 ? 11 : 13}px "Atkinson Hyperlegible Next", system-ui, sans-serif`;
@@ -2208,7 +2625,7 @@ function render() {
   const f = currentFrame();
   if (!f.world) return null;
   updateVT(f.e);
-  glDraw(state.morph ? f.e : 1, W, H, VT.z, VT.kx, VT.ky);
+  glDraw(state.morph ? f.e : 1, W, H, VT.z, VT.kx, VT.ky, spilInvolved());
   if (state.morph) {
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
     ctx.clearRect(0, 0, W, H);
@@ -2262,13 +2679,16 @@ function drawThumbnails() {
     const saved = VT; VT = { z: 1, kx: 0, ky: 0, ax: 0, ay: 0 };
     if (glReady && glCanvas.width >= TW && glCanvas.height >= TH) {
       glUpload('to', toScreen(p.meshXY, fit));
-      glDraw(1, glCanvas.width, glCanvas.height);
+      glDraw(1, glCanvas.width, glCanvas.height, 1, 0, 0, !!p.spil);
       c.drawImage(glCanvas, 0, 0, TW, TH, 0, 0, TW, TH);
     } else {
-      c.beginPath(); traceRings(c, scr, world.outline, true); c.fillStyle = C.ocean; c.fill();
+      c.beginPath();
+      if (p.spil) c.rect(fit.tx + fit.s * xmin, fit.ty - fit.s * ymax, fit.s * (xmax - xmin), fit.s * (ymax - ymin)); else traceRings(c, scr, world.outline, true);
+      c.fillStyle = C.ocean; c.fill();
       c.beginPath(); for (const k of world.countries) traceRings(c, scr, k.rings, true); c.fillStyle = C.land; c.fill();
     }
-    c.beginPath(); traceRings(c, scr, world.outline, true);
+    c.beginPath();
+    if (p.spil) c.rect(fit.tx + fit.s * xmin, fit.ty - fit.s * ymax, fit.s * (xmax - xmin), fit.s * (ymax - ymin)); else traceRings(c, scr, world.outline, true);
     c.lineWidth = 1.2; c.strokeStyle = C.edge; c.stroke();
     VT = saved;
   }
@@ -2417,7 +2837,7 @@ function updateProbeReadout() {
   if (!p.fit) return;
   const st = probeStats(p);
   const ratio = st.long / Math.max(1e-9, st.short);
-  const center = p.family === 'disc' ? ' (the North Pole)' : ' (0°, 0°)';
+  const center = p.centerLabel || (p.family === 'disc' ? ' (the North Pole)' : ' (0°, 0°)');
   let shapeWords;
   if (ratio < 1.12) shapeWords = 'Still round';
   else if (ratio < 1.5) shapeWords = 'A little squashed';
@@ -2485,6 +2905,7 @@ function updateCountryReadout(full) {
     v += ' Drag it to see what changes.';
   } else if (Math.abs(st.vsHome - 1) < 0.05) v = 'Same size here as in its real place (dashed outline). This map keeps area.';
   else v = `It looks ${st.vsHome < 1 ? 'only ' : ''}${fmtX(st.vsHome)}× as big here as in its real place (dashed outline).`;
+  if (countryGroups(p).split) v += ' The edge of this map cuts it into pieces.';
   $('cVerdict').textContent = v;
   $('cWhere').innerHTML = moved
     ? `<b>${CM.name}</b> at <b>${fmtLat(CM.pos.lat)}, ${fmtLon(CM.pos.lon)}</b> · real place <b>${fmtLat(CM.c0.lat)}, ${fmtLon(CM.c0.lon)}</b>`
@@ -2521,7 +2942,8 @@ function drawCountryViz(p, st) {
   const grow = (b, x, y) => { if (!isFinite(x)) return; if (x < b.x0) b.x0 = x; if (x > b.x1) b.x1 = x; if (y < b.y0) b.y0 = y; if (y > b.y1) b.y1 = y; };
   const t = box(), m = box();
   for (const r of CM.trueShape) for (let i = 0; i < r.length; i += 2) grow(t, r[i], r[i + 1]);
-  for (const [s, n] of CM.moved.rings) for (let i = s; i < s + n; i++) grow(m, mapXY[2 * i] * kk, mapXY[2 * i + 1] * kk);
+  const mainRings = countryGroups(p).main;
+  for (const [s, n] of mainRings) for (let i = s; i < s + n; i++) grow(m, mapXY[2 * i] * kk, mapXY[2 * i + 1] * kk);
   // Both outlines at one scale: the map outline in "real meters at the scale of the map's center"
   const sc = Math.min(116 / Math.max(t.x1 - t.x0, m.x1 - m.x0, 1), 88 / Math.max(t.y1 - t.y0, m.y1 - m.y0, 1));
   const tcx = (t.x0 + t.x1) / 2, tcy = (t.y0 + t.y1) / 2, mcx = (m.x0 + m.x1) / 2, mcy = (m.y0 + m.y1) / 2;
@@ -2535,7 +2957,7 @@ function drawCountryViz(p, st) {
     dTrue += 'Z';
   }
   let dMap = '';
-  for (const [s, n] of CM.moved.rings) {
+  for (const [s, n] of mainRings) {
     for (let j = 0; j < n; j += stride) {
       const i = s + j;
       dMap += `${j ? 'L' : 'M'}${(195 + (mapXY[2 * i] * kk - mcx) * sc).toFixed(1)} ${(48 - (mapXY[2 * i + 1] * kk - mcy) * sc).toFixed(1)}`;
@@ -2946,7 +3368,7 @@ function showTip(text, x, y) {
 function hideTip() { $('tip').hidden = true; }
 
 /* Small test hook for checking the maths */
-window.__lab = {
+window.__lab = { mesh, toObl, fromObl, spilSafe, splitRing, probe, probeFor, 
   state, PROJ, world, view, CM, probeStats: id => probeStats(PROJ[id]), setProbe, goTo, render, screenToLonLat,
   isGL: () => glReady, setMode, chooseCountry, mainFeatureFor, setCountryPos, countryStats: id => countryStats(PROJ[id]),
   zoomBy, zoomFit, zoomToCountry, setZoomKeepingPoint, getVT: () => ({ ...VT }), getVP: () => ({ ...VP }),

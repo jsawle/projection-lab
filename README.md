@@ -10,7 +10,7 @@ A browser app for middle school students. The world morphs between nine map proj
 - Map buttons sit below the map, so every projection uses the full height
 - Country, Measure and Compare each show their result in a real-versus-this-map card that fits without scrolling on laptop screens
 
-**Lab version:** https://jsawle.github.io/projection-lab/lab/ — test copy for trying new features before they reach the live app. Now testing v1.3.6: clearer Country card. The number under the map shape and the label on the map show its size compared with its real size, and the sentence below compares it with its size in its real place (the dashed outline). “Home” is now “real place” throughout.
+**Lab version:** https://jsawle.github.io/projection-lab/lab/ — test copy for trying new features before they reach the live app. Now testing v1.4.0: the Spilhaus World Ocean Map replaces Mollweide, plus the clearer Country card from v1.3.5–1.3.6 (“real place” instead of “home”).
 
 
 ## Projections
@@ -18,10 +18,11 @@ A browser app for middle school students. The world morphs between nine map proj
 | Family | Projections |
 | --- | --- |
 | Rectangles (cylindrical) | Plate Carrée, Mercator, Gall–Peters |
-| Rounded | Robinson, Winkel Tripel, Mollweide, Equal Earth |
+| Rounded | Robinson, Winkel Tripel, Mollweide (live app), Equal Earth |
+| Square | Spilhaus World Ocean Map (lab: replaces Mollweide) |
 | Polar (North Pole) | Azimuthal Equidistant, Lambert Azimuthal Equal-Area |
 
-Equal-area: Gall–Peters, Mollweide, Equal Earth, Lambert Azimuthal Equal-Area.
+Equal-area: Gall–Peters, Equal Earth, Lambert Azimuthal Equal-Area, and Mollweide in the live app.
 
 ## Built with
 
