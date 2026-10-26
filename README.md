@@ -4,7 +4,7 @@ A browser app for middle school students. The world morphs between nine map proj
 
 **Live app:** https://jsawle.github.io/projection-lab/
 
-**Lab version (testing):** https://jsawle.github.io/projection-lab/lab/ — new design with Esri World Imagery that morphs with the map, zoom (1–12×) that keeps the place in the middle centred through each morph, and **My country**: drag any country over the globe at its real size and shape to see what each projection does to it. Moves to the main URL once approved.
+**Lab version (testing):** https://jsawle.github.io/projection-lab/lab/ — new design with Esri World Imagery that morphs with the map, zoom (1–12×) that keeps the place in the middle centred through each morph, and a **Country** tab: tap any country to choose it, then drag it over the globe at its real size and shape to see what each projection does to it. Moves to the main URL once approved.
 
 ## Projections
 
