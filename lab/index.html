@@ -434,8 +434,8 @@ kbd { font-family: var(--font-data); font-size: 0.85em; border: 1px solid var(--
 .c-sub b { color: var(--ink); font-family: var(--font-data); font-weight: 600; }
 .c-verdict { grid-column: 1 / -1; margin: 10px 0 0 !important; padding-top: 9px; border-top: 1px solid var(--line); font-weight: 700; font-size: 0.92rem; line-height: 1.35; }
 .c-lbl { margin: 12px 0 6px !important; font: 700 0.68rem/1.2 var(--font-body); letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-soft); }
-.c-moves { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
-.c-moves .pair-btn { padding: 6px 4px; text-align: center; }
+.c-moves { display: flex; gap: 6px; }
+.c-moves .pair-btn { flex: 1 1 auto; min-width: 0; padding: 6px 4px; text-align: center; }
 .c-note { margin-top: 10px !important; font-size: 0.82rem; }
 /* v1.3.3: Measure and Compare use the same card as Country */
 .hint.tight.first, .c-lbl.first { margin-top: 0 !important; }
@@ -603,7 +603,7 @@ kbd { font-family: var(--font-data); font-size: 0.85em; border: 1px solid var(--
           <button class="pair-btn" type="button" data-move="eq" aria-label="Move it to the Equator">Equator</button>
           <button class="pair-btn" type="button" data-move="n60" aria-label="Move it to 60 degrees north">60° N</button>
           <button class="pair-btn" type="button" data-move="s60" aria-label="Move it to 60 degrees south">60° S</button>
-          <button class="pair-btn" type="button" data-move="home" aria-label="Move it back home">Home</button>
+          <button class="pair-btn" type="button" data-move="home" aria-label="Move it back to its real place">Real place</button>
         </div>
         <p class="where" id="cWhere"></p>
         <p class="hint c-note">On the globe the country keeps its real size and shape wherever you move it, so every change you see comes from the map projection. <span class="ver" id="countryVer"></span></p>
@@ -712,7 +712,7 @@ kbd { font-family: var(--font-data); font-size: 0.85em; border: 1px solid var(--
    Versions: app + one version per model. Bump a model's version when
    its maths or data handling changes, and the app version every release.
    ================================================================== */
-const APP_VERSION = '1.3.5';
+const APP_VERSION = '1.3.6';
 const SDK_VERSION = '5.1';
 const MODELS = {
   morph:   { name: 'Morph engine',       v: '1.4', what: 'Slides every projected point from one map to the next (eased, 2 seconds). The satellite picture is moved on the graphics card. Can be switched off.' },
@@ -720,7 +720,7 @@ const MODELS = {
   imagery: { name: 'Imagery basemap',    v: '1.1', what: 'Esri World Imagery, zoom level 3 tiles (level 4 once you zoom in past 2×), reshaped to a latitude–longitude grid and draped over a 2° mesh.' },
   circles: { name: 'Same-size circles',  v: '1.0', what: '55 geodesic circles, 500-mile radius, every 30° of longitude at 60°S, 30°S, 0°, 30°N and 60°N.' },
   probe:   { name: 'Measuring circle',   v: '1.1', what: 'Map area ÷ real area, compared with a circle at the center of the map; shape and tilt from the circle’s longest and shortest axes.' },
-  country: { name: 'Country mover',      v: '1.0', what: 'Turns the country over the globe (a rotation, so its real size and shape never change), then projects it. Size compared with at home and with its real size.' },
+  country: { name: 'Country mover',      v: '1.0', what: 'Turns the country over the globe (a rotation, so its real size and shape never change), then projects it. Its size on the map compared with its real size, and with its size in its real place.' },
   compare: { name: 'Compare sizes',      v: '1.0', what: 'Real (geodetic) area versus flat area on the projected map.' },
   data:    { name: 'Country data',       v: '1.1', what: 'Living Atlas World Countries (Generalized). Map: simplified to 0.1°. Your country: finer detail (0.01°–0.1°, by size), joined across the 180° line.' },
 };
@@ -2128,7 +2128,7 @@ function drawTag(g, lines, x0, x1, ymid, subColor) {
   }
 }
 
-/* Your country: a dashed outline at home, the moved copy filled */
+/* Your country: a dashed outline in its real place, the moved copy filled */
 function pathGeo(g, s, geo, skipSeams) {
   const z = VT.z, kx = VT.kx, ky = VT.ky;
   for (const [st, n] of geo.rings) {
@@ -2476,20 +2476,20 @@ function updateCountryReadout(full) {
   $('cRealLbl').textContent = `${unit} in real life`;
   // The number under the map shape compares it with the globe shape beside it
   $('cMapX').innerHTML = `${fmtX(st.vsTrue)}<small>×</small>`;
-  // The verdict compares it with its size at home (the dashed outline on the map)
+  // The verdict compares it with its size in its real place (the dashed outline on the map)
   let v;
   if (!moved) {
-    v = st.vsTrue > 1.05 ? 'Even at home, this map draws it bigger than it really is.'
-      : st.vsTrue < 0.95 ? 'Even at home, this map draws it smaller than it really is.'
-      : 'At home, this map shows it at its real size.';
-    v += ' Move it to see if that changes.';
-  } else if (Math.abs(st.vsHome - 1) < 0.05) v = 'Same size here as at home (the dashed outline). This map keeps area.';
-  else v = `Here it looks ${st.vsHome < 1 ? 'only ' : ''}${fmtX(st.vsHome)}× as big as at home (the dashed outline).`;
+    v = st.vsTrue > 1.05 ? 'This map already draws it bigger than it really is.'
+      : st.vsTrue < 0.95 ? 'This map already draws it smaller than it really is.'
+      : 'This map shows it at its real size here.';
+    v += ' Drag it to see what changes.';
+  } else if (Math.abs(st.vsHome - 1) < 0.05) v = 'Same size here as in its real place (dashed outline). This map keeps area.';
+  else v = `It looks ${st.vsHome < 1 ? 'only ' : ''}${fmtX(st.vsHome)}× as big here as in its real place (dashed outline).`;
   $('cVerdict').textContent = v;
   $('cWhere').innerHTML = moved
-    ? `<b>${CM.name}</b> now at <b>${fmtLat(CM.pos.lat)}, ${fmtLon(CM.pos.lon)}</b> · home <b>${fmtLat(CM.c0.lat)}, ${fmtLon(CM.c0.lon)}</b>`
-    : `<b>${CM.name}</b> at home: <b>${fmtLat(CM.c0.lat)}, ${fmtLon(CM.c0.lon)}</b>`;
-  CM.tag = moved ? `${fmtX(st.vsHome)}× its size at home` : 'at home';
+    ? `<b>${CM.name}</b> at <b>${fmtLat(CM.pos.lat)}, ${fmtLon(CM.pos.lon)}</b> · real place <b>${fmtLat(CM.c0.lat)}, ${fmtLon(CM.c0.lon)}</b>`
+    : `<b>${CM.name}</b> at <b>${fmtLat(CM.c0.lat)}, ${fmtLon(CM.c0.lon)}</b>`;
+  CM.tag = `${fmtX(st.vsTrue)}× its real size`;
   const now = performance.now();
   if (full || now - CM.vizTime > 120) { CM.vizTime = now; drawCountryViz(p, st); }
   if (full) fitCountryViz();
@@ -2545,13 +2545,13 @@ function drawCountryViz(p, st) {
   svg.innerHTML = `
     <path d="${dTrue}" fill="rgba(214,224,250,0.24)" fill-rule="evenodd" stroke="#e4ebff" stroke-width="1.8" stroke-dasharray="4 2.5" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
     <path d="${dMap}" fill="rgba(255,201,60,0.42)" fill-rule="evenodd" stroke="#ffc93c" stroke-width="1.8" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>`;
-  svg.setAttribute('aria-label', `${CM.name} on a globe and on this ${p.short} map, at the same scale. On this map it is drawn ${fmtX(st.vsTrue)} times its real size, and ${fmtX(st.vsHome)} times its size at home.`);
+  svg.setAttribute('aria-label', `${CM.name} on a globe and on this ${p.short} map, at the same scale. On this map it is drawn ${fmtX(st.vsTrue)} times its real size, and ${fmtX(st.vsHome)} times its size in its real place.`);
 }
 
 function countryAnnouncement() {
   if (!CM.moved) return '';
   const st = countryStats(PROJ[state.current]);
-  return `${CM.name} at ${fmtLat(CM.pos.lat)}, ${fmtLon(CM.pos.lon)}. On this ${PROJ[state.current].short} map it is drawn ${fmtX(st.vsTrue)} times its real size, and ${fmtX(st.vsHome)} times its size at home.`;
+  return `${CM.name} at ${fmtLat(CM.pos.lat)}, ${fmtLon(CM.pos.lon)}. On this ${PROJ[state.current].short} map it is drawn ${fmtX(st.vsTrue)} times its real size, and ${fmtX(st.vsHome)} times its size in its real place.`;
 }
 
 function updateCompare() {
@@ -2623,7 +2623,7 @@ function updateAria() {
   const pair = PAIRS.find(x => x.id === state.pair);
   const zoom = view.z > 1.0001 ? ` Zoomed in ${view.z.toFixed(1)} times.` : '';
   if (state.mode === 'country' && CM.moved) {
-    canvas.setAttribute('aria-label', `${state.showImagery && glReady ? 'Satellite map' : 'Map'} of the world in the ${p.name} projection. ${countryAnnouncement()} A dashed outline shows it at home.${zoom}`);
+    canvas.setAttribute('aria-label', `${state.showImagery && glReady ? 'Satellite map' : 'Map'} of the world in the ${p.name} projection. ${countryAnnouncement()} A dashed outline shows it in its real place.${zoom}`);
     return;
   }
   canvas.setAttribute('aria-label',
