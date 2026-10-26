@@ -363,6 +363,10 @@ kbd { font-family: var(--font-data); font-size: 0.85em; border: 1px solid var(--
   .status { display: none; }
   .brand p { display: none; }
   .btn { padding: 0 13px; }
+  .top { flex-wrap: nowrap; gap: 10px; }
+  .brand { gap: 9px; }
+  .mark { width: 36px; height: 36px; }
+  .actions { flex: none; }
 }
 
 /* ---------- v1.2: mode button, zoom, my-country panel ---------- */
@@ -488,10 +492,6 @@ kbd { font-family: var(--font-data); font-size: 0.85em; border: 1px solid var(--
       </div>
     </div>
     <div class="actions">
-      <button class="btn sun" id="tourBtn" type="button" aria-pressed="false">
-        <svg viewBox="0 0 16 16" aria-hidden="true"><path id="tourIcon" d="M4 2.5v11l9-5.5z" fill="currentColor"/></svg>
-        <span id="tourLabel">Play tour</span>
-      </button>
       <button class="btn" id="aboutBtn" type="button">About</button>
     </div>
   </header>
@@ -692,7 +692,7 @@ kbd { font-family: var(--font-data); font-size: 0.85em; border: 1px solid var(--
       <li><kbd>1</kbd> to <kbd>9</kbd>: choose a projection, in the order of the tray under the map.</li>
       <li>Select the map, then use the arrow keys to move the measuring circle or your country. Hold <kbd>Shift</kbd> to move further.</li>
       <li><kbd>+</kbd> and <kbd>−</kbd> zoom in and out. <kbd>0</kbd> shows the whole world.</li>
-      <li>The tour can be paused at any time. If your device is set to reduce motion, maps switch without animating until you turn on Animate (the wave button on the map).</li>
+      <li>If your device is set to reduce motion, maps switch without animating until you turn on Animate (the wave button on the map).</li>
     </ul>
     <h3>Animation check</h3>
     <p id="motionCheck">Choose a projection to measure the last morph.</p>
@@ -712,7 +712,7 @@ kbd { font-family: var(--font-data); font-size: 0.85em; border: 1px solid var(--
    Versions: app + one version per model. Bump a model's version when
    its maths or data handling changes, and the app version every release.
    ================================================================== */
-const APP_VERSION = '1.3.3';
+const APP_VERSION = '1.3.4';
 const SDK_VERSION = '5.1';
 const MODELS = {
   morph:   { name: 'Morph engine',       v: '1.4', what: 'Slides every projected point from one map to the next (eased, 2 seconds). The satellite picture is moved on the graphics card. Can be switched off.' },
@@ -732,7 +732,6 @@ const CIRCLE_RADIUS_MI = 500;
 const PROBE_MAX_LAT = 75;
 const COUNTRY_MAX_LAT = 85;
 const MORPH_MS = 2000;
-const TOUR_HOLD_MS = 5000;
 const ZMAX = 12;
 const D2R = Math.PI / 180;
 const R_EARTH = 6371008.8;
@@ -912,8 +911,6 @@ const state = {
   units: 'mi',
   pair: 'gl-af',
   probe: { lon: -105, lat: 45 },
-  touring: false,
-  tourTimer: null,
   animate: !reduceMotion.matches,
   animateChosen: false,
   lastMorph: null,
@@ -1926,7 +1923,6 @@ function currentMesh() {
 
 function goTo(id, opts = {}) {
   if (!PROJ[id]) return;
-  if (!opts.fromTour && state.touring) stopTour();
   if (id === state.current && !state.morph) return;
   if (view.tween) finishTween();
   if (CM.tween) { const tw = CM.tween; CM.tween = null; setCountryPos(tw.to.lon, tw.to.lat); updateCountryReadout(true); }
@@ -1982,29 +1978,6 @@ function afterArrive() {
   updateReadouts();
   updateAria();
   render();
-  if (state.touring) scheduleTour();
-}
-
-/* ---------- Tour ---------- */
-function startTour() {
-  state.touring = true;
-  updateTourUI();
-  const i = PROJECTIONS.findIndex(p => p.id === state.current);
-  goTo(PROJECTIONS[(i + 1) % PROJECTIONS.length].id, { fromTour: true });
-}
-function scheduleTour() {
-  clearTimeout(state.tourTimer);
-  state.tourTimer = setTimeout(() => {
-    if (!state.touring) return;
-    const i = PROJECTIONS.findIndex(p => p.id === state.current);
-    goTo(PROJECTIONS[(i + 1) % PROJECTIONS.length].id, { fromTour: true });
-  }, TOUR_HOLD_MS);
-}
-function stopTour() { state.touring = false; clearTimeout(state.tourTimer); updateTourUI(); }
-function updateTourUI() {
-  $('tourBtn').setAttribute('aria-pressed', String(state.touring));
-  $('tourLabel').textContent = state.touring ? 'Pause tour' : 'Play tour';
-  $('tourIcon').setAttribute('d', state.touring ? 'M4 2.5h3v11H4zM9 2.5h3v11H9z' : 'M4 2.5v11l9-5.5z');
 }
 
 /* ================================================================
@@ -2678,8 +2651,7 @@ $('togCircles').addEventListener('click', () => {
 });
 $('togGrid').addEventListener('click', () => { state.showGrid = !state.showGrid; updateToggles(); requestRender(); });
 $('togAnimate').addEventListener('click', () => { state.animate = !state.animate; state.animateChosen = true; updateToggles(); announce(state.animate ? 'Map changes will animate.' : 'Map changes will switch without animating.'); });
-$('tourBtn').addEventListener('click', () => state.touring ? stopTour() : startTour());
-$('aboutBtn').addEventListener('click', () => { if (state.touring) stopTour(); updateMotionCheck(); $('about').showModal(); });
+$('aboutBtn').addEventListener('click', () => { updateMotionCheck(); $('about').showModal(); });
 $('aboutClose').addEventListener('click', () => $('about').close());
 $('about').addEventListener('click', e => { if (e.target === $('about')) $('about').close(); });
 $('attrib').addEventListener('click', e => {
@@ -2820,7 +2792,6 @@ canvas.addEventListener('pointerdown', e => {
   const [px, py] = localPoint(e);
   pointers.set(e.pointerId, { x: px, y: py });
   try { canvas.setPointerCapture(e.pointerId); } catch {}
-  if (state.touring) stopTour();
   hideTip();
   if (state.morph) { drag = null; return; }
   if (view.tween) finishTween();
@@ -2936,7 +2907,6 @@ canvas.addEventListener('keydown', e => {
   else if (e.key === 'ArrowDown') dLat = -step;
   else return;
   e.preventDefault();
-  if (state.touring) stopTour();
   if (state.mode === 'country' && CM.pos) {
     setCountryPos(CM.pos.lon + dLon, CM.pos.lat + dLat);
     afterCountryMove(false, true);
