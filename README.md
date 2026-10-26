@@ -2,14 +2,14 @@
 
 A browser app for middle school students. The world morphs between nine map projections, and 55 circles that are all the same real size (500-mile radius) show how each projection stretches area, shape and distance.
 
-**Live app:** https://jsawle.github.io/projection-lab/ (v1.3.0)
+**Live app:** https://jsawle.github.io/projection-lab/ (v1.3.1)
 
 - Esri World Imagery that morphs with the map, with same-size circles, a measuring circle and size comparisons
 - Zoom (1–12×) that keeps the place in the middle of the view centred through each morph
 - **Country** tab: tap any country to choose it, then drag it over the globe at its real size and shape to see what each projection does to it; a globe-vs-map card shows its real size, its size compared with at home, and how many times its real size the map draws it
 - Map buttons sit below the map, so every projection uses the full height
 
-**Lab version:** https://jsawle.github.io/projection-lab/lab/ — test copy for trying new features before they reach the live app. Now testing v1.3.1: the Country tab's globe-vs-map drawing grows to fill the panel, with a stronger globe outline.
+**Lab version:** https://jsawle.github.io/projection-lab/lab/ — test copy for trying new features before they reach the live app. Currently the same as the live app.
 
 
 ## Projections
