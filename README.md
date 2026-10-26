@@ -8,7 +8,7 @@ A browser app for middle school students. The world morphs between nine map proj
 - Zoom (1–12×) that keeps the place in the middle of the view centred through each morph
 - **Country** tab: tap any country to choose it, then drag it over the globe at its real size and shape to see what each projection does to it
 
-**Lab version:** https://jsawle.github.io/projection-lab/lab/ — test copy for trying new features before they reach the live app. Currently the same as the live app.
+**Lab version:** https://jsawle.github.io/projection-lab/lab/ — test copy for trying new features before they reach the live app. Now testing v1.3.0: map buttons moved below the map so every projection uses the full height, Mercator fitted to 82.5° so it opens larger, and a more compact Country panel.
 
 
 ## Projections

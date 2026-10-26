@@ -121,19 +121,22 @@ body {
 #map:focus-visible { outline: 3px solid var(--sun); outline-offset: -3px; border-radius: 20px; }
 
 .glass { background: var(--glass); border: 1px solid var(--glass-line); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
-.stage-top {
-  position: absolute; left: 0; right: 0; top: 0; z-index: 2;
-  display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; flex-wrap: wrap;
-  padding: 10px; pointer-events: none;
-}
-.stage-top > * { pointer-events: auto; }
 .toggles { display: flex; gap: 6px; flex-wrap: wrap; }
 .tog {
   font: 700 0.82rem/1 var(--font-body); color: var(--ink);
   display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 36px; min-width: 36px; padding: 0 11px;
   border-radius: 999px; cursor: pointer;
 }
-@container (max-width: 860px) { .tog { padding: 0; } .tog .lbl { display: none; } }
+@container (max-width: 1180px) { .tog { padding: 0; } .tog .lbl { display: none; } }
+@container (max-width: 900px) { .stage-foot .status { display: none; } }
+@container (max-width: 700px) {
+  .stage-foot .toggles { order: 1; }
+  .stage-foot .zoom { order: 2; margin-left: auto; }
+  .stage-foot .foot-break { display: block; order: 3; flex-basis: 100%; height: 0; }
+  .stage-foot .attrib { order: 4; }
+  .stage-foot .credit { order: 5; }
+}
+@container (max-width: 420px) { .stage-foot .mode-btn span { display: none; } .stage-foot .mode-btn { padding: 0; width: 36px; justify-content: center; } }
 .tog .sw { width: 13px; height: 13px; border-radius: 50%; flex: none; }
 .tog .sw.img { background: conic-gradient(#2a6e8f 0 25%, #c9b27a 0 50%, #3f7a45 0 75%, #e9eef5 0); }
 .tog .sw.circ { border: 2px solid var(--coral); background: rgba(255, 93, 115, 0.3); }
@@ -157,10 +160,12 @@ body {
   display: flex; flex-direction: column; align-items: flex-start; gap: 6px;
   padding: 0 10px 10px; pointer-events: none;
 }
-.stage-foot { align-self: stretch; display: flex; justify-content: space-between; align-items: flex-end; gap: 8px; }
+.stage-foot { align-self: stretch; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 6px 8px; }
+.stage-foot .toggles { flex: none; flex-wrap: nowrap; }
+.foot-break { display: none; }
 .stage-foot > * { pointer-events: auto; }
 .attrib {
-  min-width: 0; font: 0.72rem/1.35 var(--font-body); color: var(--ink-soft); text-align: left;
+  flex: 1 1 140px; min-width: 0; font: 0.72rem/1.35 var(--font-body); color: var(--ink-soft); text-align: left;
   padding: 4px 9px; border-radius: 7px; cursor: pointer;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
@@ -354,12 +359,6 @@ kbd { font-family: var(--font-data); font-size: 0.85em; border: 1px solid var(--
 .field-lbl { display: block; font-weight: 700; font-size: 0.8rem; color: var(--ink-soft); margin: 12px 0 6px; }
 .field-lbl.first { margin-top: 2px; }
 .hint.tight { margin: 6px 0 0 !important; font-size: 0.84rem; }
-.field-row { display: flex; gap: 8px; flex-wrap: wrap; }
-.field-row select {
-  flex: 1 1 150px; min-width: 0; min-height: 40px; border-radius: 10px; border: 1.5px solid var(--line);
-  background: var(--night-2); color: var(--ink); font: 700 0.92rem var(--font-body); padding: 0 10px;
-}
-.field-row select:hover { border-color: var(--ink-soft); }
 .mini {
   font: 700 0.82rem/1 var(--font-body); min-height: 40px; padding: 0 12px; border-radius: 10px;
   border: 1.5px solid var(--line); background: var(--night-2); color: var(--ink); cursor: pointer;
@@ -375,6 +374,37 @@ kbd { font-family: var(--font-data); font-size: 0.85em; border: 1px solid var(--
   display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
 }
 .mode-note .mini { min-height: 34px; }
+.c-head { display: flex; gap: 8px; }
+.c-head select {
+  flex: 1 1 auto; min-width: 0; min-height: 40px; border-radius: 10px; border: 1.5px solid var(--line);
+  background: var(--night-2); color: var(--ink); font: 700 0.95rem var(--font-body); padding: 0 10px;
+}
+.c-head select:hover { border-color: var(--ink-soft); }
+#zoomToBtn { flex: none; white-space: nowrap; }
+.c-card {
+  margin-top: 10px; padding: 10px 12px 12px; border-radius: 14px; background: var(--night-2); border: 1px solid var(--line);
+  display: grid; grid-template-columns: 1fr 1fr; column-gap: 12px;
+}
+.c-h { font: 700 0.68rem/1.2 var(--font-body); letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-soft); text-align: center; }
+.c-h.r { color: var(--sun); }
+.c-card svg { grid-column: 1 / -1; width: 100%; height: auto; max-height: 112px; margin: 4px 0 6px; }
+.c-col { text-align: center; min-width: 0; }
+.c-num { font: 600 1.55rem/1.05 var(--font-data); color: var(--sun); font-variant-numeric: tabular-nums; }
+.c-num small { font-size: 0.85rem; color: var(--ink-soft); }
+.c-num.real { color: var(--ink); font-size: 1.25rem; padding-top: 0.2rem; }
+.c-sub { font-size: 0.8rem; line-height: 1.3; color: var(--ink-soft); }
+.c-sub b { color: var(--ink); font-family: var(--font-data); font-weight: 600; }
+.c-verdict { grid-column: 1 / -1; margin: 10px 0 0 !important; padding-top: 9px; border-top: 1px solid var(--line); font-weight: 700; font-size: 0.92rem; line-height: 1.35; }
+.c-lbl { margin: 12px 0 6px !important; font: 700 0.68rem/1.2 var(--font-body); letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-soft); }
+.c-moves { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+.c-moves .pair-btn { padding: 6px 4px; text-align: center; }
+.c-note { margin-top: 10px !important; font-size: 0.82rem; }
+@media (min-width: 900px) and (max-height: 760px) {
+  #panel-country { padding-top: 10px; }
+  .c-card svg { max-height: 52px; margin: 2px 0 4px; } .c-num { font-size: 1.3rem; } .c-num.real { font-size: 1.1rem; }
+  .c-head + .hint.tight { display: none; } .c-card { margin-top: 8px; padding: 8px 10px 10px; } .c-verdict { margin-top: 8px !important; padding-top: 7px; font-size: 0.88rem; }
+  .c-lbl { margin: 8px 0 5px !important; }
+}
 .viz-key .k-country { background: rgba(255, 201, 60, 0.5); border: 1.5px solid var(--sun); }
 .metric .val.sunv { color: var(--sun); }
 </style>
@@ -407,21 +437,20 @@ kbd { font-family: var(--font-data); font-size: 0.85em; border: 1px solid var(--
     <canvas id="gl" aria-hidden="true"></canvas>
     <canvas id="map" tabindex="0" role="application" aria-roledescription="interactive map" aria-label="World map loading" aria-describedby="mapHelp"></canvas>
     <p id="mapHelp" class="sr-only">Select the map, then use the arrow keys to move the measuring circle, or the chosen country on the Country tab. On the Country tab, tap a country to choose it. Hold Shift to move further. Press plus or minus to zoom, and 0 to see the whole world. Press 1 to 9 to choose a projection.</p>
-    <div class="stage-top" id="stageTop">
-      <div class="toggles" id="toggles">
-        <button class="mode-btn glass" id="modeBtn" type="button" aria-pressed="false" title="Choose a country and move it around the map">
-          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.2 2.6c2-1 3.6.6 5.6.2 1.4-.3 2.4-1 3.6-.6l-.9 6.4c-1.2-.4-2.2.3-3.6.6-2 .4-3.6-1.2-5.6-.2z" fill="currentColor"/><path d="M3.2 2.6 1.8 14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-          <span>Country</span>
-        </button>
-        <button class="tog glass" id="togImagery" type="button" aria-pressed="true" aria-label="Satellite imagery" title="Satellite imagery"><span class="sw img" aria-hidden="true"></span><span class="lbl" aria-hidden="true">Imagery</span></button>
-        <button class="tog glass" id="togCircles" type="button" aria-pressed="true" aria-label="Same-size circles" title="Same-size circles"><span class="sw circ" aria-hidden="true"></span><span class="lbl" aria-hidden="true">Circles</span></button>
-        <button class="tog glass" id="togGrid" type="button" aria-pressed="true" aria-label="Grid lines" title="Grid lines"><span class="sw grid" aria-hidden="true"></span><span class="lbl" aria-hidden="true">Grid lines</span></button>
-        <button class="tog glass" id="togAnimate" type="button" aria-pressed="true" aria-label="Animate map changes" title="Animate map changes"><svg class="sw anim" viewBox="0 0 16 16" aria-hidden="true"><path d="M1.5 11c2.5 0 2.5-6 5-6s2.5 6 5 6 2-3 3-3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span class="lbl" aria-hidden="true">Animate</span></button>
-      </div>
-    </div>
     <div class="tip" id="tip" hidden></div>
     <div class="stage-bottom" id="stageBottom">
       <div class="stage-foot" id="stageFoot">
+        <div class="toggles" id="toggles">
+          <button class="mode-btn glass" id="modeBtn" type="button" aria-pressed="false" title="Choose a country and move it around the map">
+            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.2 2.6c2-1 3.6.6 5.6.2 1.4-.3 2.4-1 3.6-.6l-.9 6.4c-1.2-.4-2.2.3-3.6.6-2 .4-3.6-1.2-5.6-.2z" fill="currentColor"/><path d="M3.2 2.6 1.8 14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            <span>Country</span>
+          </button>
+          <button class="tog glass" id="togImagery" type="button" aria-pressed="true" aria-label="Satellite imagery" title="Satellite imagery"><span class="sw img" aria-hidden="true"></span><span class="lbl" aria-hidden="true">Imagery</span></button>
+          <button class="tog glass" id="togCircles" type="button" aria-pressed="true" aria-label="Same-size circles" title="Same-size circles"><span class="sw circ" aria-hidden="true"></span><span class="lbl" aria-hidden="true">Circles</span></button>
+          <button class="tog glass" id="togGrid" type="button" aria-pressed="true" aria-label="Grid lines" title="Grid lines"><span class="sw grid" aria-hidden="true"></span><span class="lbl" aria-hidden="true">Grid lines</span></button>
+          <button class="tog glass" id="togAnimate" type="button" aria-pressed="true" aria-label="Animate map changes" title="Animate map changes"><svg class="sw anim" viewBox="0 0 16 16" aria-hidden="true"><path d="M1.5 11c2.5 0 2.5-6 5-6s2.5 6 5 6 2-3 3-3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span class="lbl" aria-hidden="true">Animate</span></button>
+        </div>
+        <span class="foot-break" aria-hidden="true"></span>
         <button class="attrib glass" id="attrib" type="button" aria-expanded="false">Powered by Esri · Imagery: Esri, Vantor, Earthstar Geographics, and the GIS User Community · Boundaries: Esri, Garmin, CIA World Factbook, National Geographic Society</button>
         <div class="status glass" id="status" aria-hidden="true">
           <span id="statusText">Loading…</span><span class="ver" id="statusVer"></span><span class="zl" id="statusZoom"></span>
@@ -482,41 +511,35 @@ kbd { font-family: var(--font-data); font-size: 0.85em; border: 1px solid var(--
       </section>
 
       <section class="panel" role="tabpanel" id="panel-country" aria-labelledby="tab-country" tabindex="0" hidden>
-        <p class="eyebrow">Country <span class="ver" id="countryVer"></span></p>
-        <label class="field-lbl first" for="countrySelect">Choose a country</label>
-        <div class="field-row">
+        <div class="c-head">
+          <label class="sr-only" for="countrySelect">Choose a country</label>
           <select id="countrySelect"></select>
+          <button class="mini" type="button" id="zoomToBtn">Zoom to it</button>
         </div>
-        <p class="hint tight">Or tap any country on the map. Drag it to move it.</p>
-        <div class="readout">
-          <div class="metric">
-            <div class="lbl">Size here, compared with at home</div>
-            <div class="val sunv" id="cHome">–</div>
-            <div class="note" id="cHomeNote"></div>
+        <p class="hint tight">Tap any country on the map to choose it. Drag it to move it.</p>
+        <div class="c-card">
+          <div class="c-h">On a globe</div>
+          <div class="c-h r">On this map</div>
+          <svg id="countrySvg" viewBox="0 0 260 96" role="img" aria-label="The country on a globe and on this map"></svg>
+          <div class="c-col">
+            <div class="c-num real" id="cReal">–</div>
+            <div class="c-sub" id="cRealLbl">real size</div>
           </div>
-          <div class="metric">
-            <div class="lbl">Size here, compared with its real size</div>
-            <div class="val sunv" id="cTrue">–</div>
-            <div class="note" id="cTrueNote"></div>
+          <div class="c-col">
+            <div class="c-num" id="cHome">–</div>
+            <div class="c-sub">its size at home</div>
           </div>
+          <p class="c-verdict" id="cVerdict"></p>
         </div>
-        <div class="moves" role="group" aria-label="Move your country">
-          <span class="moves-lbl" aria-hidden="true">Move it to</span>
+        <p class="c-lbl" id="movesLbl">Move it to</p>
+        <div class="c-moves" role="group" aria-labelledby="movesLbl">
           <button class="pair-btn" type="button" data-move="eq" aria-label="Move it to the Equator">Equator</button>
           <button class="pair-btn" type="button" data-move="n60" aria-label="Move it to 60 degrees north">60° N</button>
           <button class="pair-btn" type="button" data-move="s60" aria-label="Move it to 60 degrees south">60° S</button>
           <button class="pair-btn" type="button" data-move="home" aria-label="Move it back home">Home</button>
         </div>
-        <div class="viz">
-          <svg id="countrySvg" viewBox="0 0 260 124" role="img" aria-label="Your country on a globe and on this map"></svg>
-          <div class="viz-key" aria-hidden="true"><span><i class="k-true"></i>On a globe</span><span><i class="k-country"></i>On this map</span></div>
-        </div>
-        <p class="hint" style="margin-top:12px">Drag your country around the map. On the globe it keeps its real size and shape, so every change you see comes from the map projection.</p>
         <p class="where" id="cWhere"></p>
-        <p class="where" id="cReal"></p>
-        <div class="btn-row">
-          <button class="mini" type="button" id="zoomToBtn">Zoom to it</button>
-        </div>
+        <p class="hint c-note">On the globe the country keeps its real size and shape wherever you move it, so every change you see comes from the map projection. <span class="ver" id="countryVer"></span></p>
       </section>
 
       <section class="panel" role="tabpanel" id="panel-measure" aria-labelledby="tab-measure" tabindex="0" hidden>
@@ -620,11 +643,11 @@ kbd { font-family: var(--font-data); font-size: 0.85em; border: 1px solid var(--
    Versions: app + one version per model. Bump a model's version when
    its maths or data handling changes, and the app version every release.
    ================================================================== */
-const APP_VERSION = '1.2.1';
+const APP_VERSION = '1.3.0';
 const SDK_VERSION = '5.1';
 const MODELS = {
   morph:   { name: 'Morph engine',       v: '1.4', what: 'Slides every projected point from one map to the next (eased, 2 seconds). The satellite picture is moved on the graphics card. Can be switched off.' },
-  view:    { name: 'Zoom and centering', v: '1.0', what: 'All nine maps are fitted around one shared center. Zoom 1–12×. The place in the middle of the view stays in the middle while the map morphs.' },
+  view:    { name: 'Zoom and centering', v: '1.1', what: 'All nine maps are fitted around one shared center and use the whole map area (the buttons sit below the map). Mercator is fitted to 82.5° N and S and drawn to 85°. Zoom 1–12×. The place in the middle of the view stays in the middle while the map morphs.' },
   imagery: { name: 'Imagery basemap',    v: '1.1', what: 'Esri World Imagery, zoom level 3 tiles (level 4 once you zoom in past 2×), reshaped to a latitude–longitude grid and draped over a 2° mesh.' },
   circles: { name: 'Same-size circles',  v: '1.0', what: '55 geodesic circles, 500-mile radius, every 30° of longitude at 60°S, 30°S, 0°, 30°N and 60°N.' },
   probe:   { name: 'Measuring circle',   v: '1.1', what: 'Map area ÷ real area, compared with a circle at the center of the map; shape and tilt from the circle’s longest and shortest axes.' },
@@ -680,7 +703,7 @@ const PROJECTIONS = [
   },
   {
     id: 'mercator', name: 'Mercator', short: 'Mercator', v: '1.0', family: 'rect',
-    sr: { wkid: 3857 }, maxLat: 85, minLat: -85, ref: [0, 0],
+    sr: { wkid: 3857 }, maxLat: 85, minLat: -85, fitLat: 82.5, ref: [0, 0],
     wkidText: 'ArcGIS WKID 3857 · WGS 1984 Web Mercator (Auxiliary Sphere)',
     familyText: 'Cylindrical · conformal', tags: [], tileTag: 'Web maps',
     tagline: 'Made for sailors in 1569. Today it is the map behind most online street maps.',
@@ -1178,6 +1201,11 @@ function projectWorld(p) {
     if (x < xmin) xmin = x; if (x > xmax) xmax = x; if (y < ymin) ymin = y; if (y > ymax) ymax = y;
   }
   p.bbox = { xmin, ymin, xmax, ymax };
+  if (p.fitLat) {
+    // Fit the opening view to a narrower band of latitude; the map is still drawn beyond it
+    const c = projectFlat(new Float64Array([0, p.fitLat, 0, -p.fitLat]), p);
+    p.bbox.ymax = Math.max(c[1], c[3]); p.bbox.ymin = Math.min(c[1], c[3]);
+  }
   const ring = circleRing(p.ref[0], p.ref[1], 40, 1);
   const xy = projectFlat(new Float64Array(ring.flat()), p);
   const realM2 = geodeticAreaOperator.execute(new Polygon({ rings: [ring], spatialReference: WGS }), { unit: 'square-kilometers' }) * 1e6;
@@ -1550,25 +1578,8 @@ function fitInto(p, a) {
   return { s, tx: cx - s * (xmin + xmax) / 2, ty: cy + s * (ymin + ymax) / 2,
            rect: { l: cx - s * bw / 2, r: cx + s * bw / 2, t: cy - s * bh / 2, b: cy + s * bh / 2 } };
 }
-/* Every map is fitted around the same center. To keep clear of the buttons in the top-left
-   corner, the map is shrunk evenly (top and bottom, or left and right), never shifted. */
-function computeFit(p) {
-  const tg = overlayBox($('toggles'));
-  const opts = [{ ...VP }];
-  if (tg) {
-    const dy = tg.b + 8 - VP.T, dx = tg.r + 8 - VP.L;
-    opts.push({ L: VP.L, R: VP.R, T: VP.T + dy, B: VP.B - dy });
-    opts.push({ L: VP.L + dx, R: VP.R - dx, T: VP.T, B: VP.B });
-  }
-  let best = null;
-  opts.forEach((a, i) => {
-    if (a.R - a.L < 40 || a.B - a.T < 40) return;
-    const f = fitInto(p, a);
-    if (i === 0 && tg && f.rect.l < tg.r && f.rect.r > tg.l && f.rect.t < tg.b && f.rect.b > tg.t) return;
-    if (!best || f.s > best.s) best = f;
-  });
-  return best || fitInto(p, VP);
-}
+/* Every map is fitted around the same center, using the whole map area above the button strip */
+function computeFit(p) { return fitInto(p, VP); }
 function toScreen(xy, f) {
   const out = new Float32Array(xy.length);
   for (let i = 0; i < xy.length; i += 2) { out[i] = f.tx + f.s * xy[i]; out[i + 1] = f.ty - f.s * xy[i + 1]; }
@@ -2397,22 +2408,35 @@ function drawShapeViz(st, shapeWords) {
   svg.setAttribute('aria-label', `The measuring circle on this map: ${fmtX(st.area)} times the size, ${shapeWords.toLowerCase()}. Longest way across ${st.long.toFixed(1)} times, shortest ${st.short.toFixed(1)} times a true circle.`);
 }
 
+function areaParts(km2) {
+  const v = state.units === 'mi' ? km2 * SQMI_PER_SQKM : km2;
+  const u = state.units === 'mi' ? 'sq mi' : 'km²';
+  if (v >= 1e6) return [`${(v / 1e6).toFixed(1)} million`, u];
+  if (v >= 10000) return [(Math.round(v / 1000) * 1000).toLocaleString('en-US'), u];
+  if (v >= 100) return [(Math.round(v / 10) * 10).toLocaleString('en-US'), u];
+  return [Math.max(1, Math.round(v)).toLocaleString('en-US'), u];
+}
 function updateCountryReadout(full) {
   if (!state.ready || !CM.moved) return;
   const p = PROJ[state.current];
   if (!p.fit) return;
   const st = countryStats(p);
-  const homeWords = Math.abs(st.vsHome - 1) < 0.05 ? 'Same size as at home' : (st.vsHome > 1 ? 'Bigger here than at home' : 'Smaller here than at home');
+  const moved = Math.abs(CM.pos.lat - CM.c0.lat) + Math.abs(wrapDelta(CM.pos.lon - CM.c0.lon)) > 3;
+  const [num, unit] = areaParts(CM.trueKm2);
+  $('cReal').textContent = num;
+  $('cRealLbl').textContent = `${unit}, its real size`;
   $('cHome').innerHTML = `${fmtX(st.vsHome)}<small>×</small>`;
-  $('cHomeNote').textContent = homeWords + (Math.abs(st.vsHome - 1) < 0.05 && Math.abs(CM.pos.lat - CM.c0.lat) + Math.abs(wrapDelta(CM.pos.lon - CM.c0.lon)) > 3 ? '. This map keeps area.' : '.');
-  $('cTrue').innerHTML = `${fmtX(st.vsTrue)}<small>×</small>`;
-  $('cTrueNote').textContent = `${sizeWords(st.vsTrue)} its real size, at the scale of the map’s center.`;
-  const atHome = Math.abs(CM.pos.lat - CM.c0.lat) < 0.5 && Math.abs(wrapDelta(CM.pos.lon - CM.c0.lon)) < 0.5;
-  $('cWhere').innerHTML = atHome
-    ? `<b>${CM.name}</b> is at home: <b>${fmtLat(CM.c0.lat)}, ${fmtLon(CM.c0.lon)}</b>`
-    : `<b>${CM.name}</b> now at <b>${fmtLat(CM.pos.lat)}, ${fmtLon(CM.pos.lon)}</b> · home <b>${fmtLat(CM.c0.lat)}, ${fmtLon(CM.c0.lon)}</b>`;
-  $('cReal').innerHTML = `Real size: about <b>${fmtArea(CM.trueKm2)}</b>, wherever you move it.`;
-  CM.tag = atHome ? 'at home' : `${fmtX(st.vsHome)}× its size at home`;
+  let v;
+  if (!moved) v = `${CM.name} is at home. Drag it, or use the buttons below.`;
+  else if (Math.abs(st.vsHome - 1) < 0.05) v = 'Same size here as at home: this map keeps area.';
+  else v = st.vsHome > 1 ? 'Bigger here than at home.' : 'Smaller here than at home.';
+  v += Math.abs(st.vsTrue - 1) < 0.1 ? ' Here the map shows it at about its real size.'
+     : st.vsTrue > 1 ? ` Here the map draws it ${fmtX(st.vsTrue)}× as big as it really is.` : ` Here the map draws it at only ${fmtX(st.vsTrue)}× its real size.`;
+  $('cVerdict').textContent = v;
+  $('cWhere').innerHTML = moved
+    ? `<b>${CM.name}</b> now at <b>${fmtLat(CM.pos.lat)}, ${fmtLon(CM.pos.lon)}</b> · home <b>${fmtLat(CM.c0.lat)}, ${fmtLon(CM.c0.lon)}</b>`
+    : `<b>${CM.name}</b> at home: <b>${fmtLat(CM.c0.lat)}, ${fmtLon(CM.c0.lon)}</b>`;
+  CM.tag = moved ? `${fmtX(st.vsHome)}× its size at home` : 'at home';
   const now = performance.now();
   if (full || now - CM.vizTime > 120) { CM.vizTime = now; drawCountryViz(p, st); }
 }
@@ -2420,35 +2444,36 @@ function updateCountryReadout(full) {
 /* Your country on a globe (true shape and size) next to how this map draws it, same scale */
 function drawCountryViz(p, st) {
   const svg = $('countrySvg');
-  const mapXY = countryCache(p, 'moved').xy, ci = CM.moved.centre;
-  const cx = mapXY[2 * ci], cy = mapXY[2 * ci + 1], kk = 1 / Math.sqrt(p.kRef);
-  let tw = 1, th = 1, mw = 1, mh = 1;
-  for (const r of CM.trueShape) for (let i = 0; i < r.length; i += 2) { tw = Math.max(tw, Math.abs(r[i])); th = Math.max(th, Math.abs(r[i + 1])); }
-  for (const [s, n] of CM.moved.rings) for (let i = s; i < s + n; i++) {
-    mw = Math.max(mw, Math.abs((mapXY[2 * i] - cx) * kk)); mh = Math.max(mh, Math.abs((mapXY[2 * i + 1] - cy) * kk));
-  }
-  const sc = Math.min(58 / Math.max(tw, mw), 54 / Math.max(th, mh));
-  const total = CM.trueShape.reduce((s, r) => s + r.length / 2, 0);
+  const mapXY = countryCache(p, 'moved').xy, kk = 1 / Math.sqrt(p.kRef);
+  const box = () => ({ x0: Infinity, y0: Infinity, x1: -Infinity, y1: -Infinity });
+  const grow = (b, x, y) => { if (!isFinite(x)) return; if (x < b.x0) b.x0 = x; if (x > b.x1) b.x1 = x; if (y < b.y0) b.y0 = y; if (y > b.y1) b.y1 = y; };
+  const t = box(), m = box();
+  for (const r of CM.trueShape) for (let i = 0; i < r.length; i += 2) grow(t, r[i], r[i + 1]);
+  for (const [s, n] of CM.moved.rings) for (let i = s; i < s + n; i++) grow(m, mapXY[2 * i] * kk, mapXY[2 * i + 1] * kk);
+  // Both outlines at one scale: the map outline in "real meters at the scale of the map's center"
+  const sc = Math.min(116 / Math.max(t.x1 - t.x0, m.x1 - m.x0, 1), 88 / Math.max(t.y1 - t.y0, m.y1 - m.y0, 1));
+  const tcx = (t.x0 + t.x1) / 2, tcy = (t.y0 + t.y1) / 2, mcx = (m.x0 + m.x1) / 2, mcy = (m.y0 + m.y1) / 2;
+  const total = CM.trueShape.reduce((a, r) => a + r.length / 2, 0);
   const stride = Math.max(1, Math.floor(total / 1500));
   let dTrue = '';
   for (const r of CM.trueShape) {
     const n = r.length / 2;
     if (n < 3) continue;
-    for (let i = 0; i < n; i += stride) dTrue += `${i ? 'L' : 'M'}${(65 + r[2 * i] * sc).toFixed(1)} ${(62 - r[2 * i + 1] * sc).toFixed(1)}`;
+    for (let i = 0; i < n; i += stride) dTrue += `${i ? 'L' : 'M'}${(65 + (r[2 * i] - tcx) * sc).toFixed(1)} ${(48 - (r[2 * i + 1] - tcy) * sc).toFixed(1)}`;
     dTrue += 'Z';
   }
   let dMap = '';
   for (const [s, n] of CM.moved.rings) {
     for (let j = 0; j < n; j += stride) {
       const i = s + j;
-      dMap += `${j ? 'L' : 'M'}${(195 + (mapXY[2 * i] - cx) * kk * sc).toFixed(1)} ${(62 - (mapXY[2 * i + 1] - cy) * kk * sc).toFixed(1)}`;
+      dMap += `${j ? 'L' : 'M'}${(195 + (mapXY[2 * i] * kk - mcx) * sc).toFixed(1)} ${(48 - (mapXY[2 * i + 1] * kk - mcy) * sc).toFixed(1)}`;
     }
     dMap += 'Z';
   }
   svg.innerHTML = `
     <path d="${dTrue}" fill="rgba(174,187,220,0.12)" fill-rule="evenodd" stroke="#aebbdc" stroke-width="1.3" stroke-dasharray="3 3"/>
     <path d="${dMap}" fill="rgba(255,201,60,0.42)" fill-rule="evenodd" stroke="#ffc93c" stroke-width="1.6" stroke-linejoin="round"/>`;
-  svg.setAttribute('aria-label', `${CM.name} on a globe and on this ${p.short} map, at the same scale. On this map it is drawn ${fmtX(st.vsTrue)} times its real size.`);
+  svg.setAttribute('aria-label', `${CM.name} on a globe and on this ${p.short} map, at the same scale. On this map it is drawn ${fmtX(st.vsTrue)} times its real size, and ${fmtX(st.vsHome)} times its size at home.`);
 }
 
 function countryAnnouncement() {
