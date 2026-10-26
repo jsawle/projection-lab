@@ -348,19 +348,12 @@ kbd { font-family: var(--font-data); font-size: 0.85em; border: 1px solid var(--
 .zoom svg { width: 15px; height: 15px; }
 .status .zl { font: 600 0.74rem/1 var(--font-data); color: var(--sun); }
 
-.pick-hint {
-  position: absolute; z-index: 3; left: 50%; top: 56px; transform: translateX(-50%);
-  max-width: calc(100% - 20px); display: flex; align-items: center; gap: 10px;
-  padding: 7px 8px 7px 14px; border-radius: 12px; font-weight: 700; font-size: 0.88rem;
-  border-color: rgba(255, 201, 60, 0.7);
-}
-.pick-hint button { font: 700 0.8rem/1 var(--font-body); min-height: 30px; padding: 0 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--night-2); color: var(--ink); cursor: pointer; }
-#map.picking { cursor: pointer; }
 
 .tab { flex: 1 1 auto; padding: 0 8px; font-size: 0.82rem; white-space: nowrap; }
 
 .field-lbl { display: block; font-weight: 700; font-size: 0.8rem; color: var(--ink-soft); margin: 12px 0 6px; }
 .field-lbl.first { margin-top: 2px; }
+.hint.tight { margin: 6px 0 0 !important; font-size: 0.84rem; }
 .field-row { display: flex; gap: 8px; flex-wrap: wrap; }
 .field-row select {
   flex: 1 1 150px; min-width: 0; min-height: 40px; border-radius: 10px; border: 1.5px solid var(--line);
@@ -413,12 +406,12 @@ kbd { font-family: var(--font-data); font-size: 0.85em; border: 1px solid var(--
   <section class="stage" id="stage" aria-label="Map">
     <canvas id="gl" aria-hidden="true"></canvas>
     <canvas id="map" tabindex="0" role="application" aria-roledescription="interactive map" aria-label="World map loading" aria-describedby="mapHelp"></canvas>
-    <p id="mapHelp" class="sr-only">Select the map, then use the arrow keys to move the measuring circle, or your country in My country mode. Hold Shift to move further. Press plus or minus to zoom, and 0 to see the whole world. Press 1 to 9 to choose a projection.</p>
+    <p id="mapHelp" class="sr-only">Select the map, then use the arrow keys to move the measuring circle, or the chosen country on the Country tab. On the Country tab, tap a country to choose it. Hold Shift to move further. Press plus or minus to zoom, and 0 to see the whole world. Press 1 to 9 to choose a projection.</p>
     <div class="stage-top" id="stageTop">
       <div class="toggles" id="toggles">
-        <button class="mode-btn glass" id="modeBtn" type="button" aria-pressed="false">
+        <button class="mode-btn glass" id="modeBtn" type="button" aria-pressed="false" title="Choose a country and move it around the map">
           <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.2 2.6c2-1 3.6.6 5.6.2 1.4-.3 2.4-1 3.6-.6l-.9 6.4c-1.2-.4-2.2.3-3.6.6-2 .4-3.6-1.2-5.6-.2z" fill="currentColor"/><path d="M3.2 2.6 1.8 14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-          <span>My country</span>
+          <span>Country</span>
         </button>
         <button class="tog glass" id="togImagery" type="button" aria-pressed="true" aria-label="Satellite imagery" title="Satellite imagery"><span class="sw img" aria-hidden="true"></span><span class="lbl" aria-hidden="true">Imagery</span></button>
         <button class="tog glass" id="togCircles" type="button" aria-pressed="true" aria-label="Same-size circles" title="Same-size circles"><span class="sw circ" aria-hidden="true"></span><span class="lbl" aria-hidden="true">Circles</span></button>
@@ -426,7 +419,6 @@ kbd { font-family: var(--font-data); font-size: 0.85em; border: 1px solid var(--
         <button class="tog glass" id="togAnimate" type="button" aria-pressed="true" aria-label="Animate map changes" title="Animate map changes"><svg class="sw anim" viewBox="0 0 16 16" aria-hidden="true"><path d="M1.5 11c2.5 0 2.5-6 5-6s2.5 6 5 6 2-3 3-3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span class="lbl" aria-hidden="true">Animate</span></button>
       </div>
     </div>
-    <div class="pick-hint glass" id="pickHint" hidden><span>Tap a country on the map to choose it.</span><button type="button" id="pickCancel">Cancel</button></div>
     <div class="tip" id="tip" hidden></div>
     <div class="stage-bottom" id="stageBottom">
       <div class="stage-foot" id="stageFoot">
@@ -455,9 +447,9 @@ kbd { font-family: var(--font-data); font-size: 0.85em; border: 1px solid var(--
   <aside class="info" id="info" tabindex="-1" aria-label="Projection facts and tools">
     <div class="tabs" role="tablist" aria-label="Panels">
       <button class="tab" role="tab" id="tab-proj" aria-controls="panel-proj" aria-selected="true" type="button">Projection</button>
+      <button class="tab" role="tab" id="tab-country" aria-controls="panel-country" aria-selected="false" tabindex="-1" type="button">Country</button>
       <button class="tab" role="tab" id="tab-measure" aria-controls="panel-measure" aria-selected="false" tabindex="-1" type="button">Measure</button>
       <button class="tab" role="tab" id="tab-compare" aria-controls="panel-compare" aria-selected="false" tabindex="-1" type="button">Compare</button>
-      <button class="tab" role="tab" id="tab-country" aria-controls="panel-country" aria-selected="false" tabindex="-1" type="button">My country</button>
     </div>
     <div class="panels">
       <section class="panel" role="tabpanel" id="panel-proj" aria-labelledby="tab-proj" tabindex="0">
@@ -489,65 +481,13 @@ kbd { font-family: var(--font-data); font-size: 0.85em; border: 1px solid var(--
         <p class="wkid" id="pWkid"></p>
       </section>
 
-      <section class="panel" role="tabpanel" id="panel-measure" aria-labelledby="tab-measure" tabindex="0" hidden>
-        <div class="mode-note" data-country-note hidden><span>The circles are hidden while you move your country.</span><button class="mini" type="button" data-back>Back to circles</button></div>
-        <p class="eyebrow">Measuring circle <span class="ver" id="probeVer"></span></p>
-        <p class="hint">Drag the white circle on the map. Or select the map and use the arrow keys.</p>
-        <div class="readout">
-          <div class="metric">
-            <div class="lbl">Size on this map</div>
-            <div class="val" id="mArea">–</div>
-            <div class="note" id="mAreaNote"></div>
-          </div>
-          <div class="metric">
-            <div class="lbl">Shape on this map</div>
-            <div class="val" id="mShape">–</div>
-            <div class="note" id="mShapeNote"></div>
-          </div>
-        </div>
-        <div class="viz">
-          <svg id="shapeSvg" viewBox="0 0 260 124" role="img" aria-label="Shape of the measuring circle"></svg>
-          <div class="viz-key" aria-hidden="true"><span><i class="k-true"></i>True circle</span><span><i class="k-map"></i>On this map</span></div>
-        </div>
-        <p class="where" id="probeWhere"></p>
-        <p class="where" id="probeTrue"></p>
-        <div class="units" role="group" aria-label="Units">
-          <button type="button" id="uMi" aria-pressed="true">Miles</button>
-          <button type="button" id="uKm" aria-pressed="false">Kilometers</button>
-        </div>
-      </section>
-
-      <section class="panel" role="tabpanel" id="panel-compare" aria-labelledby="tab-compare" tabindex="0" hidden>
-        <div class="mode-note" data-country-note hidden><span>The highlights are hidden while you move your country.</span><button class="mini" type="button" data-back>Back to circles</button></div>
-        <p class="eyebrow">Compare sizes <span class="ver" id="cmpVer"></span></p>
-        <p class="hint">Highlight two places. Compare their real sizes with how big this map draws them.</p>
-        <div class="pairs" id="pairs" role="group" aria-label="Places to compare"></div>
-        <div id="cmpBody">
-          <div class="bars" aria-hidden="true">
-            <div class="bar-group">
-              <h4>Real Earth</h4>
-              <div class="bar-row"><span class="nm" id="bnA1"></span><span class="bar-track"><span class="bar-fill a" id="bReal1"></span></span></div>
-              <div class="bar-row"><span class="nm" id="bnB1"></span><span class="bar-track"><span class="bar-fill b" id="bReal2"></span></span></div>
-            </div>
-            <div class="bar-group">
-              <h4>On this map</h4>
-              <div class="bar-row"><span class="nm" id="bnA2"></span><span class="bar-track"><span class="bar-fill a" id="bMap1"></span></span></div>
-              <div class="bar-row"><span class="nm" id="bnB2"></span><span class="bar-track"><span class="bar-fill b" id="bMap2"></span></span></div>
-            </div>
-          </div>
-          <p class="cmp-text" id="cmpReal"></p>
-          <p class="cmp-text" id="cmpMap"></p>
-          <p class="verdict" id="cmpVerdict"></p>
-        </div>
-      </section>
-
       <section class="panel" role="tabpanel" id="panel-country" aria-labelledby="tab-country" tabindex="0" hidden>
-        <p class="eyebrow">My country <span class="ver" id="countryVer"></span></p>
-        <label class="field-lbl first" for="countrySelect">Your country</label>
+        <p class="eyebrow">Country <span class="ver" id="countryVer"></span></p>
+        <label class="field-lbl first" for="countrySelect">Choose a country</label>
         <div class="field-row">
           <select id="countrySelect"></select>
-          <button class="mini" type="button" id="pickBtn" aria-pressed="false">Pick on map</button>
         </div>
+        <p class="hint tight">Or tap any country on the map. Drag it to move it.</p>
         <div class="readout">
           <div class="metric">
             <div class="lbl">Size here, compared with at home</div>
@@ -576,9 +516,59 @@ kbd { font-family: var(--font-data); font-size: 0.85em; border: 1px solid var(--
         <p class="where" id="cReal"></p>
         <div class="btn-row">
           <button class="mini" type="button" id="zoomToBtn">Zoom to it</button>
-          <button class="mini" type="button" data-back>Back to circles</button>
         </div>
       </section>
+
+      <section class="panel" role="tabpanel" id="panel-measure" aria-labelledby="tab-measure" tabindex="0" hidden>
+        <p class="eyebrow">Measuring circle <span class="ver" id="probeVer"></span></p>
+        <p class="hint">Drag the white circle on the map. Or select the map and use the arrow keys.</p>
+        <div class="readout">
+          <div class="metric">
+            <div class="lbl">Size on this map</div>
+            <div class="val" id="mArea">–</div>
+            <div class="note" id="mAreaNote"></div>
+          </div>
+          <div class="metric">
+            <div class="lbl">Shape on this map</div>
+            <div class="val" id="mShape">–</div>
+            <div class="note" id="mShapeNote"></div>
+          </div>
+        </div>
+        <div class="viz">
+          <svg id="shapeSvg" viewBox="0 0 260 124" role="img" aria-label="Shape of the measuring circle"></svg>
+          <div class="viz-key" aria-hidden="true"><span><i class="k-true"></i>True circle</span><span><i class="k-map"></i>On this map</span></div>
+        </div>
+        <p class="where" id="probeWhere"></p>
+        <p class="where" id="probeTrue"></p>
+        <div class="units" role="group" aria-label="Units">
+          <button type="button" id="uMi" aria-pressed="true">Miles</button>
+          <button type="button" id="uKm" aria-pressed="false">Kilometers</button>
+        </div>
+      </section>
+
+      <section class="panel" role="tabpanel" id="panel-compare" aria-labelledby="tab-compare" tabindex="0" hidden>
+        <p class="eyebrow">Compare sizes <span class="ver" id="cmpVer"></span></p>
+        <p class="hint">Highlight two places. Compare their real sizes with how big this map draws them.</p>
+        <div class="pairs" id="pairs" role="group" aria-label="Places to compare"></div>
+        <div id="cmpBody">
+          <div class="bars" aria-hidden="true">
+            <div class="bar-group">
+              <h4>Real Earth</h4>
+              <div class="bar-row"><span class="nm" id="bnA1"></span><span class="bar-track"><span class="bar-fill a" id="bReal1"></span></span></div>
+              <div class="bar-row"><span class="nm" id="bnB1"></span><span class="bar-track"><span class="bar-fill b" id="bReal2"></span></span></div>
+            </div>
+            <div class="bar-group">
+              <h4>On this map</h4>
+              <div class="bar-row"><span class="nm" id="bnA2"></span><span class="bar-track"><span class="bar-fill a" id="bMap1"></span></span></div>
+              <div class="bar-row"><span class="nm" id="bnB2"></span><span class="bar-track"><span class="bar-fill b" id="bMap2"></span></span></div>
+            </div>
+          </div>
+          <p class="cmp-text" id="cmpReal"></p>
+          <p class="cmp-text" id="cmpMap"></p>
+          <p class="verdict" id="cmpVerdict"></p>
+        </div>
+      </section>
+
     </div>
   </aside>
 </div>
@@ -601,7 +591,7 @@ kbd { font-family: var(--font-data); font-size: 0.85em; border: 1px solid var(--
       <li>Every circle is a true geodesic circle with a 500-mile radius, made with the ArcGIS geodesic buffer operator. On the real Earth they are all exactly the same size.</li>
       <li>Every point is projected by the ArcGIS projection engine, using the same projection definitions as ArcGIS Pro and ArcGIS Online.</li>
       <li>To morph, each point slides in a straight line from where it sits on one map to where it sits on the next. The graphics card moves the satellite picture.</li>
-      <li>My country moves your country over the globe by turning it, the way you would slide a paper cut-out over a real globe. That keeps its real size and shape. The map then projects it, so any change you see comes from the projection.</li>
+      <li>The Country tab moves a country over the globe by turning it, the way you would slide a paper cut-out over a real globe. That keeps its real size and shape. The map then projects it, so any change you see comes from the projection.</li>
       <li>All nine maps share the same center point. When you zoom in, the place in the middle of the view stays in the middle while the map changes.</li>
       <li>Real areas are measured on the curved Earth with the ArcGIS geodetic area operator. Map areas are measured flat, on the projected map.</li>
     </ul>
@@ -630,7 +620,7 @@ kbd { font-family: var(--font-data); font-size: 0.85em; border: 1px solid var(--
    Versions: app + one version per model. Bump a model's version when
    its maths or data handling changes, and the app version every release.
    ================================================================== */
-const APP_VERSION = '1.2.0';
+const APP_VERSION = '1.2.1';
 const SDK_VERSION = '5.1';
 const MODELS = {
   morph:   { name: 'Morph engine',       v: '1.4', what: 'Slides every projected point from one map to the next (eased, 2 seconds). The satellite picture is moved on the graphics card. Can be switched off.' },
@@ -638,7 +628,7 @@ const MODELS = {
   imagery: { name: 'Imagery basemap',    v: '1.1', what: 'Esri World Imagery, zoom level 3 tiles (level 4 once you zoom in past 2×), reshaped to a latitude–longitude grid and draped over a 2° mesh.' },
   circles: { name: 'Same-size circles',  v: '1.0', what: '55 geodesic circles, 500-mile radius, every 30° of longitude at 60°S, 30°S, 0°, 30°N and 60°N.' },
   probe:   { name: 'Measuring circle',   v: '1.1', what: 'Map area ÷ real area, compared with a circle at the center of the map; shape and tilt from the circle’s longest and shortest axes.' },
-  country: { name: 'My country',         v: '1.0', what: 'Turns the country over the globe (a rotation, so its real size and shape never change), then projects it. Size compared with at home and with its real size.' },
+  country: { name: 'Country mover',      v: '1.0', what: 'Turns the country over the globe (a rotation, so its real size and shape never change), then projects it. Size compared with at home and with its real size.' },
   compare: { name: 'Compare sizes',      v: '1.0', what: 'Real (geodetic) area versus flat area on the projected map.' },
   data:    { name: 'Country data',       v: '1.1', what: 'Living Atlas World Countries (Generalized). Map: simplified to 0.1°. Your country: finer detail (0.01°–0.1°, by size), joined across the 180° line.' },
 };
@@ -685,7 +675,7 @@ const PROJECTIONS = [
     circles: 'All the circles cover the same amount of map. Near the Equator they are tall, thin ovals. Near the poles they are short, wide ovals. They are round only at 45° north and south.',
     where: 'Some schools and organizations use it to show the true sizes of countries. In 2017, Boston Public Schools started using it in classrooms.',
     history: 'James Gall, a Scottish minister, described it in 1855. Arno Peters, a German historian, made it famous in 1973.',
-    tryThis: 'Turn on My country and move your country to the Equator, then to 60° north. Does its size change? What happens to its shape?',
+    tryThis: 'Open the Country tab and move a country to the Equator, then to 60° north. Does its size change? What happens to its shape?',
     summary: 'Circles all cover the same area but are tall near the Equator and flat near the poles.'
   },
   {
@@ -698,7 +688,7 @@ const PROJECTIONS = [
     circles: 'Every circle stays round, but circles get much bigger toward the poles. At 60° north a circle is drawn about 4 times bigger than at the Equator.',
     where: 'Most web maps and phone map apps, because streets and buildings keep their shape when you zoom in. Ship navigators use it too: a straight line on this map follows one compass heading.',
     history: 'Gerardus Mercator, a Flemish mapmaker, published it in 1569. The poles would be infinitely far away, so the web version cuts the map off at about 85° north and south.',
-    tryThis: 'Turn on My country, choose Greenland and move it to the Equator. How big is it really? Then press 4 to morph to Equal Earth.',
+    tryThis: 'Open the Country tab, tap Greenland and move it to the Equator. How big is it really? Then press 4 to morph to Equal Earth.',
     summary: 'Circles stay round but grow much bigger toward the poles.'
   },
   {
@@ -866,11 +856,11 @@ let VP = { L: 0, R: 1, T: 0, B: 1, cx: 0.5, cy: 0.5 };
 let VT = { z: 1, kx: 0, ky: 0, ax: 0, ay: 0 };
 const view = { z: 1, A: null, tween: null, gesture: false, crispTimer: 0, lastCrisp: 0 };
 
-/* ---------- My country ---------- */
+/* ---------- Country tab ---------- */
 const CM = {
   feat: -1, name: '', rings3: [], c0: null, pos: null, trueKm2: 0,
   moved: null, home: null, pc: {}, hc: {}, trueShape: null,
-  picking: false, tween: null, vizTime: 0,
+  tween: null, vizTime: 0,
 };
 
 /* ================================================================
@@ -1275,7 +1265,7 @@ function probeCentreBase(p) {
 }
 
 /* ================================================================
-   My country: move a country over the globe by rotating it
+   Country tab: move a country over the globe by rotating it
    ================================================================ */
 function toVec(lon, lat) { const l = lon * D2R, p = lat * D2R; return [Math.cos(p) * Math.cos(l), Math.cos(p) * Math.sin(l), Math.sin(p)]; }
 function mul3(A, B) {
@@ -1496,19 +1486,11 @@ function chooseCountry(fi, speak) {
   if (CM.tween) CM.tween = null;
   prepareCountry(fi);
   $('countrySelect').value = String(fi);
-  setPicking(false);
   updateCountryReadout(true);
   base.key = '';
   requestRender();
   updateAria();
-  if (speak) announce(`${CM.name} chosen. Drag it around the map, or use the Move it to buttons.`);
-}
-function setPicking(on) {
-  CM.picking = on;
-  $('pickBtn').setAttribute('aria-pressed', String(on));
-  $('pickHint').hidden = !on;
-  canvas.classList.toggle('picking', on);
-  if (on) announce('Tap a country on the map to choose it. Press Escape to cancel.');
+  if (speak) announce(`${CM.name} chosen. Drag it around the map, or use the Move it to buttons. Tap another country to choose it instead.`);
 }
 
 function moveCountryTo(lon, lat, speak) {
@@ -2280,7 +2262,9 @@ function buildTabs() {
       $(t.getAttribute('aria-controls')).hidden = !on;
     }
     if (focus) tab.focus();
-    if (tab.id === 'tab-country') setMode('country');
+    // The tabs drive the map: Country shows the moved country; the others show the circles
+    if (tab.id !== 'tab-country') lastCirclesTab = tab.id.replace('tab-', '');
+    setMode(tab.id === 'tab-country' ? 'country' : 'circles');
   };
   tabs.forEach((t, i) => {
     t.addEventListener('click', () => select(t, false));
@@ -2296,22 +2280,22 @@ function buildTabs() {
   return (id, focus = false) => { const t = $('tab-' + id); if (t) select(t, focus); };
 }
 const activeTab = () => document.querySelector('.tab[aria-selected="true"]')?.id.replace('tab-', '');
+let lastCirclesTab = 'proj';
 
 function setMode(mode) {
   if (state.mode === mode) return;
   state.mode = mode;
   if (mode === 'country' && CM.feat < 0 && state.ready) chooseCountry(defaultCountryIndex(), false);
-  if (mode !== 'country') setPicking(false);
   $('modeBtn').setAttribute('aria-pressed', String(mode === 'country'));
-  document.querySelectorAll('[data-country-note]').forEach(n => n.hidden = mode !== 'country');
+  canvas.style.cursor = '';
   updateToggles();
   if (mode === 'country') { if (activeTab() !== 'country') selectTab('country'); updateCountryReadout(true); }
-  else if (activeTab() === 'country') selectTab('proj');
+  else if (activeTab() === 'country') selectTab(lastCirclesTab);
   base.key = '';
   requestRender();
   updateAria();
   announce(mode === 'country'
-    ? `My country. ${CM.name ? CM.name + ' is on the map.' : ''} Drag it around to see how this projection changes it. The circles are hidden.`
+    ? `Country. ${CM.name ? CM.name + ' is on the map.' : ''} Drag it around to see how this projection changes it, or tap another country to choose it. The circles are hidden.`
     : 'Back to the circles.');
 }
 
@@ -2552,14 +2536,14 @@ function updateToggles() {
   $('togImagery').setAttribute('aria-pressed', String(state.showImagery));
   $('togCircles').setAttribute('aria-pressed', String(state.showCircles && state.mode === 'circles'));
   $('togCircles').setAttribute('aria-disabled', String(state.mode === 'country'));
-  $('togCircles').title = state.mode === 'country' ? 'Circles are hidden in My country' : 'Same-size circles';
+  $('togCircles').title = state.mode === 'country' ? 'Circles are hidden on the Country tab' : 'Same-size circles';
   $('togGrid').setAttribute('aria-pressed', String(state.showGrid));
   $('togAnimate').setAttribute('aria-pressed', String(state.animate));
 }
 $('modeBtn').addEventListener('click', () => setMode(state.mode === 'country' ? 'circles' : 'country'));
 $('togImagery').addEventListener('click', () => { if (!glReady) return; state.showImagery = !state.showImagery; updateToggles(); updateAria(); requestRender(); });
 $('togCircles').addEventListener('click', () => {
-  if (state.mode === 'country') { announce('The circles are hidden while you move your country. Choose Back to circles to see them.'); return; }
+  if (state.mode === 'country') { announce('The circles are hidden on the Country tab. Choose the Projection, Measure or Compare tab to see them.'); return; }
   state.showCircles = !state.showCircles; updateToggles(); requestRender();
 });
 $('togGrid').addEventListener('click', () => { state.showGrid = !state.showGrid; updateToggles(); requestRender(); });
@@ -2577,9 +2561,6 @@ $('zoomIn').addEventListener('click', () => zoomBy(2));
 $('zoomOut').addEventListener('click', () => zoomBy(0.5));
 $('zoomFit').addEventListener('click', zoomFit);
 $('zoomToBtn').addEventListener('click', zoomToCountry);
-$('pickBtn').addEventListener('click', () => { if (state.mode !== 'country') setMode('country'); setPicking(!CM.picking); });
-$('pickCancel').addEventListener('click', () => setPicking(false));
-document.querySelectorAll('[data-back]').forEach(b => b.addEventListener('click', () => setMode('circles')));
 document.querySelectorAll('[data-move]').forEach(b => b.addEventListener('click', () => {
   if (!CM.c0) return;
   if (state.mode !== 'country') setMode('country');
@@ -2652,7 +2633,12 @@ function hitObject(px, py) {
   if (!CM.moved) return null;
   const s = countryCache(p, 'moved').screen, c = countryCentreBase(p);
   if (insideRings(s, CM.moved.rings, b.x, b.y)) return 'country';
-  if (c && Math.hypot((c.x - b.x) * VT.z, (c.y - b.y) * VT.z) < 18) return 'country';
+  // A country too small to tap can be grabbed inside its locator ring, unless the tap is on another country
+  const vb = viewBox(s, CM.moved);
+  if (c && Math.max(vb.w, vb.h) < 26 && Math.hypot((c.x - b.x) * VT.z, (c.y - b.y) * VT.z) < 18) {
+    const under = countryAtBase(b.x, b.y);
+    if (!under || under.fi === CM.feat) return 'country';
+  }
   return null;
 }
 
@@ -2710,11 +2696,10 @@ canvas.addEventListener('pointerdown', e => {
   updateVT();
   if (pointers.size === 2) { if (drag?.kind === 'country' || drag?.kind === 'probe') endObjectDrag(); startPinch(); return; }
   if (pointers.size > 2) return;
-  if (CM.picking) { drag = { kind: 'pick', x0: px, y0: py }; return; }
   const hit = hitObject(px, py);
-  if (hit === 'probe') { drag = { kind: 'probe' }; return; }
-  if (hit === 'country') { const g0 = screenToLonLat(px, py); drag = g0 ? { kind: 'country', g0, p0: { ...CM.pos } } : null; return; }
-  if (view.z <= 1.0001) { placeObjectAt(px, py, true); return; }
+  if (hit === 'probe') { drag = { kind: 'probe' }; canvas.style.cursor = 'grabbing'; return; }
+  if (hit === 'country') { const g0 = screenToLonLat(px, py); drag = g0 ? { kind: 'country', g0, p0: { ...CM.pos } } : null; canvas.style.cursor = 'grabbing'; return; }
+  if (state.mode !== 'country' && view.z <= 1.0001) { placeObjectAt(px, py, true); return; }
   drag = { kind: 'maybe', x0: px, y0: py, a0: { x: VT.ax, y: VT.ay } };
 });
 canvas.addEventListener('pointermove', e => {
@@ -2729,14 +2714,13 @@ canvas.addEventListener('pointermove', e => {
     return;
   }
   if (!drag) {
-    if (e.pointerType === 'mouse' && !state.morph && !CM.picking) {
+    if (e.pointerType === 'mouse' && !state.morph) {
       updateVT();
-      const b = toBase(px, py), c = countryAtBase(b.x, b.y);
-      if (c) showTip(c.name, px, py); else hideTip();
-    } else if (CM.picking && e.pointerType === 'mouse') {
-      updateVT();
-      const b = toBase(px, py), c = countryAtBase(b.x, b.y);
-      if (c) showTip(c.name, px, py); else hideTip();
+      const hit = hitObject(px, py);
+      const b = toBase(px, py), c = hit ? null : countryAtBase(b.x, b.y);
+      const choose = state.mode === 'country' && c && c.fi !== CM.feat;
+      if (c) showTip(choose ? `${c.name} · click to choose` : c.name, px, py); else hideTip();
+      canvas.style.cursor = hit ? 'grab' : choose ? 'pointer' : (state.mode === 'country' ? (view.z > 1.0001 ? 'move' : 'default') : '');
     }
     return;
   }
@@ -2749,8 +2733,16 @@ canvas.addEventListener('pointermove', e => {
   } else if (drag.kind === 'probe') moveProbeTo(px, py);
   else if (drag.kind === 'country') countryDragTo(px, py);
 });
+function chooseAt(px, py) {
+  updateVT();
+  const b = toBase(px, py), c = countryAtBase(b.x, b.y);
+  if (!c) { announce('Tap a country to choose it. Drag the highlighted country to move it.'); return; }
+  if (c.fi === CM.feat) { announce(`${CM.name} is already chosen. Drag it to move it.`); return; }
+  chooseCountry(c.fi, true);
+}
 function endObjectDrag() {
   if (!drag) return;
+  canvas.style.cursor = '';
   const f = pendingMove; pendingMove = null; if (f) f();
   if (drag.kind === 'probe') { updateAria(); announce(probeAnnouncement(), 200); }
   if (drag.kind === 'country') afterCountryMove(true, false);
@@ -2762,12 +2754,9 @@ function onPointerEnd(e) {
   if (!had || !drag) return;
   const [px, py] = localPoint(e);
   if (drag.kind === 'pinch') { if (pointers.size < 2) { drag = null; updateAria(); } return; }
-  if (drag.kind === 'maybe' && e.type === 'pointerup') { drag = null; placeObjectAt(px, py, false); return; }
-  if (drag.kind === 'pick' && e.type === 'pointerup') {
+  if (drag.kind === 'maybe' && e.type === 'pointerup') {
     drag = null;
-    updateVT();
-    const b = toBase(px, py), c = countryAtBase(b.x, b.y);
-    if (c) chooseCountry(c.fi, true); else announce('That is not a country. Tap a country, or press Escape to cancel.');
+    if (state.mode === 'country') chooseAt(px, py); else placeObjectAt(px, py, false);
     return;
   }
   if (drag.kind === 'pan') { drag = null; updateAria(); return; }
@@ -2833,7 +2822,6 @@ function probeAnnouncement() {
   return `Measuring circle at ${fmtLat(state.probe.lat)}, ${fmtLon(state.probe.lon)}. Drawn ${fmtX(st.area)} times the size of the same circle at the center of the map. ${$('mShapeNote').textContent}`;
 }
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape' && CM.picking) { setPicking(false); return; }
   if (e.target.closest('input, textarea, select, dialog[open], [role="tab"]') || e.altKey || e.ctrlKey || e.metaKey) return;
   if (e.key === '+' || e.key === '=') { e.preventDefault(); zoomBy(2); return; }
   if (e.key === '-' || e.key === '_') { e.preventDefault(); zoomBy(0.5); return; }
@@ -2858,6 +2846,7 @@ window.__lab = {
   isGL: () => glReady, setMode, chooseCountry, mainFeatureFor, setCountryPos, countryStats: id => countryStats(PROJ[id]),
   zoomBy, zoomFit, zoomToCountry, setZoomKeepingPoint, getVT: () => ({ ...VT }), getVP: () => ({ ...VP }),
   anchorFor: id => anchorFor(PROJ[id]), moveCountryTo, hiImagery: () => hiImagery, rotationMatrix, toVec,
+  hitObject: (x, y) => { updateVT(); return hitObject(x, y); }, countryAt: (x, y) => { updateVT(); const b = toBase(x, y), c = countryAtBase(b.x, b.y); return c ? [c.name, c.fi] : null; },
   lonLatToScreen: (lon, lat) => { const p = PROJ[state.current], xy = projectFlat(new Float64Array([lon, lat]), p), s = toScreen(xy, p.fit); updateVT(); return [s[0] * VT.z + VT.kx, s[1] * VT.z + VT.ky]; },
 };
 </script>
