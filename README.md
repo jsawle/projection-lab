@@ -9,7 +9,7 @@ A browser app for middle school students. The world morphs between nine map proj
 - **Country** tab: tap any country to choose it, then drag it over the globe at its real size and shape to see what each projection does to it; a globe-vs-map card shows its real size, its size compared with at home, and how many times its real size the map draws it
 - Map buttons sit below the map, so every projection uses the full height
 
-**Lab version:** https://jsawle.github.io/projection-lab/lab/ — test copy for trying new features before they reach the live app. Now testing v1.3.2: a compact Projection panel, with the facts students need first and background under “More about”.
+**Lab version:** https://jsawle.github.io/projection-lab/lab/ — test copy for trying new features before they reach the live app. Now testing v1.3.3: compact Projection, Measure and Compare panels. Measure and Compare use the same real-versus-this-map card as Country, so the result shows without scrolling.
 
 
 ## Projections
