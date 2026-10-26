@@ -433,11 +433,40 @@ kbd { font-family: var(--font-data); font-size: 0.85em; border: 1px solid var(--
 .c-moves { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
 .c-moves .pair-btn { padding: 6px 4px; text-align: center; }
 .c-note { margin-top: 10px !important; font-size: 0.82rem; }
+/* v1.3.3: Measure and Compare use the same card as Country */
+.hint.tight.first, .c-lbl.first { margin-top: 0 !important; }
+#panel-measure, #panel-compare { padding-top: 12px; }
+.m-card .c-h.r, .m-card .c-num { color: var(--coral); }
+.m-card .c-num.real { color: var(--ink); }
+.m-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.m-pair > div { min-width: 0; }
+.m-card .c-num { white-space: nowrap; }
+.m-card .c-verdict { min-height: calc(2.7em + 10px); }
+.m-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px 12px; margin-top: 10px; }
+.m-row .where { margin: 0 !important; }
+.m-row .units { margin-top: 0; }
+.k-pairs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin-top: 0; }
+.k-pairs .pair-btn { min-height: 44px; padding: 5px 4px; text-align: center; line-height: 1.15; }
+.k-pairs .pair-btn span { display: block; }
+@container (max-width: 359px) { .k-pairs { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.k-card { grid-template-columns: auto minmax(0, 1fr) minmax(0, 1fr); column-gap: 10px; row-gap: 6px; align-items: center; }
+.k-card .nm { font-size: 0.84rem; font-weight: 700; white-space: nowrap; }
+.k-card .bar-track { height: 14px; }
+.k-card .c-col { margin-top: 2px; }
+.k-card .c-num.real { padding-top: 0; }
+#cmpSizes { margin-top: 8px !important; }
+#cmpSizes b { font-size: 0.84rem; }
+.nw { white-space: nowrap; }
 @media (min-width: 900px) and (max-height: 760px) {
   #panel-country { padding-top: 10px; }
   .c-card svg { max-height: 52px; margin: 2px 0 4px; } .c-num { font-size: 1.3rem; } .c-num.real { font-size: 1.1rem; }
   .c-head + .hint.tight { display: none; } .c-card { margin-top: 8px; padding: 8px 10px 10px; } .c-verdict { margin-top: 8px !important; padding-top: 7px; font-size: 0.88rem; }
   .c-lbl { margin: 8px 0 5px !important; }
+  #panel-measure, #panel-compare { padding-top: 10px; }
+  .k-card { row-gap: 5px; }
+  #panel-compare .c-lbl.first { margin-bottom: 5px !important; }
+  .k-pairs .pair-btn { min-height: 40px; padding: 4px; }
+  @container (max-width: 359px) { #panel-compare .c-lbl.first { display: none; } }
 }
 .viz-key .k-country { background: rgba(255, 201, 60, 0.5); border: 1.5px solid var(--sun); }
 .metric .val.sunv { color: var(--sun); }
@@ -581,53 +610,55 @@ kbd { font-family: var(--font-data); font-size: 0.85em; border: 1px solid var(--
       </section>
 
       <section class="panel" role="tabpanel" id="panel-measure" aria-labelledby="tab-measure" tabindex="0" hidden>
-        <p class="eyebrow">Measuring circle <span class="ver" id="probeVer"></span></p>
-        <p class="hint">Drag the white circle on the map. Or select the map and use the arrow keys.</p>
-        <div class="readout">
-          <div class="metric">
-            <div class="lbl">Size on this map</div>
-            <div class="val" id="mArea">–</div>
-            <div class="note" id="mAreaNote"></div>
+        <p class="hint tight first">Drag the white circle on the map. Or select the map and use the arrow keys.</p>
+        <div class="c-card m-card">
+          <div class="c-h">Real circle</div>
+          <div class="c-h r">On this map</div>
+          <svg id="shapeSvg" viewBox="0 0 260 96" role="img" aria-label="The measuring circle on the real Earth and on this map"></svg>
+          <div class="c-col">
+            <div class="c-num real" id="mTrue">–</div>
+            <div class="c-sub" id="mTrueLbl">miles across</div>
           </div>
-          <div class="metric">
-            <div class="lbl">Shape on this map</div>
-            <div class="val" id="mShape">–</div>
-            <div class="note" id="mShapeNote"></div>
+          <div class="c-col m-pair">
+            <div><div class="c-num" id="mArea">–</div><div class="c-sub">size vs. center</div></div>
+            <div><div class="c-num" id="mShape">–</div><div class="c-sub">long : wide</div></div>
+          </div>
+          <p class="c-verdict" id="mVerdict"></p>
+        </div>
+        <div class="m-row">
+          <p class="where" id="probeWhere"></p>
+          <div class="units" role="group" aria-label="Units">
+            <button type="button" id="uMi" aria-pressed="true">Miles</button>
+            <button type="button" id="uKm" aria-pressed="false">Kilometers</button>
           </div>
         </div>
-        <div class="viz">
-          <svg id="shapeSvg" viewBox="0 0 260 124" role="img" aria-label="Shape of the measuring circle"></svg>
-          <div class="viz-key" aria-hidden="true"><span><i class="k-true"></i>True circle</span><span><i class="k-map"></i>On this map</span></div>
-        </div>
-        <p class="where" id="probeWhere"></p>
-        <p class="where" id="probeTrue"></p>
-        <div class="units" role="group" aria-label="Units">
-          <button type="button" id="uMi" aria-pressed="true">Miles</button>
-          <button type="button" id="uKm" aria-pressed="false">Kilometers</button>
-        </div>
+        <p class="hint c-note"><span id="probeTrue"></span> <span class="ver" id="probeVer"></span></p>
       </section>
 
       <section class="panel" role="tabpanel" id="panel-compare" aria-labelledby="tab-compare" tabindex="0" hidden>
-        <p class="eyebrow">Compare sizes <span class="ver" id="cmpVer"></span></p>
-        <p class="hint">Highlight two places. Compare their real sizes with how big this map draws them.</p>
-        <div class="pairs" id="pairs" role="group" aria-label="Places to compare"></div>
+        <p class="c-lbl first" id="pairsLbl">Highlight two places on the map</p>
+        <div class="pairs k-pairs" id="pairs" role="group" aria-labelledby="pairsLbl"></div>
         <div id="cmpBody">
-          <div class="bars" aria-hidden="true">
-            <div class="bar-group">
-              <h4>Real Earth</h4>
-              <div class="bar-row"><span class="nm" id="bnA1"></span><span class="bar-track"><span class="bar-fill a" id="bReal1"></span></span></div>
-              <div class="bar-row"><span class="nm" id="bnB1"></span><span class="bar-track"><span class="bar-fill b" id="bReal2"></span></span></div>
-            </div>
-            <div class="bar-group">
-              <h4>On this map</h4>
-              <div class="bar-row"><span class="nm" id="bnA2"></span><span class="bar-track"><span class="bar-fill a" id="bMap1"></span></span></div>
-              <div class="bar-row"><span class="nm" id="bnB2"></span><span class="bar-track"><span class="bar-fill b" id="bMap2"></span></span></div>
-            </div>
+          <div class="c-card k-card">
+            <p class="sr-only" id="cmpReal"></p>
+            <p class="sr-only" id="cmpMap"></p>
+            <span aria-hidden="true"></span>
+            <div class="c-h" aria-hidden="true">Real Earth</div>
+            <div class="c-h" aria-hidden="true">On this map</div>
+            <span class="nm" id="bnA" aria-hidden="true"></span>
+            <span class="bar-track" aria-hidden="true"><span class="bar-fill a" id="bReal1"></span></span>
+            <span class="bar-track" aria-hidden="true"><span class="bar-fill a" id="bMap1"></span></span>
+            <span class="nm" id="bnB" aria-hidden="true"></span>
+            <span class="bar-track" aria-hidden="true"><span class="bar-fill b" id="bReal2"></span></span>
+            <span class="bar-track" aria-hidden="true"><span class="bar-fill b" id="bMap2"></span></span>
+            <span aria-hidden="true"></span>
+            <div class="c-col" aria-hidden="true"><div class="c-num real" id="kReal">–</div><div class="c-sub" id="kRealLbl"></div></div>
+            <div class="c-col" aria-hidden="true"><div class="c-num real" id="kMap">–</div><div class="c-sub" id="kMapLbl"></div></div>
+            <p class="c-verdict" id="cmpVerdict"></p>
           </div>
-          <p class="cmp-text" id="cmpReal"></p>
-          <p class="cmp-text" id="cmpMap"></p>
-          <p class="verdict" id="cmpVerdict"></p>
+          <p class="where" id="cmpSizes"></p>
         </div>
+        <p class="hint c-note">The Real Earth bars use real sizes. The On this map bars show how much space this map gives each place. On a map that keeps area, the two sets match. <span class="ver" id="cmpVer"></span></p>
       </section>
 
     </div>
@@ -681,7 +712,7 @@ kbd { font-family: var(--font-data); font-size: 0.85em; border: 1px solid var(--
    Versions: app + one version per model. Bump a model's version when
    its maths or data handling changes, and the app version every release.
    ================================================================== */
-const APP_VERSION = '1.3.2';
+const APP_VERSION = '1.3.3';
 const SDK_VERSION = '5.1';
 const MODELS = {
   morph:   { name: 'Morph engine',       v: '1.4', what: 'Slides every projected point from one map to the next (eased, 2 seconds). The satellite picture is moved on the graphics card. Can be switched off.' },
@@ -2314,6 +2345,7 @@ function buildTabs() {
     // The tabs drive the map: Country shows the moved country; the others show the circles
     if (tab.id !== 'tab-country') lastCirclesTab = tab.id.replace('tab-', '');
     setMode(tab.id === 'tab-country' ? 'country' : 'circles');
+    if (tab.id === 'tab-measure') requestAnimationFrame(fitMeasureViz);
   };
   tabs.forEach((t, i) => {
     t.addEventListener('click', () => select(t, false));
@@ -2418,13 +2450,19 @@ function updateProbeReadout() {
   else if (ratio < 1.5) shapeWords = 'A little squashed';
   else if (ratio < 2.5) shapeWords = 'Stretched into an oval';
   else shapeWords = 'Very stretched';
+  const acrossNum = state.units === 'mi' ? CIRCLE_RADIUS_MI * 2 : Math.round(CIRCLE_RADIUS_MI * 2 * MI_TO_KM);
+  const acrossUnit = state.units === 'mi' ? 'miles' : 'km';
+  $('mTrue').textContent = acrossNum.toLocaleString('en-US');
+  $('mTrueLbl').textContent = `${acrossUnit} across`;
   $('mArea').innerHTML = `${fmtX(st.area)}<small>×</small>`;
-  $('mAreaNote').textContent = `${sizeWords(st.area)} the same circle at the center of the map${center}`;
   $('mShape').innerHTML = `${ratio.toFixed(1)}<small> : 1</small>`;
-  $('mShapeNote').textContent = `${shapeWords}. Longest way across is ${st.long.toFixed(1)}×, shortest is ${st.short.toFixed(1)}× a true circle.`;
+  const sizeLine = `${sizeWords(st.area)} at the map’s center${center}.`;
+  const shapeLine = ratio < 1.12 ? `${shapeWords}.` : `${shapeWords}: ${ratio.toFixed(1)}× as long as it is wide.`;
+  $('mVerdict').textContent = `${sizeLine} ${shapeLine}`;
+  // A longer verdict can add a line: shrink the drawing so the panel still fits without scrolling
+  if (!$('panel-measure').hidden) { const vh = $('mVerdict').offsetHeight; if (vh !== probe.verdictH) { probe.verdictH = vh; fitMeasureViz(); } }
   $('probeWhere').innerHTML = `Circle center: <b>${fmtLat(state.probe.lat)}, ${fmtLon(state.probe.lon)}</b>`;
-  const across = state.units === 'mi' ? `${(CIRCLE_RADIUS_MI * 2).toLocaleString('en-US')} miles` : `${Math.round(CIRCLE_RADIUS_MI * 2 * MI_TO_KM).toLocaleString('en-US')} km`;
-  $('probeTrue').innerHTML = `On the real Earth every circle is <b>${across}</b> across and covers <b>${fmtArea(probe.trueM2 / 1e6)}</b>.`;
+  $('probeTrue').innerHTML = `On the real Earth every circle is ${acrossNum.toLocaleString('en-US')} ${acrossUnit} across and covers ${fmtArea(probe.trueM2 / 1e6)}. “Size vs. center” compares it with the same circle at the center of the map.`;
   probe.label = [`${fmtX(st.area)}× size`, shapeWords.toLowerCase()];
   drawShapeViz(st, shapeWords);
 }
@@ -2432,18 +2470,18 @@ function updateProbeReadout() {
 /* True circle (dashed) next to the circle as this map draws it, same scale, real tilt */
 function drawShapeViz(st, shapeWords) {
   const svg = $('shapeSvg');
-  const r0 = 26;
+  const r0 = 24;
   let rx = r0 * st.long, ry = r0 * st.short, rr = r0;
-  const k = Math.min(1, 56 / Math.max(rx, rr));
+  const k = Math.min(1, 45 / Math.max(rx, rr));
   rx *= k; ry *= k; rr *= k;
   const deg = -st.angle * 180 / Math.PI;
   svg.innerHTML = `
-    <circle cx="70" cy="62" r="${rr.toFixed(1)}" fill="none" stroke="#aebbdc" stroke-width="1.5" stroke-dasharray="4 4"/>
-    <g transform="translate(185 62) rotate(${deg.toFixed(1)})">
-      <ellipse rx="${rx.toFixed(1)}" ry="${ry.toFixed(1)}" fill="rgba(255,93,115,0.42)" stroke="#ffffff" stroke-width="2"/>
-      <line x1="${(-rx).toFixed(1)}" y1="0" x2="${rx.toFixed(1)}" y2="0" stroke="rgba(255,255,255,0.5)" stroke-width="1"/>
+    <circle cx="65" cy="48" r="${rr.toFixed(1)}" fill="rgba(214,224,250,0.12)" stroke="#aebbdc" stroke-width="1.6" stroke-dasharray="4 3" vector-effect="non-scaling-stroke"/>
+    <g transform="translate(195 48) rotate(${deg.toFixed(1)})">
+      <ellipse rx="${rx.toFixed(1)}" ry="${ry.toFixed(1)}" fill="rgba(255,93,115,0.42)" stroke="#ffffff" stroke-width="2" vector-effect="non-scaling-stroke"/>
+      <line x1="${(-rx).toFixed(1)}" y1="0" x2="${rx.toFixed(1)}" y2="0" stroke="rgba(255,255,255,0.5)" stroke-width="1" vector-effect="non-scaling-stroke"/>
     </g>`;
-  svg.setAttribute('aria-label', `The measuring circle on this map: ${fmtX(st.area)} times the size, ${shapeWords.toLowerCase()}. Longest way across ${st.long.toFixed(1)} times, shortest ${st.short.toFixed(1)} times a true circle.`);
+  svg.setAttribute('aria-label', `The measuring circle on the real Earth and on this map, at the same scale. On this map it is ${fmtX(st.area)} times its size at the center, ${shapeWords.toLowerCase()}. Longest way across ${st.long.toFixed(1)} times, shortest ${st.short.toFixed(1)} times the real circle.`);
 }
 
 function areaParts(km2) {
@@ -2479,10 +2517,10 @@ function updateCountryReadout(full) {
   if (full || now - CM.vizTime > 120) { CM.vizTime = now; drawCountryViz(p, st); }
   if (full) fitCountryViz();
 }
-/* Make the globe-vs-map drawing as large as the panel allows without scrolling (52 px at least) */
+/* Make a card's real-vs-map drawing as large as the panel allows without scrolling (52 px at least) */
 const wideLayout = matchMedia('(min-width: 900px)');
-function fitCountryViz() {
-  const panel = $('panel-country'), svg = $('countrySvg');
+function fitViz(panelId, svgId) {
+  const panel = $(panelId), svg = $(svgId);
   if (!panel || panel.hidden) return;
   if (!wideLayout.matches) { svg.style.height = ''; svg.style.maxHeight = ''; return; }
   const panels = panel.parentElement;
@@ -2492,8 +2530,11 @@ function fitCountryViz() {
   const h = clamp(cur + free - 2, 52, Math.min(natural, 170));
   if (Math.abs(h - cur) > 1) { svg.style.maxHeight = 'none'; svg.style.height = `${Math.round(h)}px`; }
 }
-new ResizeObserver(() => fitCountryViz()).observe(document.querySelector('.panels'));
-wideLayout.addEventListener?.('change', fitCountryViz);
+function fitCountryViz() { fitViz('panel-country', 'countrySvg'); }
+function fitMeasureViz() { fitViz('panel-measure', 'shapeSvg'); }
+function fitAllViz() { fitCountryViz(); fitMeasureViz(); }
+new ResizeObserver(() => fitAllViz()).observe(document.querySelector('.panels'));
+wideLayout.addEventListener?.('change', fitAllViz);
 
 /* Your country on a globe (true shape and size) next to how this map draws it, same scale */
 function drawCountryViz(p, st) {
@@ -2543,9 +2584,8 @@ function updateCompare() {
   if (!pair.a) { body.hidden = true; return; }
   body.hidden = false;
   const A = SUBJECTS[pair.a], B = SUBJECTS[pair.b];
-  ['bnA1', 'bnA2'].forEach(id => $(id).textContent = A.label);
-  ['bnB1', 'bnB2'].forEach(id => $(id).textContent = B.label);
-  if (!state.ready) { $('cmpReal').textContent = 'Loading real sizes…'; $('cmpMap').textContent = ''; $('cmpVerdict').textContent = ''; return; }
+  $('bnA').textContent = A.label; $('bnB').textContent = B.label;
+  if (!state.ready) { $('cmpReal').textContent = 'Loading real sizes…'; $('cmpMap').textContent = ''; $('cmpVerdict').textContent = ''; $('cmpSizes').textContent = ''; return; }
   const p = PROJ[state.current];
   const ta = world.subjectTrueKm2[pair.a], tb = world.subjectTrueKm2[pair.b];
   const ma = p.subjectMapM2[pair.a], mb = p.subjectMapM2[pair.b];
@@ -2560,23 +2600,34 @@ function updateCompare() {
     if (r <= 1 / 1.05) return `${a.label} ${verb} <strong>${fmtX(1 / r)}×</strong> bigger than ${b.label}`;
     return `${a.label} and ${b.label} ${verb === 'is' ? 'are' : 'look'} about the same size`;
   };
-  $('cmpReal').innerHTML = `<b>Real Earth:</b> ${sentence(realRatio, A, B, 'is')}. ${A.label}: about ${fmtArea(ta)}. ${B.label}: about ${fmtArea(tb)}.`;
+  $('cmpReal').innerHTML = `<b>Real Earth:</b> ${sentence(realRatio, A, B, 'is')}.`;
   $('cmpMap').innerHTML = `<b>On this ${p.short} map:</b> ${sentence(mapRatio, A, B, 'looks')}.`;
+  const column = (r, verb) => {
+    if (r < 1.05 && r > 1 / 1.05) return ['≈ 1×', verb === 'is' ? 'about the same size' : 'look about the same size'];
+    const big = r >= 1 ? B : A;
+    return [`${fmtX(Math.max(r, 1 / r))}×`, `${big.label} ${verb} bigger`];
+  };
+  const [rn, rl] = column(realRatio, 'is'), [mn, ml] = column(mapRatio, 'looks');
+  $('kReal').textContent = rn; $('kRealLbl').textContent = rl;
+  $('kMap').textContent = mn; $('kMapLbl').textContent = ml;
+  $('cmpSizes').innerHTML = `Real sizes: <span class="nw">${A.label} <b>${fmtArea(ta)}</b></span> · <span class="nw">${B.label} <b>${fmtArea(tb)}</b></span>`;
   const off = mapRatio / realRatio;
   $('cmpVerdict').textContent = Math.abs(off - 1) < 0.05
     ? 'Same as real life. This map keeps area.'
-    : `This map changes their sizes: ${off < 1 ? A.label : B.label} is drawn too big compared with ${off < 1 ? B.label : A.label}.`;
+    : `This map draws ${off < 1 ? A.label : B.label} too big compared with ${off < 1 ? B.label : A.label}.`;
 }
 
 function buildPairs() {
   const box = $('pairs');
   for (const pr of PAIRS) {
     const b = document.createElement('button');
-    b.type = 'button'; b.className = 'pair-btn'; b.dataset.id = pr.id; b.textContent = pr.label;
+    b.type = 'button'; b.className = 'pair-btn'; b.dataset.id = pr.id;
+    if (pr.a) b.innerHTML = `<span>${SUBJECTS[pr.a].label}</span> <span>vs ${SUBJECTS[pr.b].label}</span>`;
+    else b.textContent = pr.label;
     b.addEventListener('click', () => {
       state.pair = pr.id;
       updateCompare(); updateAria(); requestRender();
-      if (pr.a) announce(`${pr.label}. ${$('cmpReal').textContent} ${$('cmpMap').textContent}`);
+      if (pr.a) announce(`${pr.label}. ${$('cmpReal').textContent} ${$('cmpMap').textContent} ${$('cmpVerdict').textContent}`);
     });
     box.appendChild(b);
   }
@@ -2899,7 +2950,7 @@ canvas.addEventListener('keydown', e => {
 });
 function probeAnnouncement() {
   const st = probeStats(PROJ[state.current]);
-  return `Measuring circle at ${fmtLat(state.probe.lat)}, ${fmtLon(state.probe.lon)}. Drawn ${fmtX(st.area)} times the size of the same circle at the center of the map. ${$('mShapeNote').textContent}`;
+  return `Measuring circle at ${fmtLat(state.probe.lat)}, ${fmtLon(state.probe.lon)}. Drawn ${fmtX(st.area)} times the size of the same circle at the center of the map. ${$('mVerdict').textContent}`;
 }
 document.addEventListener('keydown', e => {
   if (e.target.closest('input, textarea, select, dialog[open], [role="tab"]') || e.altKey || e.ctrlKey || e.metaKey) return;
