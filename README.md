@@ -10,7 +10,7 @@ A browser app for middle school students. The world morphs between nine map proj
 - Map buttons sit below the map, so every projection uses the full height
 - Country, Measure and Compare each show their result in a real-versus-this-map card that fits without scrolling on laptop screens
 
-**Lab version:** https://jsawle.github.io/projection-lab/lab/ — test copy for trying new features before they reach the live app. Now testing v1.4.1: the Spilhaus World Ocean Map replaces Mollweide, plus the clearer Country card from v1.3.5–1.3.6 (“real place” instead of “home”).
+**Lab version:** https://jsawle.github.io/projection-lab/lab/ — test copy for trying new features before they reach the live app. Now testing v1.5.0: the Spilhaus World Ocean Map replaces Mollweide, the Compare tab is removed (Greenland and Africa stay highlighted on the map), and the clearer Country card from v1.3.5–1.3.6 (“real place” instead of “home”).
 
 
 ## Projections
