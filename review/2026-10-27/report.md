@@ -56,6 +56,16 @@ These need your call; they are not bugs.
 - **Greenland at 40°W on the projector but 41°W on the Chromebook** (part of T2-08): the projector screenshot placed it at 40°W directly.
 - **The "On a globe" shape changes size** (T4-13): both shapes are drawn at one scale so they can be compared, so the globe shape shrinks when the map shape is large. Changing that would lose the comparison.
 
+## What changed (lab v1.5.1)
+
+All 17 fix items were made in the lab. Where the change differs from the suggestion above:
+
+- **Item 3 (Robinson and Winkel Tripel cards).** Measuring the whole world with PROJ showed that "A little distorted" fits their area but not their shape or direction. Their shape error is larger than Plate Carrée's, which the app already rates Distorted (mean |ln(a/b)| 0.37 and 0.41 against 0.30), and so is their angle error (21° and 23° against 16°). Their overall scale error is lower than Equal Earth's but still large (0.28 and 0.26 against 0.33). So both maps now show Area ≈ A little distorted · More near the poles, and Shape, Distance and Direction ✕ Distorted. The notes differ where the maps differ: Robinson's shapes are worst near the poles and edges, Winkel Tripel's near the edges. The answer to Winkel Tripel's Try this is in its circles text, and the task tells students to check it on the Country tab.
+- **Item 14 (two Country controls).** The Country button on the map was removed; the Country tab is the one control.
+- **Item 6 (Try this).** The task stays when a step switches to another map it uses, labelled "from Mercator" with a button to show the new map's own task. It also appears on the Country tab for tasks that use it, and on the Measure tab for white-circle tasks.
+
+Checked after the changes: every panel fits without scrolling at 1366×768 and 1520×724, with Try this always visible; at 1280×720 (projector) Try this is still cut off on some maps, as before (Decide item 5). axe-core found no WCAG A/AA violations.
+
 ## Files
 
 - `briefs/`: shared instructions and the seven persona briefs.

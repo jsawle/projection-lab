@@ -123,12 +123,12 @@ body {
 .glass { background: var(--glass); border: 1px solid var(--glass-line); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
 .toggles { display: flex; gap: 6px; flex-wrap: wrap; }
 .tog {
-  font: 700 0.82rem/1 var(--font-body); color: var(--ink);
-  display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 36px; min-width: 36px; padding: 0 11px;
-  border-radius: 999px; cursor: pointer;
+  font: 700 0.72rem/1 var(--font-body); color: var(--ink);
+  display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-height: 42px; min-width: 46px; padding: 5px 7px 4px;
+  border-radius: 12px; cursor: pointer;
 }
-@container (max-width: 1180px) { .tog { padding: 0; } .tog .lbl { display: none; } }
 @container (max-width: 900px) { .stage-foot .status { display: none; } }
+@container (max-width: 420px) { .tog { padding: 4px 5px 3px; min-width: 40px; } .stage-foot .toggles { gap: 4px; } .zoom button { width: 32px; } }
 @container (max-width: 700px) {
   .stage-foot .toggles { order: 1; }
   .stage-foot .zoom { order: 2; margin-left: auto; }
@@ -136,7 +136,6 @@ body {
   .stage-foot .attrib { order: 4; }
   .stage-foot .credit { order: 5; }
 }
-@container (max-width: 420px) { .stage-foot .mode-btn span { display: none; } .stage-foot .mode-btn { padding: 0; width: 36px; justify-content: center; } }
 .tog .sw { width: 13px; height: 13px; border-radius: 50%; flex: none; }
 .tog .sw.img { background: conic-gradient(#2a6e8f 0 25%, #c9b27a 0 50%, #3f7a45 0 75%, #e9eef5 0); }
 .tog .sw.circ { border: 2px solid var(--coral); background: rgba(255, 93, 115, 0.3); }
@@ -181,7 +180,7 @@ body {
   background: radial-gradient(ellipse at center, #13285a, var(--night-2) 70%);
 }
 .loading p { margin: 0; font-weight: 700; }
-.loading .sub { font-weight: 400; color: var(--ink-soft); font-size: 0.9rem; }
+.loading .sub { font-weight: 400; color: var(--ink-soft); font-size: 0.9rem; max-width: 58ch; margin-inline: auto; }
 .loading .bar { width: min(280px, 70vw); height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; margin: 0 auto; }
 .loading .bar span { display: block; height: 100%; width: 8%; background: var(--sun); transition: width .35s ease; }
 .loading .btn { justify-self: center; }
@@ -257,12 +256,18 @@ body {
 .prop[data-s="nearly"] .ico { background: var(--nearly); } .prop[data-s="nearly"] .st { color: var(--nearly); }
 .prop[data-s="partly"] .ico { background: var(--partly); } .prop[data-s="partly"] .st { color: var(--partly); }
 .prop[data-s="changed"] .ico { background: var(--changed); } .prop[data-s="changed"] .st { color: var(--changed); }
-details.glossary { margin-top: 10px; font-size: 0.88rem; }
-details.glossary summary { cursor: pointer; font-weight: 700; color: var(--sun); min-height: 30px; display: flex; align-items: center; }
-details.glossary dl { margin: 6px 0 0; display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; }
-details.glossary dt { font-weight: 700; }
-details.glossary dd { margin: 0; color: var(--ink-soft); }
-details.glossary p { margin: 8px 0 0; color: var(--ink-soft); }
+.glossary { margin-top: 6px; font-size: 0.88rem; padding: 10px 12px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--night-2); }
+.disc-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 0 14px; margin-top: 6px; }
+.disc-btn { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 2px 0; border: 0; background: none; cursor: pointer; font: 700 0.86rem/1.2 var(--font-body); color: var(--sun); text-align: left; }
+.disc-btn::after { content: "+"; font: 700 1.05rem/1 var(--font-body); }
+.disc-btn[aria-expanded="true"]::after { content: "−"; }
+.disc-btn:hover { text-decoration: underline; }
+.circ h3, .circ p { display: inline; }
+.circ { margin: 10px 0 0; }
+.glossary dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; }
+.glossary dt { font-weight: 700; }
+.glossary dd { margin: 0; color: var(--ink-soft); }
+.glossary p { margin: 8px 0 0; color: var(--ink-soft); }
 .panel h3 { margin: 18px 0 4px; font: 700 0.72rem/1.2 var(--font-body); letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-soft); }
 .panel p { margin: 0; max-width: 65ch; }
 .try { margin-top: 18px; padding: 12px 14px; border-radius: 14px; background: rgba(255, 201, 60, 0.1); border: 1px solid rgba(255, 201, 60, 0.45); }
@@ -282,23 +287,42 @@ details.glossary p { margin: 8px 0 0; color: var(--ink-soft); }
   #panel-proj .prop .st { grid-column: 1 / -1; }
 }
 #panel-proj .pname { font-size: 1.25rem; }
-#panel-proj details.glossary { margin-top: 4px; }
-#panel-proj details.glossary summary { min-height: 24px; }
 #panel-proj h3 { margin: 10px 0 3px; }
 #panel-proj p { font-size: 0.95rem; line-height: 1.45; }
 #panel-proj .try { margin-top: 10px; padding: 9px 12px; }
 .try-lbl { font: 700 0.72rem/1.2 var(--font-body); letter-spacing: 0.12em; text-transform: uppercase; color: var(--sun); margin-right: 4px; }
-.more { margin-top: 10px; border: 1px solid var(--line); border-radius: 12px; background: var(--night-2); }
-.more summary {
-  cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 10px;
-  min-height: 40px; padding: 6px 12px; font-weight: 700; font-size: 0.86rem; color: var(--ink);
+.try .try-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 2px 10px; }
+.try .try-head p { margin: 0; }
+.try-from { font-size: 0.8rem; color: var(--ink-soft); }
+.try ol { margin: 3px 0 0; padding-left: 1.35em; }
+.try li { margin: 1px 0 0; padding-left: 2px; }
+.try li::marker { font-weight: 700; color: var(--sun); }
+.try .ask { margin-top: 4px; font-weight: 700; }
+.try-next { font: 700 0.78rem/1.2 var(--font-body); min-height: 28px; padding: 3px 10px; border-radius: 999px; border: 1.5px solid rgba(255, 201, 60, 0.7); background: transparent; color: var(--sun); cursor: pointer; }
+.try-next:hover { background: rgba(255, 201, 60, 0.12); }
+#panel-proj .try li, #panel-proj .try .ask { font-size: 0.93rem; line-height: 1.38; }
+.try.compact { margin: 6px 0 0; padding: 6px 10px 7px; }
+.try.compact li, .try.compact .ask { font-size: 0.82rem; line-height: 1.28; }
+.try.compact .try-next { min-height: 26px; }
+.has-try .c-lbl { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; margin: 0 !important; }
+.has-try .c-moves { margin-top: 8px; }
+@media (min-width: 900px) and (max-height: 760px) {
+  .has-try .where { display: none; }
+  #panel-proj .try li, #panel-proj .try .ask { font-size: 0.88rem; line-height: 1.32; }
+  #panel-proj .try { padding: 8px 11px; }
+  .disc-btn { min-height: 28px; }
+  .disc-row { margin-top: 2px; }
+  #panel-proj .circ { margin-top: 8px; }
 }
-.more summary::-webkit-details-marker { display: none; }
-.more summary::after { content: "+"; flex: none; font: 700 1.1rem/1 var(--font-body); color: var(--sun); }
-.more[open] summary::after { content: "−"; }
-.more summary:hover { color: var(--sun); }
-.more-body { padding: 0 12px 12px; }
-.more-body h3:first-child { margin-top: 2px; }
+.has-try .try-slot + .hint, .has-try .c-note, .has-try > .hint.first { display: none; }
+.try.compact .try-head { font-size: 0.84rem; }
+.glossary .g-h { margin: 10px 0 0; font: 700 0.68rem/1.2 var(--font-body); letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-soft); }
+.glossary dl.key dt { white-space: nowrap; }
+.glossary .ki { display: inline-grid; place-items: center; width: 17px; height: 17px; border-radius: 50%; margin-right: 6px; font: 700 0.66rem/1 var(--font-data); color: var(--night); vertical-align: -3px; }
+.ki.kept { background: var(--kept); } .ki.nearly { background: var(--nearly); } .ki.partly { background: var(--partly); } .ki.changed { background: var(--changed); }
+.more-body .fullname { margin: 2px 0 0; }
+.more-body { margin-top: 6px; padding: 8px 12px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--night-2); }
+.more-body .fullname + h3, .more-body h3:first-child { margin-top: 6px; }
 #panel-proj .more-body .wkid { margin-top: 10px; font-size: 0.74rem; }
 #panel-proj { padding-top: 10px; }
 .wkid { margin-top: 16px !important; font: 0.74rem/1.45 var(--font-data); color: var(--ink-soft); }
@@ -358,15 +382,7 @@ kbd { font-family: var(--font-data); font-size: 0.85em; border: 1px solid var(--
   .actions { flex: none; }
 }
 
-/* ---------- v1.2: mode button, zoom, my-country panel ---------- */
-.mode-btn {
-  font: 700 0.84rem/1 var(--font-body); color: var(--ink);
-  display: inline-flex; align-items: center; gap: 7px; min-height: 36px; padding: 0 13px 0 10px;
-  border-radius: 999px; cursor: pointer; border: 1.5px solid rgba(255, 201, 60, 0.75);
-}
-.mode-btn svg { width: 16px; height: 16px; flex: none; color: var(--sun); }
-.mode-btn[aria-pressed="true"] { background: var(--sun); color: var(--sun-ink); border-color: var(--sun); }
-.mode-btn[aria-pressed="true"] svg { color: var(--sun-ink); }
+/* ---------- v1.2: zoom, my-country panel ---------- */
 .tog[aria-disabled="true"] { opacity: 0.38; cursor: not-allowed; }
 
 .zoom { flex: none; display: flex; border-radius: 9px; overflow: hidden; }
@@ -441,7 +457,7 @@ kbd { font-family: var(--font-data); font-size: 0.85em; border: 1px solid var(--
 @media (min-width: 900px) and (max-height: 760px) {
   #panel-country { padding-top: 10px; }
   .c-card svg { max-height: 52px; margin: 2px 0 4px; } .c-num { font-size: 1.3rem; } .c-num.real { font-size: 1.1rem; }
-  .c-head + .hint.tight { display: none; } .c-card { margin-top: 8px; padding: 8px 10px 10px; } .c-verdict { margin-top: 8px !important; padding-top: 7px; font-size: 0.88rem; }
+  .try-slot + .hint.tight { display: none; } .c-card { margin-top: 8px; padding: 8px 10px 10px; } .c-verdict { margin-top: 8px !important; padding-top: 7px; font-size: 0.88rem; }
   .c-lbl { margin: 8px 0 5px !important; }
   #panel-measure { padding-top: 10px; }
 }
@@ -472,18 +488,14 @@ kbd { font-family: var(--font-data); font-size: 0.85em; border: 1px solid var(--
   <section class="stage" id="stage" aria-label="Map">
     <canvas id="gl" aria-hidden="true"></canvas>
     <canvas id="map" tabindex="0" role="application" aria-roledescription="interactive map" aria-label="World map loading" aria-describedby="mapHelp"></canvas>
-    <p id="mapHelp" class="sr-only">Select the map, then use the arrow keys to move the measuring circle, or the chosen country on the Country tab. On the Country tab, tap a country to choose it. Hold Shift to move further. Press plus or minus to zoom, and 0 to see the whole world. Press 1 to 9 to choose a projection.</p>
+    <p id="mapHelp" class="sr-only">Select the map, then use the arrow keys to move the white circle, or the chosen country on the Country tab. On the Country tab, tap a country to choose it. Hold Shift to move further. Press plus or minus to zoom, and 0 to see the whole world. Press 1 to 9 to choose a projection.</p>
     <div class="tip" id="tip" hidden></div>
     <div class="stage-bottom" id="stageBottom">
       <div class="stage-foot" id="stageFoot">
         <div class="toggles" id="toggles">
-          <button class="mode-btn glass" id="modeBtn" type="button" aria-pressed="false" title="Choose a country and move it around the map">
-            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.2 2.6c2-1 3.6.6 5.6.2 1.4-.3 2.4-1 3.6-.6l-.9 6.4c-1.2-.4-2.2.3-3.6.6-2 .4-3.6-1.2-5.6-.2z" fill="currentColor"/><path d="M3.2 2.6 1.8 14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-            <span>Country</span>
-          </button>
-          <button class="tog glass" id="togImagery" type="button" aria-pressed="true" aria-label="Satellite imagery" title="Satellite imagery"><span class="sw img" aria-hidden="true"></span><span class="lbl" aria-hidden="true">Imagery</span></button>
+          <button class="tog glass" id="togImagery" type="button" aria-pressed="true" aria-label="Satellite imagery" title="Satellite imagery"><span class="sw img" aria-hidden="true"></span><span class="lbl" aria-hidden="true">Satellite</span></button>
           <button class="tog glass" id="togCircles" type="button" aria-pressed="true" aria-label="Same-size circles" title="Same-size circles"><span class="sw circ" aria-hidden="true"></span><span class="lbl" aria-hidden="true">Circles</span></button>
-          <button class="tog glass" id="togGrid" type="button" aria-pressed="true" aria-label="Grid lines" title="Grid lines"><span class="sw grid" aria-hidden="true"></span><span class="lbl" aria-hidden="true">Grid lines</span></button>
+          <button class="tog glass" id="togGrid" type="button" aria-pressed="true" aria-label="Grid lines" title="Grid lines"><span class="sw grid" aria-hidden="true"></span><span class="lbl" aria-hidden="true">Grid</span></button>
           <button class="tog glass" id="togAnimate" type="button" aria-pressed="true" aria-label="Animate map changes" title="Animate map changes"><svg class="sw anim" viewBox="0 0 16 16" aria-hidden="true"><path d="M1.5 11c2.5 0 2.5-6 5-6s2.5 6 5 6 2-3 3-3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span class="lbl" aria-hidden="true">Animate</span></button>
         </div>
         <span class="foot-break" aria-hidden="true"></span>
@@ -495,7 +507,7 @@ kbd { font-family: var(--font-data); font-size: 0.85em; border: 1px solid var(--
         <div class="zoom glass" role="group" aria-label="Zoom">
           <button type="button" id="zoomOut" aria-label="Zoom out" title="Zoom out (−)">−</button>
           <button type="button" id="zoomIn" aria-label="Zoom in" title="Zoom in (+)">+</button>
-          <button type="button" id="zoomFit" aria-label="Show the whole world" title="Show the whole world (0)"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 6V2h4M10 2h4v4M14 10v4h-4M6 14H2v-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button type="button" id="zoomFit" aria-label="Show the whole world" title="Show the whole world (0)"><svg viewBox="0 0 16 16" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6.2"/><ellipse cx="8" cy="8" rx="2.7" ry="6.2"/><path d="M1.8 8h12.4"/></g></svg></button>
         </div>
         <div class="credit">Created by Jason Sawle</div>
       </div>
@@ -520,24 +532,48 @@ kbd { font-family: var(--font-data); font-size: 0.85em; border: 1px solid var(--
         <h2 class="pname" id="pName"></h2>
         <p class="tagline" id="pTagline"></p>
         <ul class="props" id="pProps" aria-label="What this map keeps and what it changes"></ul>
-        <details class="glossary">
-          <summary>What do these words mean?</summary>
+        <div class="circ"><h3>What the circles show</h3> <p id="pCircles"></p></div>
+        <div class="try-slot" id="trySlotProj">
+          <div class="try" id="tryBox" tabindex="-1">
+            <div class="try-head"><p><b class="try-lbl" id="tryLbl">Try this</b> <span class="try-from" id="tryFrom"></span></p><button type="button" class="try-next" id="tryNext" hidden></button></div>
+            <ol id="trySteps"></ol>
+            <p class="ask" id="tryAsk"></p>
+          </div>
+        </div>
+        <div class="disc-row">
+          <button type="button" class="disc-btn" id="glossBtn" aria-expanded="false" aria-controls="glossBody">What do these words mean?</button>
+          <button type="button" class="disc-btn" id="moreBtn" aria-expanded="false" aria-controls="moreBody">More about this map</button>
+        </div>
+        <div class="glossary" id="glossBody" hidden>
           <dl>
+            <dt>Projection</dt><dd>The math that turns the round Earth into a flat map.</dd>
             <dt>Area</dt><dd>How much space a place takes up.</dd>
             <dt>Shape</dt><dd>The outline of a place, like the curve of a coastline.</dd>
             <dt>Distance</dt><dd>How far apart two places are.</dd>
             <dt>Direction</dt><dd>Which way one place is from another, like north or southeast.</dd>
+            <dt>Latitude</dt><dd>How far north or south of the Equator a place is. The Equator is 0°. The North Pole is 90°N.</dd>
           </dl>
-          <p>You can’t flatten a ball without stretching or tearing it, so every flat map changes at least one of these.</p>
-        </details>
-        <h3>What the circles show</h3>
-        <p id="pCircles"></p>
-        <div class="try">
-          <p><b class="try-lbl">Try this</b> <span id="pTry"></span></p>
+          <p class="g-h">On the cards</p>
+          <dl class="key">
+            <dt><span class="ki kept" aria-hidden="true">✓</span>Kept</dt><dd>True, the same as on a globe.</dd>
+            <dt><span class="ki nearly" aria-hidden="true">≈</span>A little distorted</dt><dd>Changed a little.</dd>
+            <dt><span class="ki partly" aria-hidden="true">◐</span>Partly kept</dt><dd>True only in some places, or along some lines.</dd>
+            <dt><span class="ki changed" aria-hidden="true">✕</span>Distorted</dt><dd>Changed: made bigger, smaller, stretched or squashed.</dd>
+          </dl>
+          <p class="g-h">Kinds of map</p>
+          <dl>
+            <dt>Equal area</dt><dd>Every place has its true size compared with the others. Shapes change.</dd>
+            <dt>Conformal</dt><dd>Small places keep their shape. Sizes change.</dd>
+            <dt>Compromise</dt><dd>Keeps none of the four exactly, but tries to keep every change small.</dd>
+            <dt>Equidistant</dt><dd>Distances from one point are true.</dd>
+            <dt>Cylindrical</dt><dd>Made as if paper were wrapped around the globe like a tube. The map is a rectangle.</dd>
+            <dt>Pseudocylindrical</dt><dd>Like cylindrical, but the left and right edges are curved.</dd>
+            <dt>Azimuthal</dt><dd>Made as if a flat sheet touched the globe at one point, here the North Pole. The map is round.</dd>
+          </dl>
+          <p>A flat map can’t show the round Earth without stretching some parts, so every flat map changes at least one of these.</p>
         </div>
-        <details class="more" id="pMore">
-          <summary><span id="pMoreTitle">More about this map</span></summary>
-          <div class="more-body">
+        <div class="more-body" id="moreBody" hidden>
+            <p class="fullname" id="pFullName" hidden></p>
             <h3>Type of projection</h3>
             <p id="pFamily"></p>
             <h3>Where you’ll see it</h3>
@@ -545,8 +581,7 @@ kbd { font-family: var(--font-data); font-size: 0.85em; border: 1px solid var(--
             <h3>Its story</h3>
             <p id="pHistory"></p>
             <p class="wkid" id="pWkid"></p>
-          </div>
-        </details>
+        </div>
       </section>
 
       <section class="panel" role="tabpanel" id="panel-country" aria-labelledby="tab-country" tabindex="0" hidden>
@@ -555,6 +590,7 @@ kbd { font-family: var(--font-data); font-size: 0.85em; border: 1px solid var(--
           <select id="countrySelect"></select>
           <button class="mini" type="button" id="zoomToBtn">Zoom to it</button>
         </div>
+        <div class="try-slot" id="trySlotCountry"></div>
         <p class="hint tight">Tap any country on the map to choose it. Drag it to move it.</p>
         <div class="c-card">
           <div class="c-h">On a globe</div>
@@ -566,7 +602,7 @@ kbd { font-family: var(--font-data); font-size: 0.85em; border: 1px solid var(--
           </div>
           <div class="c-col">
             <div class="c-num" id="cMapX">–</div>
-            <div class="c-sub">its real size</div>
+            <div class="c-sub" id="cMapLbl">its real size</div>
           </div>
           <p class="c-verdict" id="cVerdict"></p>
         </div>
@@ -582,18 +618,19 @@ kbd { font-family: var(--font-data); font-size: 0.85em; border: 1px solid var(--
       </section>
 
       <section class="panel" role="tabpanel" id="panel-measure" aria-labelledby="tab-measure" tabindex="0" hidden>
+        <div class="try-slot" id="trySlotMeasure"></div>
         <p class="hint tight first">Drag the white circle on the map. Or select the map and use the arrow keys.</p>
         <div class="c-card m-card">
           <div class="c-h">Real circle</div>
           <div class="c-h r">On this map</div>
-          <svg id="shapeSvg" viewBox="0 0 260 96" role="img" aria-label="The measuring circle on the real Earth and on this map"></svg>
+          <svg id="shapeSvg" viewBox="0 0 260 96" role="img" aria-label="The white circle on the real Earth and on this map"></svg>
           <div class="c-col">
             <div class="c-num real" id="mTrue">–</div>
             <div class="c-sub" id="mTrueLbl">miles across</div>
           </div>
           <div class="c-col m-pair">
-            <div><div class="c-num" id="mArea">–</div><div class="c-sub">size vs. center</div></div>
-            <div><div class="c-num" id="mShape">–</div><div class="c-sub">long : wide</div></div>
+            <div><div class="c-num" id="mArea">–</div><div class="c-sub">times as big as at the center</div></div>
+            <div><div class="c-num" id="mShape">–</div><div class="c-sub">times as long as wide</div></div>
           </div>
           <p class="c-verdict" id="mVerdict"></p>
         </div>
@@ -637,9 +674,18 @@ kbd { font-family: var(--font-data); font-size: 0.85em; border: 1px solid var(--
     <h3>Keyboard</h3>
     <ul>
       <li><kbd>1</kbd> to <kbd>9</kbd>: choose a projection, in the order of the tray under the map.</li>
-      <li>Select the map, then use the arrow keys to move the measuring circle or your country. Hold <kbd>Shift</kbd> to move further.</li>
+      <li>Select the map, then use the arrow keys to move the white circle or your country. Hold <kbd>Shift</kbd> to move further.</li>
       <li><kbd>+</kbd> and <kbd>−</kbd> zoom in and out. <kbd>0</kbd> shows the whole world.</li>
       <li>If your device is set to reduce motion, maps switch without animating until you turn on Animate (the wave button on the map).</li>
+    </ul>
+    <h3>Web addresses it needs</h3>
+    <p>If the lab won’t load at school, ask IT to allow these addresses:</p>
+    <ul id="hostList">
+      <li><b>jsawle.github.io</b>: the lab itself</li>
+      <li><b>js.arcgis.com</b>: the ArcGIS Maps SDK, which projects the maps (needed)</li>
+      <li><b>services.arcgis.com</b>: the country outlines (needed)</li>
+      <li><b>services.arcgisonline.com</b>: the satellite picture (without it the lab still works, with plain colors)</li>
+      <li><b>fonts.googleapis.com</b> and <b>fonts.gstatic.com</b>: the lettering (without them the lab uses your device’s fonts)</li>
     </ul>
     <h3>Animation check</h3>
     <p id="motionCheck">Choose a projection to measure the last morph.</p>
@@ -659,15 +705,15 @@ kbd { font-family: var(--font-data); font-size: 0.85em; border: 1px solid var(--
    Versions: app + one version per model. Bump a model's version when
    its maths or data handling changes, and the app version every release.
    ================================================================== */
-const APP_VERSION = '1.5.0';
+const APP_VERSION = '1.5.1';
 const SDK_VERSION = '5.1';
 const MODELS = {
   morph:   { name: 'Morph engine',       v: '1.5', what: 'Slides every projected point from one map to the next (eased, 2 seconds). The satellite picture is moved on the graphics card. Can be switched off. Morphs to and from Spilhaus use the satellite triangles split along its cut, so the world opens along that line.' },
-  view:    { name: 'Zoom and centering', v: '1.1', what: 'All nine maps are fitted around one shared center and use the whole map area (the buttons sit below the map). Mercator is fitted to 82.5° N and S and drawn to 85°. Zoom 1–12×. The place in the middle of the view stays in the middle while the map morphs.' },
+  view:    { name: 'Zoom, centering and labels', v: '1.2', what: 'All nine maps are fitted around one shared center and use the whole map area (the buttons sit below the map). Mercator is fitted to 82.5° N and S and drawn to 85°. Zoom 1–12×. The place in the middle of the view stays in the middle while the map morphs. Map labels are placed so they stay on the map and don’t cover each other: the white circle’s or the country’s label first, then Greenland and Africa, then other places, then the Equator and 60° lines. A label with no free spot is left out.' },
   imagery: { name: 'Imagery basemap',    v: '1.2', what: 'Esri World Imagery, zoom level 3 tiles (level 4 once you zoom in past 2×), reshaped to a latitude–longitude grid and draped over a 2° mesh. For Spilhaus the mesh is also split along its cut and made finer wherever an edge would be longer than 1% of the square (its corners magnify hugely); the very ends of the cut are drawn in the corners.' },
-  circles: { name: 'Same-size circles',  v: '1.1', what: '55 geodesic circles, 500-mile radius, every 30° of longitude at 60°S, 30°S, 0°, 30°N and 60°N. Split along the Spilhaus cut.' },
-  probe:   { name: 'Measuring circle',   v: '1.2', what: 'Map area ÷ real area, compared with a circle at the center of the map; shape and tilt from the circle’s longest and shortest axes. On Spilhaus the circle is kept off the edge of the square.' },
-  country: { name: 'Country mover',      v: '1.1', what: 'Turns the country over the globe (a rotation, so its real size and shape never change), then projects it. Its size on the map compared with its real size, and with its size in its real place. Split along the Spilhaus cut and the 180° line; the card shows the biggest piece.' },
+  circles: { name: 'Same-size circles',  v: '1.1', what: '55 geodesic circles, 500-mile radius, in 5 rows (60°S, 30°S, 0°, 30°N and 60°N) of 11, every 30° of longitude from 150°W to 150°E. Split along the Spilhaus cut.' },
+  probe:   { name: 'White (measuring) circle', v: '1.3', what: 'Map area ÷ real area, compared with a circle at the center of the map; shape and tilt from the circle’s longest and shortest axes, and whether it is stretched side to side, up and down, or on a slant. On Spilhaus the circle starts at the center of the square and is kept off its edge; leaving Spilhaus puts it back where it was, unless you moved it there.' },
+  country: { name: 'Country mover',      v: '1.1', what: 'Turns the country over the globe (a rotation, so its real size and shape never change), then projects it. Its size on the map compared with its real size, and with its size in its real place. Split along the Spilhaus cut and the 180° line. The card’s numbers are for the whole country; its drawing and the map label use the biggest piece.' },
   data:    { name: 'Country data',       v: '1.2', what: 'Living Atlas World Countries (Generalized). Map: simplified to 0.1°, and split along the Spilhaus cut (half a great circle on the conformal sphere from 115°E 30°N through 113°W 50°N to 65°W 30°S). Points on the cut are nudged to their own side only for Spilhaus, by the smallest amount the projection engine accepts. Your country: finer detail (0.01°–0.1°, by size), joined across the 180° line.' },
 };
 
@@ -699,7 +745,7 @@ const PROJECTIONS = [
     circles: 'Circles get wider as you go toward the poles, but they stay the same height. Near the poles they turn into wide ovals.',
     where: 'Computers and satellites use it a lot, because each pixel can stand for the same step of latitude and longitude. The satellite picture in this lab starts out on this grid.',
     history: 'It is one of the oldest projections. The geographer Marinus of Tyre is often credited with it, around the year 100.',
-    tryThis: 'Drag the measuring circle from the Equator toward the North Pole. Does it stretch up and down, or side to side?',
+    task: { uses: 'circle', maps: ['plate-carree'], steps: ['Drag the white circle to the Equator.', 'Now drag it up toward the North Pole.'], ask: 'Does it stretch up and down, or side to side?' },
     summary: 'Circles stay the same height but get wider toward the poles.'
   },
   {
@@ -712,7 +758,7 @@ const PROJECTIONS = [
     circles: 'All the circles cover the same amount of map. Near the Equator they are tall, thin ovals. Near the poles they are short, wide ovals. They are round only at 45° north and south.',
     where: 'Some schools and organizations use it to show the true sizes of countries. In 2017, Boston Public Schools started using it in classrooms.',
     history: 'James Gall, a Scottish minister, described it in 1855. Arno Peters, a German historian, made it famous in 1973.',
-    tryThis: 'Open the Country tab and move a country to the Equator, then to 60° north. Does its size change? What happens to its shape?',
+    task: { uses: 'country', maps: ['gall-peters'], steps: ['Open the Country tab and choose a country.', 'Press Equator, then 60° N.'], ask: 'Does its size change? What happens to its shape?' },
     summary: 'Circles all cover the same area but are tall near the Equator and flat near the poles.'
   },
   {
@@ -721,11 +767,11 @@ const PROJECTIONS = [
     wkidText: 'ArcGIS WKID 3857 · WGS 1984 Web Mercator (Auxiliary Sphere)',
     familyText: 'Cylindrical · conformal', tags: [], tileTag: 'Web maps',
     tagline: 'Made for sailors in 1569. Today it is the map behind most online street maps.',
-    props: { area: ['changed'], shape: ['kept', 'For small areas'], distance: ['changed'], direction: ['kept', 'Compass headings'] },
+    props: { area: ['changed'], shape: ['kept', 'For small places'], distance: ['changed'], direction: ['kept', 'Compass headings'] },
     circles: 'Every circle stays round, but circles get much bigger toward the poles. At 60° north a circle is drawn about 4 times bigger than at the Equator.',
     where: 'Most web maps and phone map apps, because streets and buildings keep their shape when you zoom in. Ship navigators use it too: a straight line on this map follows one compass heading.',
     history: 'Gerardus Mercator, a Flemish mapmaker, published it in 1569. The poles would be infinitely far away, so the web version cuts the map off at about 85° north and south.',
-    tryThis: 'Open the Country tab, tap Greenland and move it to the Equator. How big is it really? Then press 4 to morph to Equal Earth.',
+    task: { uses: 'country', maps: ['mercator', 'equal-earth'], steps: ['Open the Country tab and choose Greenland.', 'Press Equator.', 'Tap Equal Earth (or press 4).'], ask: 'How many times too big does Mercator draw Greenland in its real place? And Equal Earth?' },
     summary: 'Circles stay round but grow much bigger toward the poles.'
   },
   {
@@ -735,10 +781,10 @@ const PROJECTIONS = [
     familyText: 'Pseudocylindrical · equal area', tags: ['Equal area', 'New'], tileTag: 'Equal area',
     tagline: 'A newer equal-area map, designed in 2018 to look more like a globe.',
     props: { area: ['kept'], shape: ['changed', 'Less than Gall–Peters'], distance: ['changed'], direction: ['changed'] },
-    circles: 'All circles cover the same amount of map. They flatten toward the poles, but less than on Gall–Peters.',
-    where: 'World maps of data where fair sizes matter, such as climate or population maps.',
+    circles: 'All circles cover the same amount of map. They get flatter toward the poles, but less than on Gall–Peters.',
+    where: 'World maps of data where true sizes matter, such as climate or population maps.',
     history: 'Bojan Šavrič (who works at Esri), Tom Patterson and Bernhard Jenny created it in 2018. News that Boston schools had switched to Gall–Peters inspired them to make an equal-area map with more familiar shapes.',
-    tryThis: 'Press 3 for Mercator and 4 for Equal Earth a few times. Watch Greenland shrink and Africa grow. Which map shows their true sizes?',
+    task: { uses: 'map', maps: ['equal-earth', 'mercator'], steps: ['Tap Mercator, then Equal Earth (keys 3 and 4). Do it a few times.', 'Watch Greenland and Africa change size.'], ask: 'Which map shows their true sizes?' },
     summary: 'Circles all cover the same area and flatten a little toward the poles.'
   },
   {
@@ -746,13 +792,13 @@ const PROJECTIONS = [
     sr: { wkid: 54030 }, maxLat: 89.999, minLat: -89.999, ref: [0, 0],
     wkidText: 'ArcGIS WKID 54030 · World Robinson',
     familyText: 'Pseudocylindrical · compromise', tags: ['Compromise'], tileTag: 'Compromise',
-    tagline: 'A compromise map: nothing is perfect, but nothing is badly wrong.',
-    props: { area: ['nearly'], shape: ['nearly'], distance: ['nearly'], direction: ['nearly'] },
-    circles: 'Circles near the poles are a bit bigger and a bit squashed, but much less than on Mercator.',
+    tagline: 'A compromise map: everything changes a little in the middle, and more near the poles.',
+    props: { area: ['nearly', 'More near the poles'], shape: ['changed', 'Most near the poles and edges'], distance: ['changed'], direction: ['changed'] },
+    circles: 'Circles get bigger and flatter toward the poles. At 60° north a circle is about 1.5 times as big as at the Equator. On Mercator it is 4 times as big.',
     where: 'Atlases and classroom wall maps. National Geographic used it for its world maps from 1988 to 1998.',
-    history: 'Arthur Robinson designed it in 1963. Instead of starting from one math rule, he adjusted it by eye until the world looked right.',
-    tryThis: 'Put the measuring circle at 60° north, then switch to Mercator. How much bigger does it get?',
-    summary: 'Circles grow a little and flatten a little toward the poles.'
+    history: 'Arthur Robinson designed it in 1963. He did not start from one math rule. He changed the map by looking at it until he liked how the world looked.',
+    task: { uses: 'circle', maps: ['robinson', 'mercator'], steps: ['Drag the white circle to 60°N. Its label shows how far north it is.', 'Tap Mercator (or press 3).'], ask: 'How much bigger does the circle get?' },
+    summary: 'Circles get bigger and flatter toward the poles, but much less than on Mercator.'
   },
   {
     id: 'winkel-tripel', name: 'Winkel Tripel', short: 'Winkel Tripel', v: '1.0', family: 'oval',
@@ -760,12 +806,12 @@ const PROJECTIONS = [
     wkidText: 'ArcGIS WKID 54042 · World Winkel Tripel NGS',
     familyText: 'Compromise · modified azimuthal', tags: ['Compromise'], tileTag: 'Compromise',
     tagline: 'National Geographic’s choice for world maps since 1998.',
-    props: { area: ['nearly'], shape: ['nearly'], distance: ['nearly'], direction: ['nearly'] },
-    circles: 'Circles grow a little toward the poles and lean slightly near the edges. The changes are spread out, so no part of the map is badly wrong.',
+    props: { area: ['nearly', 'More near the poles'], shape: ['changed', 'Most near the edges'], distance: ['changed'], direction: ['changed'] },
+    circles: 'Circles get bigger toward the poles, a little more than on Robinson in the middle of the map. Near the left and right edges they tilt.',
     where: 'National Geographic world maps, and many atlases and textbooks.',
     history: 'Oswald Winkel, a German mapmaker, created it in 1921. “Tripel” is German for “triple”: it tries to keep three kinds of error small: area, direction and distance.',
-    tryThis: 'Switch between Robinson and Winkel Tripel. Watch Greenland and Antarctica. Which map makes them bigger?',
-    summary: 'Circles grow a little toward the poles and lean near the edges.'
+    task: { uses: 'country', maps: ['winkel-tripel', 'robinson'], steps: ['Tap Robinson, then Winkel Tripel (keys 5 and 6).', 'Watch Greenland and Antarctica change.', 'To check, choose Greenland on the Country tab and switch again.'], ask: 'Which map makes them bigger?' },
+    summary: 'Circles get bigger toward the poles and tilt near the edges.'
   },
   {
     id: 'spilhaus', name: 'Spilhaus World Ocean Map', short: 'Spilhaus', v: '1.0', family: 'square', spil: true,
@@ -774,10 +820,10 @@ const PROJECTIONS = [
     familyText: 'World in a square, tilted to center the oceans · conformal', tags: ['Ocean map'], tileTag: 'Ocean map',
     tagline: 'Shows all the world’s oceans as one body of water.',
     props: { area: ['changed'], shape: ['kept', 'Not at the corners'], distance: ['changed'], direction: ['changed'] },
-    circles: 'Circles stay round, but their size changes a lot. They are smallest in the Southern Ocean, 2 to 3 times bigger in the middle of the Atlantic and Pacific, and 15 to over 40 times bigger near the corners.',
+    circles: 'Circles stay round, but their size changes a lot. They are smallest in the Southern Ocean, 2 to 3 times bigger in the middle of the Atlantic and Pacific, and 15 to over 40 times bigger near the corners. That is why the picture looks streaky in the corners.',
     where: 'Ocean scientists use it to show currents, sea temperature and sea ice. In 2025 the National Maritime Museum in Greenwich, London, opened a giant ocean floor map drawn this way.',
-    history: 'Athelstan Spilhaus (1911–1998), an ocean scientist born in South Africa, drew maps with the oceans in the middle from 1942. This square version is from 1979. It is built on a world-in-a-square map by Oscar Adams, an American mapmaker. After it went viral online in 2018, Esri mapmakers Bojan Šavrič and David Burrows worked out the math so computers can draw it, and ArcGIS added it in 2020.',
-    tryThis: 'Drag the measuring circle from the middle of the ocean toward a corner. Does it stay round? How big does it get?',
+    history: 'Athelstan Spilhaus (1911–1998), an ocean scientist, drew maps with the oceans in the middle from 1942. This square version is from 1979. It uses a world-in-a-square map by the American mapmaker Oscar Adams. It became popular online in 2018. Esri mapmakers Bojan Šavrič and David Burrows then worked out the math for computers, and ArcGIS added it in 2020.',
+    task: { uses: 'circle', maps: ['spilhaus'], steps: ['The white circle starts in the middle of the map, in the Southern Ocean.', 'Drag it toward a corner.'], ask: 'Does it stay round? How big does it get?' },
     summary: 'Circles stay round but grow bigger toward the edges, and huge in the corners.'
   },
   {
@@ -787,10 +833,10 @@ const PROJECTIONS = [
     familyText: 'Azimuthal · centered on the North Pole', tags: ['Polar'], tileTag: 'Polar',
     tagline: 'The world seen from above the North Pole, with true distances from the center.',
     props: { area: ['changed'], shape: ['changed'], distance: ['partly', 'From the North Pole'], direction: ['partly', 'From the North Pole'] },
-    circles: 'Near the center, circles stay round and the right size. Farther out they stretch sideways more and more. The South Pole becomes the whole outer edge, so Antarctica wraps around the map like a ring.',
+    circles: 'Near the center, circles stay round and the right size. Farther out they stretch sideways more and more. The South Pole becomes the whole outer edge, so Antarctica is a ring around the outside.',
     where: 'The flag of the United Nations shows the world this way. It also helps you measure how far places are from one point, here the North Pole.',
     history: 'It is sometimes called the Postel projection, after the French scholar Guillaume Postel, who used it in 1581. The idea is even older than that.',
-    tryThis: 'Drag the measuring circle from near the North Pole down to South America. How does its shape change?',
+    task: { uses: 'circle', maps: ['polar-equidistant'], steps: ['Drag the white circle to the North Pole, in the middle of the map.', 'Drag it out to South America.'], ask: 'How does its shape change?' },
     summary: 'Circles near the center are right; farther out they stretch sideways.'
   },
   {
@@ -800,10 +846,10 @@ const PROJECTIONS = [
     familyText: 'Azimuthal · centered on the North Pole · equal area', tags: ['Polar', 'Equal area'], tileTag: 'Equal area',
     tagline: 'A view from above the North Pole that keeps every area true.',
     props: { area: ['kept'], shape: ['changed'], distance: ['changed'], direction: ['partly', 'From the North Pole'] },
-    circles: 'Every circle covers the same amount of map. Toward the edge they get flatter: stretched sideways and squeezed toward the center.',
-    where: 'Scientists use it for maps of the Arctic and Antarctic, such as snow and sea ice data, because areas stay fair.',
+    circles: 'Every circle covers the same amount of map. Toward the edge they become wide, thin ovals.',
+    where: 'Scientists use it for maps of the Arctic and Antarctic, such as snow and sea ice data, because areas stay true.',
     history: 'Johann Heinrich Lambert, a Swiss mathematician, described it in 1772.',
-    tryThis: 'Compare this map with Polar Equidistant, next door. Look at Antarctica around the outer edge. Which map makes it bigger?',
+    task: { uses: 'map', maps: ['polar-equal-area', 'polar-equidistant'], steps: ['Look at Antarctica, the ring around the outer edge.', 'Tap Polar Equidistant, then Polar Equal-Area (keys 8 and 9).'], ask: 'Which map makes Antarctica bigger?' },
     summary: 'Circles all cover the same area but flatten toward the edge.'
   },
 ];
@@ -814,7 +860,7 @@ const FAMILIES = [
   { id: 'square', label: 'Square' },
   { id: 'disc', label: 'Polar' },
 ];
-const STATE_WORDS = { kept: 'Kept', nearly: 'Nearly kept', partly: 'Partly kept', changed: 'Distorted' };
+const STATE_WORDS = { kept: 'Kept', nearly: 'A little distorted', partly: 'Partly kept', changed: 'Distorted' };
 const STATE_ICONS = { kept: '✓', nearly: '≈', partly: '◐', changed: '✕' };
 
 /* ---------- Greenland and Africa, highlighted on the map in the Projection and Measure tabs ---------- */
@@ -824,6 +870,13 @@ const SUBJECTS = {
   AF: { label: 'Africa', match: f => AFRICA_ISO.includes(f.ISO) || f.COUNTRY === 'Canarias', anchor: [19, 6] },
 };
 const HIGHLIGHT = { a: 'GL', b: 'AF' };
+/* Other places named on the map, because the Try this tasks send students there */
+const PLACES = {
+  SA: { label: 'South America', anchor: [-59, -12] },
+  AQ: { label: 'Antarctica', anchor: [10, -78] },
+  NP: { label: 'North Pole', anchor: [0, 89.99], family: 'disc' },
+};
+const GRID_LABELS = [[60, '60°N'], [0, 'Equator'], [-60, '60°S']];
 
 /* ---------- Map colors (single dark look) ---------- */
 const C = {
@@ -854,9 +907,13 @@ const state = {
   animateChosen: false,
   lastMorph: null,
 };
+/* Spilhaus starts the white circle at the center of its square; leaving it puts the circle back, unless you moved it there */
+const spilProbe = { before: null, moved: false };
+/* Whose Try this is showing: it stays while you switch to a map the task uses */
+let tryOwner = state.current;
 reduceMotion.addEventListener?.('change', () => { if (!state.animateChosen) { state.animate = !reduceMotion.matches; updateToggles(); } });
 const hashId = decodeURIComponent(location.hash.slice(1));
-if (PROJ[hashId]) state.current = hashId;
+if (PROJ[hashId]) state.current = tryOwner = hashId;
 
 /* ---------- DOM ---------- */
 const $ = id => document.getElementById(id);
@@ -955,7 +1012,8 @@ async function start() {
   setLoading('Projecting the world nine ways…', 72);
   await nextFrame();
   for (const p of PROJECTIONS) projectWorld(p);
-  setProbe(state.probe.lon, state.probe.lat, false);
+  if (PROJ[state.current].spil) enterSpilProbe(PROJ[state.current]);
+  else setProbe(state.probe.lon, state.probe.lat, false);
 
   setLoading('Draping the satellite imagery…', 88);
   const imagery = await imageryJob;
@@ -983,7 +1041,7 @@ function showLoadError() {
   const box = $('loading');
   box.hidden = false;
   $('loadingMsg').textContent = 'The maps couldn’t load.';
-  $('loadingSub').textContent = 'This lab needs an internet connection to reach ArcGIS. Check your connection, then try again.';
+  $('loadingSub').textContent = 'This lab needs to reach ArcGIS over the internet. At school, a web filter may be blocking it: ask IT to allow js.arcgis.com and services.arcgis.com (and services.arcgisonline.com for the satellite picture). Otherwise, check your connection, then try again.';
   $('loadingBar').parentElement.hidden = true;
   if (!$('retryBtn')) {
     const b = document.createElement('button');
@@ -1285,9 +1343,12 @@ function buildWorld(features) {
     const line = []; for (let lat = -90; lat <= 90; lat += 2) line.push([lon, lat]);
     pushLine(line, world.gratMinor);
   }
+  world.parallels = {};
   for (let lat = -60; lat <= 60; lat += 30) {
     const line = []; for (let lon = -180; lon <= 180; lon += 2) line.push([lon, lat]);
-    pushLine(line, lat === 0 ? world.gratMajor : world.gratMinor);
+    const list = lat === 0 ? world.gratMajor : world.gratMinor, n0 = list.length;
+    pushLine(line, list);
+    world.parallels[lat] = list.slice(n0);
   }
 
   // One call per country: executeMany drops empty results, which would shift names onto the wrong shapes.
@@ -1308,7 +1369,7 @@ function buildWorld(features) {
     }
   }
 
-  for (const [sid, s] of Object.entries(SUBJECTS)) {
+  for (const [sid, s] of [...Object.entries(SUBJECTS), ...Object.entries(PLACES)]) {
     world.anchors[sid] = ll.length / 2;
     ll.push(s.anchor[0], s.anchor[1]); seamArr.push(0); sideArr.push(0);
   }
@@ -1609,6 +1670,11 @@ function setProbe(lon, lat, redraw = true) {
   probe.cache = {};
   if (redraw) { updateProbeReadout(); requestRender(); }
 }
+function enterSpilProbe(p) {
+  spilProbe.before = { ...state.probe }; spilProbe.moved = false;
+  setProbe(p.ref[0], p.ref[1], false);
+}
+function noteProbeMoved() { if (PROJ[state.current].spil) spilProbe.moved = true; }
 function probeFor(p) {
   let c = probe.cache[p.id];
   if (!c) c = probe.cache[p.id] = { xy: projectFlat(probe.ll, p), screen: null };
@@ -2238,11 +2304,17 @@ function goTo(id, opts = {}) {
     if (view.A) view.A = carryAnchor(PROJ[prev], PROJ[id], view.A);
   }
   state.current = id;
-  if (state.ready && (PROJ[prev].spil || PROJ[id].spil)) setProbe(state.probe.lon, state.probe.lat, false);  // Spilhaus keeps the circle off its edge
+  if (state.ready && PROJ[id].spil && !PROJ[prev].spil) enterSpilProbe(PROJ[id]);
+  else if (state.ready && PROJ[prev].spil && !PROJ[id].spil) {
+    const q = !spilProbe.moved && spilProbe.before ? spilProbe.before : state.probe;
+    spilProbe.before = null;
+    setProbe(q.lon, q.lat, false);
+  }
+  if (!PROJ[tryOwner].task.maps.includes(id)) tryOwner = id;
   history.replaceState(null, '', '#' + id);
   updateDial();
   updateInfo();
-  announce(`${PROJ[id].name} projection. ${PROJ[id].summary}`);
+  announce(`${PROJ[id].short} projection. ${PROJ[id].summary}`);
   if (!state.ready) return;
 
   const dur = state.animate ? MORPH_MS : 0;
@@ -2402,16 +2474,167 @@ function drawScene(g, cur, morphing, cull) {
     g.shadowBlur = 0;
   }
 
-  if (circlesMode && pair && pair.a) {
-    g.font = `700 ${W < 520 ? 11 : 13}px "Atkinson Hyperlegible Next", system-ui, sans-serif`;
+  // While a map changes, names ride along at their anchors; when it stops, drawLabels places them
+  if (circlesMode && morphing && pair && pair.a) {
     g.textAlign = 'center'; g.textBaseline = 'middle'; g.lineJoin = 'round';
-    for (const sid of [pair.a, pair.b]) {
+    for (const [sid, label, px] of [[pair.a, SUBJECTS[pair.a].label, W < 520 ? 12 : 13], [pair.b, SUBJECTS[pair.b].label, W < 520 ? 12 : 13], ['SA', PLACES.SA.label, W < 520 ? 11 : 12], ['AQ', PLACES.AQ.label, W < 520 ? 11 : 12]]) {
       const i = world.anchors[sid];
       const x = cur[2 * i] * VT.z + VT.kx, y = cur[2 * i + 1] * VT.z + VT.ky;
       if (!isFinite(x)) continue;
-      g.lineWidth = 4; g.strokeStyle = C.halo; g.strokeText(SUBJECTS[sid].label, x, y);
-      g.fillStyle = C.label; g.fillText(SUBJECTS[sid].label, x, y);
+      g.font = labelFont(sid === 'SA' || sid === 'AQ' ? 600 : 700, px);
+      g.lineWidth = 4; g.strokeStyle = C.halo; g.strokeText(label, x, y);
+      g.fillStyle = C.label; g.fillText(label, x, y);
     }
+  }
+}
+
+/* ================================================================
+   Map labels, placed so they stay on the map and don't cover each other.
+   Most important first: the white circle's (or the country's) label, then Greenland and Africa,
+   then the other places, then the Equator and 60° lines. A label with no free spot is left out.
+   ================================================================ */
+const labelFont = (weight, px) => `${weight} ${px}px "Atkinson Hyperlegible Next", system-ui, sans-serif`;
+function onMap(x, y) {
+  if (x < 4 || x > W - 4 || y < 4 || y > VP.B + 4) return false;
+  const p = PROJ[state.current], b = toBase(x, y);
+  if (p.spil) { const r = p.fit.rect; return b.x >= r.l && b.x <= r.r && b.y >= r.t && b.y <= r.b; }
+  return insideRings(p.screen, world.outline, b.x, b.y);
+}
+function boxOnMap(q) {
+  const mx = (q.l + q.r) / 2;
+  return onMap(q.l, q.t) && onMap(q.r, q.t) && onMap(q.l, q.b) && onMap(q.r, q.b) && onMap(mx, q.t) && onMap(mx, q.b);
+}
+const inView = q => q.l >= 4 && q.r <= W - 4 && q.t >= 4 && q.b <= VP.B + 4;
+const boxesMeet = (a, b) => a.l < b.r && b.l < a.r && a.t < b.b && b.t < a.b;
+const grow = (q, d) => ({ l: q.l - d, t: q.t - d, r: q.r + d, b: q.b + d });
+/* lines: [text, weight, px, color]. Each line's baseline is measured from the label's top. */
+function makeLabel(g, lines) {
+  let w = 0, base = 0, last = 0;
+  const ls = lines.filter(l => l[0]).map(([text, weight, px, color], i) => {
+    g.font = labelFont(weight, px);
+    const lw = g.measureText(text).width;
+    w = Math.max(w, lw);
+    base = i ? base + 3 + px : px * 0.8 + 1; last = px;
+    return { text, weight, px, color, w: lw, base };
+  });
+  return { lines: ls, w, h: base + last * 0.25 + 1 };
+}
+function labelBox(L, c) {
+  const l = c.align === 'left' ? c.x : c.align === 'right' ? c.x - L.w : c.x - L.w / 2;
+  return { l: l - 2, r: l + L.w + 2, t: c.t, b: c.t + L.h };
+}
+function paintLabel(g, L, c) {
+  const l = c.align === 'left' ? c.x : c.align === 'right' ? c.x - L.w : c.x - L.w / 2;
+  g.textAlign = 'left'; g.textBaseline = 'alphabetic'; g.lineJoin = 'round';
+  for (const ln of L.lines) {
+    const x = c.align === 'left' ? l : c.align === 'right' ? l + L.w - ln.w : l + (L.w - ln.w) / 2;
+    g.font = labelFont(ln.weight, ln.px);
+    g.lineWidth = 4; g.strokeStyle = C.halo; g.strokeText(ln.text, x, c.t + ln.base);
+    g.fillStyle = ln.color; g.fillText(ln.text, x, c.t + ln.base);
+  }
+}
+/* Spots around an object's box: right, left, above, below, then the corners, then on top of it */
+const besideSpots = b => {
+  const cx = (b.x0 + b.x1) / 2, cy = (b.y0 + b.y1) / 2;
+  return [
+    L => ({ x: b.x1 + 9, t: cy - L.h / 2, align: 'left' }), L => ({ x: b.x0 - 9, t: cy - L.h / 2, align: 'right' }),
+    L => ({ x: cx, t: b.y0 - 7 - L.h, align: 'center' }), L => ({ x: cx, t: b.y1 + 7, align: 'center' }),
+    L => ({ x: b.x1 + 4, t: b.y0 - L.h - 2, align: 'left' }), L => ({ x: b.x1 + 4, t: b.y1 + 2, align: 'left' }),
+    L => ({ x: b.x0 - 4, t: b.y0 - L.h - 2, align: 'right' }), L => ({ x: b.x0 - 4, t: b.y1 + 2, align: 'right' }),
+    L => ({ x: cx, t: cy - L.h / 2, align: 'center' }),
+  ];
+};
+/* Spots for a name: on its place, then stepping toward the middle of the map, then just above or below */
+const nameSpots = (x, y) => {
+  const dx = VP.cx - x, dy = VP.cy - y, d = Math.hypot(dx, dy) || 1, ux = dx / d, uy = dy / d;
+  return [0, 1, 2, 3, 4, -1, -2].map(k => L => ({ x: x + ux * k * L.h * 1.1, t: y + uy * k * L.h * 1.1 - L.h / 2, align: 'center' }))
+    .concat([L => ({ x, t: y - L.h * 1.6, align: 'center' }), L => ({ x, t: y + L.h * 0.6, align: 'center' }),
+      L => ({ x: x + L.w * 0.6 + 6, t: y - L.h / 2, align: 'center' }), L => ({ x: x - L.w * 0.6 - 6, t: y - L.h / 2, align: 'center' })]);
+};
+/* Spots along a line of latitude, from its left end: the label sits just above the line */
+function lineSpots(cur, ranges) {
+  const pts = [];
+  for (const [s, n] of ranges || []) for (let i = s; i < s + n; i++) {
+    const x = cur[2 * i] * VT.z + VT.kx, y = cur[2 * i + 1] * VT.z + VT.ky;
+    if (isFinite(x) && isFinite(y) && x > 4 && x < W - 30 && y > 12 && y < VP.B) pts.push([x, y]);
+  }
+  pts.sort((a, b) => a[0] - b[0]);
+  const out = []; let lastX = -Infinity;
+  for (const [x, y] of pts) { if (x - lastX < 36) continue; lastX = x; out.push(L => ({ x: x + 5, t: y - 3 - L.h, align: 'left' })); if (out.length >= 10) break; }
+  return out;
+}
+function viewBoxOf(pc) {
+  let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+  for (let i = 0; i < pc.length; i += 2) {
+    if (!isFinite(pc[i])) continue;
+    const x = pc[i] * VT.z + VT.kx, y = pc[i + 1] * VT.z + VT.ky;
+    x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y);
+  }
+  return isFinite(x0) ? { x0, x1, y0, y1 } : null;
+}
+function drawLabels(g, f) {
+  const p = PROJ[state.current], cur = f.world, sm = W < 520;
+  const big = sm ? 13 : 15, small = sm ? 11 : 12, nm = sm ? 12 : 13, pl = sm ? 11 : 12;
+  const at = id => { const i = world.anchors[id]; return [cur[2 * i] * VT.z + VT.kx, cur[2 * i + 1] * VT.z + VT.ky]; };
+  const items = [], placed = [], dots = [];
+  if (state.mode === 'circles') {
+    const bb = f.ov.probe && probe.label ? viewBoxOf(f.ov.probe) : null;
+    if (bb) {
+      placed.push(grow({ l: bb.x0, r: bb.x1, t: bb.y0, b: bb.y1 }, 2));
+      items.push({ need: true, L: makeLabel(g, [[probe.label[0], 700, big, '#ffffff'], [probe.label[1], 600, small, '#ffd9df']]), spots: besideSpots(bb) });
+    }
+    // A pole is a point: its dot and name come straight after the circle's label
+    for (const [id, pc] of Object.entries(PLACES)) {
+      if (!pc.family || pc.family !== p.family) continue;
+      const [x, y] = at(id);
+      if (!isFinite(x) || !onMap(x, y)) continue;
+      dots.push([x, y]);
+      const near = besideSpots({ x0: x - 5, x1: x + 5, y0: y - 5, y1: y + 5 }).slice(0, 8), far = besideSpots({ x0: x - 18, x1: x + 18, y0: y - 16, y1: y + 16 }).slice(0, 8);
+      items.push({ L: makeLabel(g, [[pc.label, 700, pl, '#ffffff']]), spots: near.concat(far) });
+    }
+    for (const sid of [HIGHLIGHT.a, HIGHLIGHT.b]) {
+      const [x, y] = at(sid);
+      if (isFinite(x)) items.push({ L: makeLabel(g, [[SUBJECTS[sid].label, 700, nm, C.label]]), spots: nameSpots(x, y) });
+    }
+    for (const [id, pc] of Object.entries(PLACES)) {
+      if (pc.family) continue;
+      const [x, y] = at(id);
+      if (isFinite(x) && onMap(x, y)) items.push({ L: makeLabel(g, [[pc.label, 600, pl, '#e3eaff']]), spots: nameSpots(x, y) });
+    }
+  } else if (f.ov.moved && CM.moved) {
+    const bb0 = countryBBoxBase(p), i = CM.moved.centre, ms = f.ov.moved;
+    const cx = ms[2 * i] * VT.z + VT.kx, cy = ms[2 * i + 1] * VT.z + VT.ky;
+    const bb = bb0 ? { x0: bb0.x0 * VT.z + VT.kx, x1: bb0.x1 * VT.z + VT.kx, y0: bb0.y0 * VT.z + VT.ky, y1: bb0.y1 * VT.z + VT.ky } : (isFinite(cx) ? { x0: cx, x1: cx, y0: cy, y1: cy } : null);
+    if (bb) {
+      placed.push(grow({ l: bb.x0, r: bb.x1, t: bb.y0, b: bb.y1 }, 2));
+      items.push({ need: true, L: makeLabel(g, [[CM.name, 700, big, '#ffffff'], [CM.tag || '', 600, small, '#ffe7a6']]), spots: besideSpots(bb) });
+    }
+  }
+  if (state.showGrid) for (const [lat, text] of GRID_LABELS) {
+    const spots = lineSpots(cur, world.parallels[lat]);
+    if (spots.length) items.push({ L: makeLabel(g, [[text, 600, pl, 'rgba(236,242,255,0.88)']]), spots });
+  }
+  for (const [x, y] of dots) {
+    g.beginPath(); g.arc(x, y, 3.5, 0, Math.PI * 2);
+    g.fillStyle = '#ffffff'; g.fill(); g.lineWidth = 2; g.strokeStyle = C.halo; g.stroke();
+  }
+  for (const it of items) {
+    let pick = null;
+    const tries = it.spots.map(mk => { const c = mk(it.L); return [c, labelBox(it.L, c)]; });
+    for (const [c, q] of tries) if (boxOnMap(q) && !placed.some(o => boxesMeet(o, q))) { pick = [c, q]; break; }
+    if (!pick && it.need) {
+      // The white circle's or country's label always shows: on the map if it can be, otherwise in view
+      pick = tries.find(([, q]) => boxOnMap(q)) || tries.find(([, q]) => inView(q));
+      if (!pick) {
+        const [c0] = tries[0], q0 = labelBox(it.L, c0);
+        const sx = q0.l < 4 ? 4 - q0.l : q0.r > W - 4 ? W - 4 - q0.r : 0, sy = q0.t < 4 ? 4 - q0.t : q0.b > VP.B ? VP.B - q0.b : 0;
+        const c = { ...c0, x: c0.x + sx, t: c0.t + sy };
+        pick = [c, labelBox(it.L, c)];
+      }
+    }
+    if (!pick) continue;
+    placed.push(grow(pick[1], 2));
+    paintLabel(g, it.L, pick[0]);
   }
 }
 
@@ -2434,38 +2657,6 @@ function drawProbe(g, pc) {
   if (n) {
     g.beginPath(); g.arc(cx / n, cy / n, 4.5, 0, Math.PI * 2);
     g.fillStyle = C.probeLine; g.fill(); g.lineWidth = 2; g.strokeStyle = C.halo; g.stroke();
-  }
-}
-function drawProbeLabel(g, pc) {
-  if (!pc || !probe.label) return;
-  let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
-  for (let i = 0; i < pc.length; i += 2) {
-    if (!isFinite(pc[i])) continue;
-    const x = pc[i] * VT.z + VT.kx, y = pc[i + 1] * VT.z + VT.ky;
-    x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y);
-  }
-  if (!isFinite(x0)) return;
-  drawTag(g, probe.label, x0, x1, (y0 + y1) / 2, '#ffd9df');
-}
-function drawTag(g, lines, x0, x1, ymid, subColor) {
-  const big = W < 520 ? 13 : 15, small = W < 520 ? 11 : 12;
-  g.font = `700 ${big}px "Atkinson Hyperlegible Next", system-ui, sans-serif`;
-  const w1 = g.measureText(lines[0]).width;
-  g.font = `600 ${small}px "Atkinson Hyperlegible Next", system-ui, sans-serif`;
-  const w2 = lines[1] ? g.measureText(lines[1]).width : 0;
-  const w = Math.max(w1, w2);
-  let x = x1 + 10, align = 'left';
-  if (x + w > W - 8) { x = x0 - 10; align = 'right'; }
-  if (align === 'right' && x - w < 8) { x = clamp((x0 + x1) / 2, 8 + w / 2, W - 8 - w / 2); align = 'center'; }
-  const yc = clamp(ymid, big + 6, H - 40);
-  g.textAlign = align; g.textBaseline = 'alphabetic'; g.lineJoin = 'round';
-  g.font = `700 ${big}px "Atkinson Hyperlegible Next", system-ui, sans-serif`;
-  g.lineWidth = 4; g.strokeStyle = C.halo; g.strokeText(lines[0], x, yc);
-  g.fillStyle = '#ffffff'; g.fillText(lines[0], x, yc);
-  if (lines[1]) {
-    g.font = `600 ${small}px "Atkinson Hyperlegible Next", system-ui, sans-serif`;
-    g.strokeText(lines[1], x, yc + small + 3);
-    g.fillStyle = subColor; g.fillText(lines[1], x, yc + small + 3);
   }
 }
 
@@ -2527,9 +2718,6 @@ function drawCountry(g, hs, ms, morphing) {
       if (isFinite(x)) {
         g.beginPath(); g.arc(x, y, 4.5, 0, Math.PI * 2);
         g.fillStyle = C.mine; g.fill(); g.lineWidth = 2; g.strokeStyle = C.halo; g.stroke();
-        const bb = countryBBoxBase(PROJ[state.current]);
-        const x0 = bb ? bb.x0 * VT.z + VT.kx : x, x1 = bb ? bb.x1 * VT.z + VT.kx : x;
-        drawTag(g, [CM.name, CM.tag || ''], x0, x1, y, '#ffe7a6');
       }
     }
   }
@@ -2578,12 +2766,9 @@ function render() {
     }
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
   }
-  if (state.mode === 'circles') {
-    drawProbe(ctx, f.ov.probe);
-    if (!state.morph) drawProbeLabel(ctx, f.ov.probe);
-  } else {
-    drawCountry(ctx, f.ov.home, f.ov.moved, !!state.morph);
-  }
+  if (state.mode === 'circles') drawProbe(ctx, f.ov.probe);
+  else drawCountry(ctx, f.ov.home, f.ov.moved, !!state.morph);
+  if (!state.morph) drawLabels(ctx, f);
   return f;
 }
 
@@ -2636,7 +2821,7 @@ function buildDial() {
       const b = document.createElement('button');
       b.type = 'button'; b.className = 'tile'; b.dataset.id = p.id;
       b.innerHTML = `<span class="key" aria-hidden="true">${p.key}</span><canvas aria-hidden="true"></canvas><span class="nm">${p.short}</span><span class="tg">${p.tileTag}</span>`;
-      b.setAttribute('aria-label', `${p.name}${p.tags.length ? ', ' + p.tags.join(', ') : ''}`);
+      b.setAttribute('aria-label', `${p.short}${p.short !== p.name ? ` (${p.name})` : ''}${p.tags.length ? ', ' + p.tags.join(', ') : ''}`);
       b.setAttribute('aria-keyshortcuts', String(p.key));
       b.addEventListener('click', () => goTo(p.id));
       tiles.appendChild(b);
@@ -2662,6 +2847,7 @@ function buildTabs() {
     // The tabs drive the map: Country shows the moved country; the others show the circles
     if (tab.id !== 'tab-country') lastCirclesTab = tab.id.replace('tab-', '');
     setMode(tab.id === 'tab-country' ? 'country' : 'circles');
+    placeTry();
     if (tab.id === 'tab-measure') requestAnimationFrame(fitMeasureViz);
   };
   tabs.forEach((t, i) => {
@@ -2684,7 +2870,6 @@ function setMode(mode) {
   if (state.mode === mode) return;
   state.mode = mode;
   if (mode === 'country' && CM.feat < 0 && state.ready) chooseCountry(defaultCountryIndex(), false);
-  $('modeBtn').setAttribute('aria-pressed', String(mode === 'country'));
   canvas.style.cursor = '';
   updateToggles();
   if (mode === 'country') { if (activeTab() !== 'country') selectTab('country'); updateCountryReadout(true); requestAnimationFrame(fitCountryViz); }
@@ -2700,10 +2885,11 @@ function setMode(mode) {
 function updateInfo() {
   const p = PROJ[state.current];
   $('pFamily').textContent = p.familyText.charAt(0).toUpperCase() + p.familyText.slice(1) + '.';
-  $('pName').innerHTML = `${p.name}<span class="ver" title="Projection model version">v${p.v}</span>`;
+  $('pName').innerHTML = `${p.short}<span class="ver" title="Projection model version">v${p.v}</span>`;
+  $('pFullName').hidden = p.short === p.name;
+  $('pFullName').textContent = `Full name: ${p.name}.`;
   $('pTagline').textContent = p.tagline;
-  $('pMoreTitle').textContent = `More about ${p.short}`;
-  $('pMore').setAttribute('aria-label', `More about ${p.name}: its type, where it is used, and its story`);
+  $('moreBtn').setAttribute('aria-label', `More about this map, ${p.short}: its type, where it is used, and its story`);
   const props = $('pProps');
   props.innerHTML = '';
   for (const [k, label] of [['area', 'Area'], ['shape', 'Shape'], ['distance', 'Distance'], ['direction', 'Direction']]) {
@@ -2716,9 +2902,44 @@ function updateInfo() {
   $('pCircles').textContent = p.circles;
   $('pWhere').textContent = p.where;
   $('pHistory').textContent = p.history;
-  $('pTry').textContent = p.tryThis;
   $('pWkid').textContent = p.wkidText;
+  renderTry();
 }
+
+/* ---------- Try this: numbered steps that stay on screen while you follow them ---------- */
+function renderTry() {
+  const p = PROJ[state.current], o = PROJ[tryOwner], t = o.task;
+  $('tryFrom').textContent = tryOwner === state.current ? '' : `· from ${o.short}`;
+  $('trySteps').innerHTML = t.steps.map(x => `<li>${x}</li>`).join('');
+  $('tryAsk').textContent = t.ask;
+  $('tryNext').hidden = tryOwner === state.current;
+  $('tryNext').textContent = `${p.short}’s task →`;
+  $('tryNext').setAttribute('aria-label', `${p.short}’s task: show the Try this for ${p.short}`);
+  placeTry();
+}
+/* On the Projection tab always; on Country or Measure only when the task uses that tab */
+function placeTry() {
+  const tab = document.querySelector('.tab[aria-selected="true"]')?.id.replace('tab-', '') || 'proj';
+  const uses = PROJ[tryOwner].task.uses, box = $('tryBox');
+  const slot = tab === 'proj' ? 'trySlotProj' : tab === 'country' && uses === 'country' ? 'trySlotCountry' : tab === 'measure' && uses === 'circle' ? 'trySlotMeasure' : null;
+  $('panel-country').classList.toggle('has-try', slot === 'trySlotCountry');
+  $('panel-measure').classList.toggle('has-try', slot === 'trySlotMeasure');
+  box.hidden = !slot;
+  if (!slot) return;
+  if (box.parentElement.id !== slot) $(slot).appendChild(box);
+  box.classList.toggle('compact', slot !== 'trySlotProj');
+  if (slot === 'trySlotCountry') requestAnimationFrame(fitCountryViz);
+  if (slot === 'trySlotMeasure') requestAnimationFrame(fitMeasureViz);
+}
+$('tryNext').addEventListener('click', () => {
+  tryOwner = state.current;
+  // A task that isn't shown on this tab opens the Projection tab
+  const tab = activeTab(), uses = PROJ[tryOwner].task.uses;
+  if ((tab === 'country' && uses !== 'country') || (tab === 'measure' && uses !== 'circle')) selectTab('proj');
+  renderTry();
+  $('tryBox').focus();
+  announce(`Try this for ${PROJ[state.current].short}: ${$('tryBox').innerText.replace(/\s+/g, ' ')}`);
+});
 
 function updateStatus() {
   if (!state.ready) return;
@@ -2739,7 +2960,7 @@ function fmtLat(lat) { const a = Math.abs(lat); return a < 0.5 ? '0°' : `${Math
 function fmtLon(lon) { const a = Math.abs(lon); return a < 0.5 ? '0°' : `${Math.round(a)}°${lon > 0 ? 'E' : 'W'}`; }
 function fmtArea(km2) {
   const v = state.units === 'mi' ? km2 * SQMI_PER_SQKM : km2;
-  const u = state.units === 'mi' ? 'sq mi' : 'km²';
+  const u = state.units === 'mi' ? 'square miles' : 'square kilometers';
   if (v >= 1e6) return `${(v / 1e6).toFixed(1)} million ${u}`;
   if (v >= 10000) return `${(Math.round(v / 1000) * 1000).toLocaleString('en-US')} ${u}`;
   if (v >= 100) return `${(Math.round(v / 10) * 10).toLocaleString('en-US')} ${u}`;
@@ -2762,25 +2983,24 @@ function updateProbeReadout() {
   const st = probeStats(p);
   const ratio = st.long / Math.max(1e-9, st.short);
   const center = p.centerLabel || (p.family === 'disc' ? ' (the North Pole)' : ' (0°, 0°)');
-  let shapeWords;
-  if (ratio < 1.12) shapeWords = 'Still round';
-  else if (ratio < 1.5) shapeWords = 'A little squashed';
-  else if (ratio < 2.5) shapeWords = 'Stretched into an oval';
-  else shapeWords = 'Very stretched';
+  // Which way the circle is stretched on screen: its longest axis, measured from side to side
+  const tilt = Math.abs(st.angle) * 180 / Math.PI;
+  const way = tilt < 30 ? 'side to side' : tilt > 60 ? 'up and down' : 'on a slant';
+  const shapeWords = ratio < 1.12 ? 'Still round' : `${ratio < 1.5 ? 'A little stretched' : ratio < 2.5 ? 'Stretched' : 'Very stretched'} ${way}`;
   const acrossNum = state.units === 'mi' ? CIRCLE_RADIUS_MI * 2 : Math.round(CIRCLE_RADIUS_MI * 2 * MI_TO_KM);
-  const acrossUnit = state.units === 'mi' ? 'miles' : 'km';
+  const acrossUnit = state.units === 'mi' ? 'miles' : 'kilometers';
   $('mTrue').textContent = acrossNum.toLocaleString('en-US');
   $('mTrueLbl').textContent = `${acrossUnit} across`;
   $('mArea').innerHTML = `${fmtX(st.area)}<small>×</small>`;
-  $('mShape').innerHTML = `${ratio.toFixed(1)}<small> : 1</small>`;
+  $('mShape').innerHTML = `${ratio.toFixed(1)}<small>×</small>`;
   const sizeLine = `${sizeWords(st.area)} at the map’s center${center}.`;
-  const shapeLine = ratio < 1.12 ? `${shapeWords}.` : `${shapeWords}: ${ratio.toFixed(1)}× as long as it is wide.`;
+  const shapeLine = ratio < 1.12 ? `${shapeWords}.` : `${shapeWords}: ${ratio.toFixed(1)} times as long as it is wide.`;
   $('mVerdict').textContent = `${sizeLine} ${shapeLine}`;
   // A longer verdict can add a line: shrink the drawing so the panel still fits without scrolling
   if (!$('panel-measure').hidden) { const vh = $('mVerdict').offsetHeight; if (vh !== probe.verdictH) { probe.verdictH = vh; fitMeasureViz(); } }
   $('probeWhere').innerHTML = `Circle center: <b>${fmtLat(state.probe.lat)}, ${fmtLon(state.probe.lon)}</b>`;
-  $('probeTrue').innerHTML = `On the real Earth every circle is ${acrossNum.toLocaleString('en-US')} ${acrossUnit} across and covers ${fmtArea(probe.trueM2 / 1e6)}. “Size vs. center” compares it with the same circle at the center of the map.`;
-  probe.label = [`${fmtX(st.area)}× size`, shapeWords.toLowerCase()];
+  $('probeTrue').innerHTML = `On the real Earth every circle is ${acrossNum.toLocaleString('en-US')} ${acrossUnit} across and covers ${fmtArea(probe.trueM2 / 1e6)}. Its size is compared with the same circle at the center of the map${center}.`;
+  probe.label = [`${fmtX(st.area)}× as big as at the center`, `${Math.abs(state.probe.lat) < 0.5 ? 'Equator' : fmtLat(state.probe.lat)} · ${shapeWords.toLowerCase()}`];
   drawShapeViz(st, shapeWords);
 }
 
@@ -2798,12 +3018,12 @@ function drawShapeViz(st, shapeWords) {
       <ellipse rx="${rx.toFixed(1)}" ry="${ry.toFixed(1)}" fill="rgba(255,93,115,0.42)" stroke="#ffffff" stroke-width="2" vector-effect="non-scaling-stroke"/>
       <line x1="${(-rx).toFixed(1)}" y1="0" x2="${rx.toFixed(1)}" y2="0" stroke="rgba(255,255,255,0.5)" stroke-width="1" vector-effect="non-scaling-stroke"/>
     </g>`;
-  svg.setAttribute('aria-label', `The measuring circle on the real Earth and on this map, at the same scale. On this map it is ${fmtX(st.area)} times its size at the center, ${shapeWords.toLowerCase()}. Longest way across ${st.long.toFixed(1)} times, shortest ${st.short.toFixed(1)} times the real circle.`);
+  svg.setAttribute('aria-label', `The white circle on the real Earth and on this map, at the same scale. On this map it is ${fmtX(st.area)} times as big as at the center, ${shapeWords.toLowerCase()}. Longest way across ${st.long.toFixed(1)} times, shortest ${st.short.toFixed(1)} times the real circle.`);
 }
 
 function areaParts(km2) {
   const v = state.units === 'mi' ? km2 * SQMI_PER_SQKM : km2;
-  const u = state.units === 'mi' ? 'sq mi' : 'km²';
+  const u = state.units === 'mi' ? 'square miles' : 'square kilometers';
   if (v >= 1e6) return [`${(v / 1e6).toFixed(1)} million`, u];
   if (v >= 10000) return [(Math.round(v / 1000) * 1000).toLocaleString('en-US'), u];
   if (v >= 100) return [(Math.round(v / 10) * 10).toLocaleString('en-US'), u];
@@ -2820,7 +3040,10 @@ function updateCountryReadout(full) {
   $('cRealLbl').textContent = `${unit} in real life`;
   // The number under the map shape compares it with the globe shape beside it
   $('cMapX').innerHTML = `${fmtX(st.vsTrue)}<small>×</small>`;
-  // The verdict compares it with its size in its real place (the dashed outline on the map)
+  const split = countryGroups(p).split;
+  $('cMapLbl').textContent = split ? 'its real size, whole country' : 'its real size';
+  // The verdict compares it with its size in its real place (the dashed outline on the map), in whole numbers where it can
+  const times = x => x >= 9.5 ? Math.round(x).toLocaleString('en-US') : String(Math.round(x * 10) / 10);
   let v;
   if (!moved) {
     v = st.vsTrue > 1.05 ? 'This map already draws it bigger than it really is.'
@@ -2828,8 +3051,9 @@ function updateCountryReadout(full) {
       : 'This map shows it at its real size here.';
     v += ' Drag it to see what changes.';
   } else if (Math.abs(st.vsHome - 1) < 0.05) v = 'Same size here as in its real place (dashed outline). This map keeps area.';
-  else v = `It looks ${st.vsHome < 1 ? 'only ' : ''}${fmtX(st.vsHome)}× as big here as in its real place (dashed outline).`;
-  if (countryGroups(p).split) v += ' The edge of this map cuts it into pieces.';
+  else if (st.vsHome > 1) v = `It looks about ${times(st.vsHome)} times as big here as in its real place (dashed outline).`;
+  else v = `In its real place (dashed outline), this map draws it about ${times(1 / st.vsHome)} times as big as here.`;
+  if (split) v += ' The edge of this map cuts it into pieces.';
   $('cVerdict').textContent = v;
   $('cWhere').innerHTML = moved
     ? `<b>${CM.name}</b> at <b>${fmtLat(CM.pos.lat)}, ${fmtLon(CM.pos.lon)}</b> · real place <b>${fmtLat(CM.c0.lat)}, ${fmtLon(CM.c0.lon)}</b>`
@@ -2891,13 +3115,13 @@ function drawCountryViz(p, st) {
   svg.innerHTML = `
     <path d="${dTrue}" fill="rgba(214,224,250,0.24)" fill-rule="evenodd" stroke="#e4ebff" stroke-width="1.8" stroke-dasharray="4 2.5" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
     <path d="${dMap}" fill="rgba(255,201,60,0.42)" fill-rule="evenodd" stroke="#ffc93c" stroke-width="1.8" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>`;
-  svg.setAttribute('aria-label', `${CM.name} on a globe and on this ${p.short} map, at the same scale. On this map it is drawn ${fmtX(st.vsTrue)} times its real size, and ${fmtX(st.vsHome)} times its size in its real place.`);
+  svg.setAttribute('aria-label', `${CM.name} on a globe and on this ${p.short} map, at the same scale. On this map it is drawn ${fmtX(st.vsTrue)} times its real size.`);
 }
 
 function countryAnnouncement() {
   if (!CM.moved) return '';
   const st = countryStats(PROJ[state.current]);
-  return `${CM.name} at ${fmtLat(CM.pos.lat)}, ${fmtLon(CM.pos.lon)}. On this ${PROJ[state.current].short} map it is drawn ${fmtX(st.vsTrue)} times its real size, and ${fmtX(st.vsHome)} times its size in its real place.`;
+  return `${CM.name} at ${fmtLat(CM.pos.lat)}, ${fmtLon(CM.pos.lon)}. On this ${PROJ[state.current].short} map it is drawn ${fmtX(st.vsTrue)} times its real size. ${$('cVerdict').textContent}`;
 }
 
 function updateUnitsUI() {
@@ -2917,7 +3141,7 @@ function updateAria() {
   canvas.setAttribute('aria-label',
     `${state.showImagery && glReady ? 'Satellite map' : 'Map'} of the world in the ${p.name} projection, with ${world.circles.length || 55} circles that are all the same real size. ${p.summary}` +
     ` ${SUBJECTS.GL.label} and ${SUBJECTS.AF.label} are highlighted.` +
-    ` The measuring circle is at ${fmtLat(state.probe.lat)}, ${fmtLon(state.probe.lon)}.${zoom}`);
+    ` The white circle is at ${fmtLat(state.probe.lat)}, ${fmtLon(state.probe.lon)}.${zoom}`);
 }
 
 let announceTimer = null;
@@ -2935,7 +3159,6 @@ function updateToggles() {
   $('togGrid').setAttribute('aria-pressed', String(state.showGrid));
   $('togAnimate').setAttribute('aria-pressed', String(state.animate));
 }
-$('modeBtn').addEventListener('click', () => setMode(state.mode === 'country' ? 'circles' : 'country'));
 $('togImagery').addEventListener('click', () => { if (!glReady) return; state.showImagery = !state.showImagery; updateToggles(); updateAria(); requestRender(); });
 $('togCircles').addEventListener('click', () => {
   if (state.mode === 'country') { announce('The circles are hidden on the Country tab. Choose the Projection or Measure tab to see them.'); return; }
@@ -2955,7 +3178,11 @@ $('zoomIn').addEventListener('click', () => zoomBy(2));
 $('zoomOut').addEventListener('click', () => zoomBy(0.5));
 $('zoomFit').addEventListener('click', zoomFit);
 $('zoomToBtn').addEventListener('click', zoomToCountry);
-$('pMore').addEventListener('toggle', e => { if (e.currentTarget.open) e.currentTarget.scrollIntoView({ block: 'nearest', behavior: reduceMotion.matches ? 'auto' : 'smooth' }); });
+for (const b of [$('glossBtn'), $('moreBtn')]) b.addEventListener('click', () => {
+  const open = b.getAttribute('aria-expanded') !== 'true', body = $(b.getAttribute('aria-controls'));
+  b.setAttribute('aria-expanded', String(open)); body.hidden = !open;
+  if (open) body.scrollIntoView({ block: 'nearest', behavior: reduceMotion.matches ? 'auto' : 'smooth' });
+});
 document.querySelectorAll('[data-move]').forEach(b => b.addEventListener('click', () => {
   if (!CM.c0) return;
   if (state.mode !== 'country') setMode('country');
@@ -3050,7 +3277,7 @@ function queueMove(fn) {
 function moveProbeTo(px, py) {
   const ll = screenToLonLat(px, py);
   if (!ll) return false;
-  queueMove(() => setProbe(ll[0], ll[1]));
+  queueMove(() => { setProbe(ll[0], ll[1]); noteProbeMoved(); });
   return true;
 }
 function countryDragTo(px, py) {
@@ -3063,7 +3290,7 @@ function placeObjectAt(px, py, startDrag) {
   const ll = screenToLonLat(px, py);
   if (!ll) return;
   if (state.mode === 'circles') {
-    setProbe(ll[0], ll[1]);
+    setProbe(ll[0], ll[1]); noteProbeMoved();
     if (startDrag) drag = { kind: 'probe' };
   } else if (CM.c0) {
     setCountryPos(ll[0], ll[1]);
@@ -3206,7 +3433,7 @@ canvas.addEventListener('keydown', e => {
     afterCountryMove(false, true);
     announce(countryAnnouncement(), 350);
   } else {
-    setProbe(state.probe.lon + dLon, state.probe.lat + dLat);
+    setProbe(state.probe.lon + dLon, state.probe.lat + dLat); noteProbeMoved();
     keepInView(probeCentreBase(PROJ[state.current]));
     updateAria();
     announce(probeAnnouncement(), 350);
@@ -3214,10 +3441,10 @@ canvas.addEventListener('keydown', e => {
 });
 function probeAnnouncement() {
   const st = probeStats(PROJ[state.current]);
-  return `Measuring circle at ${fmtLat(state.probe.lat)}, ${fmtLon(state.probe.lon)}. Drawn ${fmtX(st.area)} times the size of the same circle at the center of the map. ${$('mVerdict').textContent}`;
+  return `White circle at ${fmtLat(state.probe.lat)}, ${fmtLon(state.probe.lon)}. Drawn ${fmtX(st.area)} times as big as the same circle at the center of the map. ${$('mVerdict').textContent}`;
 }
 document.addEventListener('keydown', e => {
-  if (e.target.closest('input, textarea, select, dialog[open], [role="tab"]') || e.altKey || e.ctrlKey || e.metaKey) return;
+  if (e.target.closest('input, textarea, dialog[open]') || e.altKey || e.ctrlKey || e.metaKey) return;
   if (e.key === '+' || e.key === '=') { e.preventDefault(); zoomBy(2); return; }
   if (e.key === '-' || e.key === '_') { e.preventDefault(); zoomBy(0.5); return; }
   if (e.key === '0') { e.preventDefault(); zoomFit(); return; }
