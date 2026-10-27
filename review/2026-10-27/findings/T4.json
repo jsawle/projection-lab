@@ -1,0 +1,133 @@
+{
+  "persona": "T4 Ana: many English learners",
+  "overall": "I would use this with my 8th graders. Moving Greenland to the Equator and watching it shrink teaches the idea with very little reading, and the main sentences are short. What holds me back is that nothing is in Spanish and the key words (projection, distorted, equal area, conformal, compromise) aren't explained where students meet them. Some Try This tasks also send students to keys, names or latitudes they can't find on the screen. I would have to make my own bilingual word sheet and rewrite several Try This boxes before my English learners could work on their own.",
+  "works": [
+    "\"What do these words mean?\" gives short, plain definitions with examples (\"like north or southeast\", \"like the curve of a coastline\"), and the key words Area, Distance and Direction are close Spanish cognates.",
+    "The four cards show red ✕ and green ✓ icons in colour, so a student can see what a map keeps or loses without reading much.",
+    "On the Country tab, the buttons \"Equator\", \"60° N\", \"60° S\" and \"Real place\" use exactly the words in the Try This tasks, and the ON A GLOBE / ON THIS MAP shapes side by side let students see the size change without reading.",
+    "The longer reading (\"More about…\", the glossary) is folded away by default, so the first screen stays short.",
+    "Measure tab has a Miles / Kilometers switch, which helps students who learned metric units at school in Latin America."
+  ],
+  "findings": [
+    {
+      "where": "Whole app: header in c02-first-view.png (only an \"About\" button) and the full page text in the packet",
+      "what": "There is no Spanish version and no language switch anywhere. Every label, card, Try This box, glossary entry and the 250-name country list are English only (e.g. \"United States\", not \"Estados Unidos\"; \"Brazil\", not \"Brasil\").",
+      "why": "About a quarter of my class are English learners, most of them Spanish speakers, and I give Spanish versions alongside English ones wherever I can. Without one, I have to build a translated handout before I can use this.",
+      "severity": "slows it down",
+      "suggestion": "Add an English/Español switch in the header that translates the side panel, the tray labels, the map labels and the glossary.",
+      "needs_live_app": false
+    },
+    {
+      "where": "Map labels drawn on the map, e.g. c03-proj-plate-carree.png \"1.4× size / a little squashed\", c07-proj-robinson.png \"stretched into an oval\", c23-country-greenland.png \"16× its real size\"",
+      "what": "Some of the most important feedback sits in labels drawn on the map itself (\"still round\", \"a little squashed\", \"very stretched\", \"its real size\"). From the packet I can't tell whether the browser's built-in page translation (for example Chrome Translate) would translate these map labels or only the side panel.",
+      "why": "My fallback for English-only sites is to have students turn on browser translation. If the map labels stay in English, the part of the screen they look at most stays untranslated.",
+      "severity": "slows it down",
+      "suggestion": "Test the app with Chrome's Translate-to-Spanish turned on. If the map labels don't translate, put the same text in the side panel, where translation reaches it.",
+      "needs_live_app": true
+    },
+    {
+      "where": "c12-glossary-open.png, \"What do these words mean?\" list; and c28-about-top.png, first sentence of the About dialog",
+      "what": "The glossary defines only Area, Shape, Distance and Direction. The lesson's main word, \"projection\", is defined only in the About dialog (\"A projection is the math that turns the round Earth into a flat map.\"). The status word on almost every card, \"Distorted\", is never defined, and neither are \"Kept\", \"Partly kept\" or \"Nearly kept\".",
+      "why": "\"Projection\" and \"distortion\" are the two words I most need my English learners to own. Students won't open About, and the glossary skips both.",
+      "severity": "slows it down",
+      "suggestion": "Add \"Projection\" and \"Distorted (stretched or squeezed, not true to the real Earth)\" to the top of the \"What do these words mean?\" list.",
+      "needs_live_app": false
+    },
+    {
+      "where": "c13-more-open.png, \"More about Mercator\" → TYPE OF PROJECTION \"Cylindrical · conformal.\"; packet text for maps 4, 6, 8 and 9 (\"Pseudocylindrical · equal area.\", \"Compromise · modified azimuthal.\", \"Azimuthal · centered on the North Pole\"); tray subtitles \"Equal area\" on tiles 2, 4 and 9",
+      "what": "Technical terms appear with no explanation: \"conformal\", \"cylindrical\", \"pseudocylindrical\", \"azimuthal\", \"equidistant\". \"Equal area\" is printed on three tray tiles and in \"A newer equal-area map\" but is never defined. The ID lines (\"ArcGIS WKID 3857 · WGS 1984 Web Mercator (Auxiliary Sphere)\") add more unreadable text.",
+      "why": "\"Equal area\" and \"conformal\" are vocabulary I'd teach. When students meet them with no support, my English learners stop and ask me, or skip the section.",
+      "severity": "slows it down",
+      "suggestion": "Add \"Equal area\", \"Conformal\" (keeps shapes of small places), \"Cylindrical\" and \"Azimuthal\" to the glossary, each with a one-line plain definition, and move the WKID line into About.",
+      "needs_live_app": false
+    },
+    {
+      "where": "Tray subtitles under Robinson (5) and Winkel Tripel (6): \"Compromise\" (c07-proj-robinson.png, c08-proj-winkel-tripel.png)",
+      "what": "\"Compromise\" is used as a category label. For Spanish speakers, \"compromiso\" usually means a commitment or obligation, so the word reads as a false friend.",
+      "why": "Spanish-speaking students will guess wrong from the cognate, and the tray label has no explanation next to it.",
+      "severity": "minor",
+      "suggestion": "Add \"Compromise map\" to the glossary (\"a little wrong everywhere, very wrong nowhere\"), or change the tray label to \"Balanced\".",
+      "needs_live_app": false
+    },
+    {
+      "where": "c10-proj-polar-equidistant.png and c11-proj-polar-equal-area.png: tray names vs panel headings; map 9 Try This \"Compare this map with Polar Equidistant, next door.\"",
+      "what": "Three maps have one name in the tray and a different name in the heading: tray \"Polar Equal-Area\" / heading \"Lambert Azimuthal Equal-Area\"; tray \"Polar Equidistant\" / heading \"Polar Azimuthal Equidistant\"; tray \"Spilhaus\" / heading \"Spilhaus World Ocean Map\". The map 9 Try This also uses the idiom \"next door\".",
+      "why": "My English learners match words letter by letter. When the heading on screen doesn't match the tile they pressed, or the name a task tells them to find, they think they are on the wrong map. \"Next door\" will be read literally.",
+      "severity": "slows it down",
+      "suggestion": "Use the tray name as the big heading and put the full name on a smaller line under it, and change \"next door\" to \"(map 8, just to the left)\".",
+      "needs_live_app": false
+    },
+    {
+      "where": "Try This boxes \"Then press 4 to morph to Equal Earth.\" (c02-first-view.png) and \"Press 3 for Mercator and 4 for Equal Earth a few times.\" (c06-proj-equal-earth.png); phone tray in m02-phone-full-page.png",
+      "what": "These tasks give keyboard numbers only. On the Chromebook the numbers are tiny in the tile corners, and on the phone layout the tray tiles show no numbers at all. \"Morph\" is also not a word on any button (the wave button has no visible text and is named \"Animate\").",
+      "why": "A student on a touch screen can't \"press 4\", and nothing on screen says which tile is 4. \"Morph\" is a word my English learners won't know.",
+      "severity": "slows it down",
+      "suggestion": "Write the tile name with the key, for example \"Tap Equal Earth (or press 4) and watch the map change shape\", and replace \"morph\" with \"change shape\".",
+      "needs_live_app": false
+    },
+    {
+      "where": "c07-proj-robinson.png Try This \"Put the measuring circle at 60° north, then switch to Mercator.\"; c03-proj-plate-carree.png Try This \"Drag the measuring circle from the Equator toward the North Pole.\"",
+      "what": "On the Projection tab the grid lines have no degree numbers and the Equator line has no label, so a student can't tell where 60° north or the Equator is. The circle's position (\"Circle center: 48°N, 97°W\") appears only on the Measure tab, and these Try This boxes don't mention that tab.",
+      "why": "The task asks for something the student can't check on the screen they are told to use, so my English learners will guess or wait for me.",
+      "severity": "slows it down",
+      "suggestion": "Label the Equator and the 30°/60° lines on the map, or add \"(open Measure to see where the circle is)\" to these Try This boxes.",
+      "needs_live_app": false
+    },
+    {
+      "where": "c09-proj-spilhaus.png, Try This \"Drag the measuring circle from the middle of the ocean toward a corner.\" and the white circle with \"12× size\" in the top-left corner of the map",
+      "what": "The task says to start in the middle of the ocean and drag toward a corner, but the measuring circle already sits in the top-left corner, overlapping the \"Greenland\" label.",
+      "why": "Students who read slowly and follow steps literally will be confused, because the first step doesn't match what they see.",
+      "severity": "minor",
+      "suggestion": "Start the measuring circle in the middle of the ocean on Spilhaus, or reword the task as \"Drag the measuring circle to the middle of the ocean, then to a corner.\"",
+      "needs_live_app": false
+    },
+    {
+      "where": "c08-proj-winkel-tripel.png Try This \"Watch Greenland and Antarctica.\"; c11-proj-polar-equal-area.png Try This \"Look at Antarctica around the outer edge.\"",
+      "what": "Only Greenland and Africa are labelled on the map. Antarctica, which two Try This tasks rely on, has no label.",
+      "why": "Students who are new to the country may not know the English place names or where Antarctica appears on an unusual map such as the polar view.",
+      "severity": "minor",
+      "suggestion": "Label Antarctica on the map the same way as Greenland and Africa.",
+      "needs_live_app": false
+    },
+    {
+      "where": "c24-country-greenland-equator.png card: big \"1.0× its real size\" above \"It looks only 0.06× as big here as in its real place (dashed outline).\"; same pattern in c27-country-brazil-polar.png (\"1.1×\" and \"0.6×\")",
+      "what": "The card shows two different comparisons with two × numbers next to each other. The sentence uses a hard comparative structure (\"only 0.06× as big here as in…\") and a small decimal that is hard to picture.",
+      "why": "My English learners will read \"1.0×\" and \"0.06×\" as answers to the same question. \"As big here as in\" is a structure many of them haven't mastered, so the key finding (Greenland is much smaller than it looked) gets lost.",
+      "severity": "slows it down",
+      "suggestion": "Write it as a whole number in a simple sentence, for example \"In its real place it looked 16 times bigger than this.\"",
+      "needs_live_app": false
+    },
+    {
+      "where": "c18-measure-default.png Measure card: \"2.3× size vs. center\", \"1.0 : 1 long : wide\", \"784,000 sq mi\"",
+      "what": "The Measure card relies on abbreviations and notation: \"vs.\", \"long : wide\" with a \"1.0 : 1\" ratio, and \"sq mi\". The explanation of \"Size vs. center\" is in small grey text at the bottom of the panel.",
+      "why": "Abbreviations and ratio notation are extra decoding for English learners. They need the meaning next to the number, not in a footnote.",
+      "severity": "minor",
+      "suggestion": "Spell out the labels (\"times bigger than at the center\", \"times longer than wide\", \"square miles\").",
+      "needs_live_app": false
+    },
+    {
+      "where": "c23-country-greenland.png vs c24-country-greenland-equator.png, the \"ON A GLOBE\" shape in the Country card",
+      "what": "The ON A GLOBE Greenland is a tiny shape in c23 and a much larger shape in c24, although the text under it says \"834,000 sq mi in real life\" both times and the footer says the country \"keeps its real size\" on the globe.",
+      "why": "My English learners lean on the pictures more than the text. A globe shape that grows looks as if Greenland itself got bigger, which is the opposite of the lesson.",
+      "severity": "minor",
+      "suggestion": "Draw the ON A GLOBE shape at the same size every time and change only the ON THIS MAP shape.",
+      "needs_live_app": false
+    },
+    {
+      "where": "c22-country-default.png Country card \"3.7 million sq mi in real life\" (no Miles/Kilometers switch on this tab)",
+      "what": "The Country tab gives areas only in square miles. The Miles / Kilometers switch is shown only on the Measure tab, and I can't tell from the packet whether choosing Kilometers there also changes the Country tab.",
+      "why": "Many of my Spanish-speaking students went to school in km and km², so square miles mean little to them.",
+      "severity": "minor",
+      "suggestion": "Show the Miles / Kilometers switch on the Country tab too, or make the Measure setting apply everywhere.",
+      "needs_live_app": true
+    },
+    {
+      "where": "Packet text, Robinson description \"nothing is perfect, but nothing is badly wrong\"; Robinson ITS STORY \"he adjusted it by eye\"; Spilhaus ITS STORY \"After it went viral online in 2018…\"",
+      "what": "Several sentences use idioms or informal phrases (\"badly wrong\", \"by eye\", \"went viral\", \"next door\"). The Spilhaus ITS STORY paragraph is four long sentences with five names and four dates.",
+      "why": "Idioms are where my English learners lose the meaning even when they know each word, and long name-and-date paragraphs are heavy reading for them.",
+      "severity": "minor",
+      "suggestion": "Replace the idioms with literal words (\"a little wrong everywhere\", \"by looking\", \"became popular online\") and cut the Spilhaus story to two short sentences.",
+      "needs_live_app": false
+    }
+  ]
+}

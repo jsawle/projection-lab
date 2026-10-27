@@ -1,0 +1,125 @@
+{
+  "persona": "S2 Sofía: English learner, Spanish speaker",
+  "overall": "I can do a lot of this with the pictures, the green ✓ and red ✕, and the big numbers, so I would use it. But some English words stop me (“Kept”, “morph”, “squashed”, “next door”, “sq mi”), the maps don’t show where 60° north or the Equator is, and when I open the Country tab the Try this box disappears, so I forget the steps. Nothing is in Spanish.",
+  "works": [
+    "The green ✓ and red ✕ on the Area / Shape / Distance / Direction cards let me compare the maps without reading much, so I can find the maps that keep area (c03–c11).",
+    "The yellow TRY THIS box is on screen for every map on my Chromebook without scrolling (c03–c11).",
+    "Country tab: the ON A GLOBE / ON THIS MAP pictures and the big “16×” then “1.0×” show Greenland getting small without many words (c23, c24).",
+    "Measure tab: the REAL CIRCLE picture next to the ON THIS MAP picture shows the stretching very clearly (c20).",
+    "Many important words are like Spanish (projection, area, distance, direction, Equator, equal), and “What do these words mean?” gives short meanings (c12)."
+  ],
+  "findings": [
+    {
+      "where": "c02-first-view.png, TRY THIS box in the right panel; then c23-country-greenland.png, Country tab panel (also c04-proj-gall-peters.png TRY THIS)",
+      "what": "The Mercator task says “Open the Country tab, tap Greenland and move it to the Equator. How big is it really? Then press 4 to morph to Equal Earth.” When I open the Country tab (c23) the TRY THIS box is gone. The Gall–Peters task also sends me to the Country tab, and then I can’t see it.",
+      "why": "That is three or four steps in English. I read slowly, so I must remember them or keep going back to the Projection tab to read again, and then I lose my place.",
+      "severity": "slows it down",
+      "suggestion": "Keep the current TRY THIS box showing at the top of the Country and Measure tabs (as numbered steps 1, 2, 3) until I go back to the Projection tab.",
+      "needs_live_app": false
+    },
+    {
+      "where": "c03-proj-plate-carree.png and c07-proj-robinson.png: the map and the TRY THIS box",
+      "what": "The tasks say “Drag the measuring circle from the Equator toward the North Pole” (map 1) and “Put the measuring circle at 60° north” (map 5). On the Projection tab the grid lines have no numbers, and the Equator and North Pole have no labels. The words “measuring circle” are not on the map; only the Measure tab (c18) calls it “the white circle” and shows “Circle center: 48°N, 97°W”.",
+      "why": "I can’t tell where 60° north is, or which of all the circles is the measuring one. I would have to guess, or find the Measure tab by myself, and the task doesn’t tell me to.",
+      "severity": "slows it down",
+      "suggestion": "On the Projection tab, label the Equator and the 60° N / 60° S lines on the map, show the white circle’s position (like “48°N”) in its label, and write “the white measuring circle” in the tasks.",
+      "needs_live_app": false
+    },
+    {
+      "where": "c02-first-view.png, the four cards under the map name (Area, Shape, Distance, Direction); c12-glossary-open.png, “What do these words mean?”",
+      "what": "The cards say “Distorted”, “Kept · For small areas”, “Kept · Compass headings”, “Nearly kept” (c07) and “Partly kept · Along north–south lines” (c03). The word help in c12 explains Area, Shape, Distance and Direction, but not “Distorted”, “Kept” or “headings”, and not what the ≈ and ◐ signs mean.",
+      "why": "“Kept” is the word I need most to say which map is fairest, and I don’t know it with this meaning. I can guess from the green ✓ and red ✕, but I can’t tell the difference between “Nearly kept” and “Partly kept”.",
+      "severity": "slows it down",
+      "suggestion": "Add Distorted (changed, not true), Kept (stays true, like on a globe), Nearly kept and Partly kept to “What do these words mean?”, or use simpler card words such as “True” and “Changed”.",
+      "needs_live_app": false
+    },
+    {
+      "where": "TRY THIS boxes on c05-proj-mercator.png, c03-proj-plate-carree.png, c06-proj-equal-earth.png and c11-proj-polar-equal-area.png",
+      "what": "Words that stop me in the tasks: “morph” (“press 4 to morph to Equal Earth”), “stretch up and down, or side to side” (map 1), “shrink” (“Watch Greenland shrink and Africa grow”), “next door” (“Compare this map with Polar Equidistant, next door”).",
+      "why": "These are the instructions I have to follow for my grade. I don’t know “morph”, and I know “next door” only as the house beside mine, so I don’t understand which map it means.",
+      "severity": "slows it down",
+      "suggestion": "Use plain words in the tasks: “change to” for “morph”, “get smaller” for “shrink”, and “map 8, just before this one in the tray” for “next door”.",
+      "needs_live_app": false
+    },
+    {
+      "where": "WHAT THE CIRCLES SHOW paragraph on c07-proj-robinson.png, c08-proj-winkel-tripel.png, c10-proj-polar-equidistant.png, c11-proj-polar-equal-area.png; the note under the word help in c12-glossary-open.png",
+      "what": "Hard words: “a bit squashed”, “lean slightly near the edges”, “no part of the map is badly wrong”, “squeezed toward the center”, “wraps around the map like a ring”, “flatten toward the poles”, and in c12 “You can’t flatten a ball without stretching or tearing it”.",
+      "why": "This paragraph tells me what to look for. I can see the ovals in the picture, but I can’t check if I am seeing what the text means.",
+      "severity": "minor",
+      "suggestion": "Use shorter sentences with common words (“a little flat”, “tilted”, “pushed in”) and put a tiny picture of one circle next to the sentence.",
+      "needs_live_app": false
+    },
+    {
+      "where": "c02-first-view.png, header and right panel (no language choice anywhere); About dialog c28-about-top.png to c30-about-bottom.png",
+      "what": "Everything is in English. I can’t see any Spanish button or language choice on any screen.",
+      "why": "I read Spanish well. With Spanish for the Try this tasks and the four cards I could do the work much faster. I can’t tell from the screenshots if the Chromebook’s translate button works on this page.",
+      "severity": "slows it down",
+      "suggestion": "Add an “Español” switch for the panel text, the Try this tasks, the card words and the word help.",
+      "needs_live_app": true
+    },
+    {
+      "where": "Tray under the map, tiles 5 Robinson and 6 Winkel Tripel: “Compromise” (c02-first-view.png); Robinson panel in c07-proj-robinson.png",
+      "what": "The tray says “Compromise” under Robinson and Winkel Tripel.",
+      "why": "In Spanish “compromiso” means a promise or a duty, so I think it means something else. The Robinson panel explains it (“nothing is perfect, but nothing is badly wrong”), but only after I choose that map.",
+      "severity": "minor",
+      "suggestion": "Use a word like “Balanced” in the tray, or add “Compromise” to “What do these words mean?”.",
+      "needs_live_app": false
+    },
+    {
+      "where": "c09-proj-spilhaus.png, c10-proj-polar-equidistant.png, c11-proj-polar-equal-area.png: tray names vs. the panel heading",
+      "what": "The tray says “Polar Equidistant” but the heading says “Polar Azimuthal Equidistant”; the tray says “Polar Equal-Area” but the heading says “Lambert Azimuthal Equal-Area”; the tray says “Spilhaus” but the heading says “Spilhaus World Ocean Map”. The map 9 task then uses the tray name again: “Compare this map with Polar Equidistant”.",
+      "why": "When the name changes I am not sure I clicked the right map, and I don’t know which name to write in my answer.",
+      "severity": "minor",
+      "suggestion": "Use the same short name in the heading as in the tray, and put the long name under it in smaller text.",
+      "needs_live_app": false
+    },
+    {
+      "where": "c24-country-greenland-equator.png, Country tab card and the label on the map",
+      "what": "After pressing “Equator” the card says “1.0× its real size” and also “It looks only 0.06× as big here as in its real place (dashed outline).” The map label says “Greenland 1.0× its real size”.",
+      "why": "The task asks “How big is it really?” and I see two different numbers. I don’t understand “0.06× as big here as in”: a × with a number smaller than 1 is hard for me, and I can’t tell which number answers the question.",
+      "severity": "slows it down",
+      "suggestion": "Say it more simply, for example “Up north this map drew it 16 times too big. Here it is drawn the right size.”, and point to the 834,000 number as its real size.",
+      "needs_live_app": false
+    },
+    {
+      "where": "c23-country-greenland.png, “834,000 sq mi in real life”; c22-country-default.png, “3.7 million sq mi in real life”",
+      "what": "Country sizes are in “sq mi”. The Measure tab (c18) has a Miles / Kilometers switch, but the Country tab shows none.",
+      "why": "Where I grew up we used km². I don’t know how big a square mile is, and “sq mi” is a short form I never learned. I can’t tell if the Measure tab switch also changes the Country tab.",
+      "severity": "minor",
+      "suggestion": "Put the Miles / Kilometers switch on the Country tab too (or show km² next to it), and write “square miles” in full.",
+      "needs_live_app": true
+    },
+    {
+      "where": "c09-proj-spilhaus.png, top-left of the map and the TRY THIS box",
+      "what": "The task says “Drag the measuring circle from the middle of the ocean toward a corner.” But the white circle is already in the top-left corner (“12× size still round”), and its label sits on top of the “Greenland” label.",
+      "why": "The task tells me to start in the middle, but the circle isn’t there, so I think I did something wrong. I also can’t read Greenland’s name.",
+      "severity": "minor",
+      "suggestion": "On Spilhaus, start the white circle in the middle of the ocean, or change the task to “Drag the white circle to the middle of the ocean, then to a corner.”",
+      "needs_live_app": false
+    },
+    {
+      "where": "c10-proj-polar-equidistant.png and c11-proj-polar-equal-area.png: the round maps and the TRY THIS boxes",
+      "what": "Map 8 says “Drag the measuring circle from near the North Pole down to South America” and map 9 says “Look at Antarctica around the outer edge”. On these round maps the North Pole, South America and Antarctica have no labels (only Greenland and Africa do). On map 9 Antarctica is only a thin pale ring at the edge.",
+      "why": "The world looks turned around on these maps. I can’t find South America fast, and “down” doesn’t help because it is on the left side. I can hardly see Antarctica on map 9.",
+      "severity": "minor",
+      "suggestion": "Label the North Pole, South America and Antarctica on the two polar maps, the same way Greenland and Africa are labelled.",
+      "needs_live_app": false
+    },
+    {
+      "where": "c18-measure-default.png, under ON THIS MAP: “size vs. center” and “1.0 : 1 long : wide”",
+      "what": "The labels “size vs. center” and “long : wide” with “1.0 : 1”. What “size vs. center” means is only in the small grey text at the bottom.",
+      "why": "I don’t know “vs.”, and the ratio is hard to read. The two circle pictures help me more than these words.",
+      "severity": "minor",
+      "suggestion": "Write “times bigger than in the middle of the map” and “how stretched (1 = round)”.",
+      "needs_live_app": false
+    },
+    {
+      "where": "c02-first-view.png TRY THIS “Then press 4 to morph to Equal Earth” (done after using the Country tab, c23–c24); the small number in the top-left corner of each tray tile",
+      "what": "The task tells me to press 4 after I have used the Country tab, where I may have clicked the country list or a button. I can’t tell from the screenshots if pressing 4 still changes the map then. The tiny “4” on the Equal Earth tile is the only clue that I can click the picture instead.",
+      "why": "If 4 does nothing I won’t know why, and I may not think to click the Equal Earth picture.",
+      "severity": "minor",
+      "suggestion": "Write “press 4 (or click Equal Earth in the row of maps)” and make the tray numbers bigger.",
+      "needs_live_app": true
+    }
+  ]
+}

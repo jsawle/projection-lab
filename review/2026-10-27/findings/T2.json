@@ -1,0 +1,133 @@
+{
+  "persona": "T2 Dana, first-year teacher",
+  "overall": "I'd like to use the Greenland-to-the-Equator part with my 8th graders. It's one click, and the dashed outline makes the point without me having to explain much. What holds me back is that nothing tells me the answers to the 'Try this' questions, so for a couple of them I couldn't work out the answer myself. Some numbers and names on my projector also don't match what students see, and if the school filter blocks the map I don't know what to tell IT.",
+  "works": [
+    "The Country tab's 'Equator' button plus the dashed outline left in Greenland's real place gives a clear 'aha' I can show in one click (c24, c25).",
+    "The ✓/✕ fact cards and 'What do these words mean?' give me plain definitions of area, shape, distance and direction to use in class (c12).",
+    "The tray is numbered 1 to 9 and grouped by shape, and the 2-second morph helps students keep track of where they are when the map changes (c14).",
+    "The Equal Earth and Gall–Peters Country cards say the answer outright: 'Same size here as in its real place … This map keeps area.' I can check students against that (c25).",
+    "No sign-in or install, and the loading error is in plain words with a 'Try again' button."
+  ],
+  "findings": [
+    {
+      "where": "Projection tab, the 'TRY THIS' box on all nine maps (e.g. c02, c06, c08, c11); About dialog (c28–c30)",
+      "what": "Every 'Try this' ends in a question ('How big is it really?', 'Which map shows their true sizes?', 'Which map makes it bigger?'), but the app never gives the answer or says what students should notice. The About dialog has no teacher section either. It only covers how the app is built.",
+      "why": "I need to tell a good answer from a wrong one in real time. If a student asks me and I'm not sure, I lose the room.",
+      "severity": "slows it down",
+      "suggestion": "Add a 'Show answer / What to notice' reveal under each 'Try this', or a one-page teacher guide linked from About with the expected answer to each question.",
+      "needs_live_app": false
+    },
+    {
+      "where": "c08 Winkel Tripel 'TRY THIS': 'Switch between Robinson and Winkel Tripel. Watch Greenland and Antarctica. Which map makes them bigger?'; fact cards in c07 and c08",
+      "what": "The fact cards for Robinson and Winkel Tripel are the same: 'Nearly kept' four times on each. Comparing c07 and c08, I honestly couldn't tell which map makes Greenland and Antarctica bigger, and the app doesn't say.",
+      "why": "This is exactly the question I couldn't answer if a student asked. I also can't explain why National Geographic switched from one to the other when the cards are the same.",
+      "severity": "slows it down",
+      "suggestion": "State the answer in the 'What the circles show' text and add one line saying how Winkel Tripel differs from Robinson.",
+      "needs_live_app": false
+    },
+    {
+      "where": "c07 Robinson 'TRY THIS': 'Put the measuring circle at 60° north, then switch to Mercator. How much bigger does it get?'",
+      "what": "The Projection tab doesn't show where the circle is: the on-map label only says '1.2× size / stretched into an oval' and the grid lines aren't labelled. The latitude ('Circle center: …') only appears on the Measure tab. 'How much bigger' is also unclear, because the label compares the circle with the map's center, not with Robinson. Students could reasonably answer about 4×, or 4 ÷ 1.2.",
+      "why": "Students won't know when they've reached 60° north, and I'll get several different 'right' numbers with no way to judge them.",
+      "severity": "slows it down",
+      "suggestion": "Reword it as: 'On the Measure tab, drag the circle until Circle center reads 60°N. Note the × size. Press 3 and note it again.' Then give the expected pair of numbers.",
+      "needs_live_app": false
+    },
+    {
+      "where": "c02/c05 Mercator 'TRY THIS' ('Open the Country tab, tap Greenland and move it to the Equator. How big is it really? Then press 4 to morph to Equal Earth.') compared with c23/c24 (Country tab open)",
+      "what": "The 'Try this' box sits on the Projection tab. The moment a student follows step 1 and opens the Country tab, the instructions disappear, including the last step ('press 4'). The Gall–Peters 'Try this' has the same problem.",
+      "why": "Students will forget the rest of the steps and ask me, or stop after moving Greenland. I'd have to write the steps on the board.",
+      "severity": "slows it down",
+      "suggestion": "Keep the current 'Try this' visible (pinned at the top of the panel) whichever tab is open, or repeat it on the Country tab.",
+      "needs_live_app": false
+    },
+    {
+      "where": "Packet, 'How it behaves': error text 'The maps couldn’t load.' 'This lab needs an internet connection to reach ArcGIS. Check your connection, then try again.'; About dialog (c28–c30)",
+      "what": "The only help when the map fails is 'check your connection'. Nowhere in the app does it say which web addresses it needs (Esri map code, ArcGIS services, fonts). On a school network the more likely cause is a content filter, and the connection will look fine.",
+      "why": "If it fails on the day, my whole lesson is gone and I can't tell IT what to unblock. I'd want to check this before I plan the lesson around the app.",
+      "severity": "stops the lesson",
+      "suggestion": "Add a line to the error and to About, e.g. 'At school? Ask IT to allow js.arcgis.com, services.arcgis.com, services.arcgisonline.com and fonts.googleapis.com.' Include a test link a teacher can try the day before.",
+      "needs_live_app": false
+    },
+    {
+      "where": "c02, the round buttons under the map (bottom left); 'Country' flag button vs 'Country' tab (top right)",
+      "what": "Four of the round buttons have no visible words: satellite picture, circles, grid and Animate show as small icons, and the names only appear on hover. There are also two controls both called 'Country': the flag button under the map and the tab in the panel.",
+      "why": "When I'm demonstrating and say 'turn off the circles' or 'click Country', students have to guess which icon or which 'Country' I mean. Hover text doesn't help when I'm pointing at a projector.",
+      "severity": "slows it down",
+      "suggestion": "Put short text labels under the round buttons ('Picture', 'Circles', 'Grid', 'Animate'). Either label the flag button differently (e.g. 'Move a country') or drop one of the two.",
+      "needs_live_app": false
+    },
+    {
+      "where": "c16 (circles and grid switched off) vs c02; packet list 'Every button and control on screen'",
+      "what": "The control list has no 'start over' or 'reset' button. When circles or grid are off, the only sign is that the button outline turns from yellow to grey (c16 vs c02), which is easy to miss.",
+      "why": "A student who switches the circles off by accident will see a different map from mine and won't know why. I need a quick way to say 'press Reset' and get everyone back to the same screen.",
+      "severity": "slows it down",
+      "suggestion": "Add a 'Reset' button that turns everything back on, returns to Mercator and the whole world, and puts the measuring circle back at its start. Make the off state of the toggles more obvious.",
+      "needs_live_app": false
+    },
+    {
+      "where": "c02, c05, p01 and p03 ('2.0× size', p03 'Circle center: 45°N, 105°W') vs c12, c13, c18 ('2.3× size', 'Circle center: 48°N, 97°W'); p02 'Greenland at 0°, 40°W' vs c24 '0°, 41°W'",
+      "what": "On Mercator the measuring circle starts in different places with different numbers: 2.0× in the projector shots and the Chromebook first view, 2.3× in other Chromebook shots. Greenland moved to the Equator reads 40°W on the projector and 41°W on the Chromebook.",
+      "why": "If my projected screen says '2.0×' and students' Chromebooks say '2.3×', they'll ask who is right, and I won't know why the numbers differ.",
+      "severity": "minor",
+      "suggestion": "Start the measuring circle at the same fixed point (e.g. 45°N, 100°W) on every screen size, and round the Equator move the same way everywhere.",
+      "needs_live_app": true
+    },
+    {
+      "where": "c09, c21, c26 Spilhaus: the corners of the square (top right, bottom left, right edge)",
+      "what": "The corners show brown, streaky, smeared imagery and huge partial pink circles. Nothing on screen says this is expected. The panel only says circles are '15 to over 40 times bigger near the corners'.",
+      "why": "Students will say 'it's glitching', and I can't tell whether it's broken or meant to look like that.",
+      "severity": "slows it down",
+      "suggestion": "Add one sentence to the Spilhaus panel, e.g. 'The blurry streaks in the corners are where this map stretches the picture 40 times or more. It isn't broken.'",
+      "needs_live_app": false
+    },
+    {
+      "where": "c09 (label '12× size / still round' on top of 'Greenland'); c10 ('1.1× size / still round' crowding 'Greenland'); c26 ('United States / 9.3× its real size' floating outside the right edge of the square)",
+      "what": "On the Spilhaus and polar maps, labels overlap each other or sit away from the shape they describe. On Spilhaus the US label is off the map and the US itself is in pieces in the corners.",
+      "why": "When I ask 'find the United States' or 'read the number next to Greenland', students can't tell which label belongs to what.",
+      "severity": "minor",
+      "suggestion": "Keep labels inside the map and away from other labels. On Spilhaus, point the country label at its largest piece.",
+      "needs_live_app": false
+    },
+    {
+      "where": "c11 heading 'Lambert Azimuthal Equal-Area' vs tray 'Polar Equal-Area' and the panel's own 'More about Polar Equal-Area'; c10 'Polar Azimuthal Equidistant' vs tray 'Polar Equidistant'; c09 'Spilhaus World Ocean Map' vs tray 'Spilhaus'",
+      "what": "The same map has different names in the tray and the panel heading, and even within the panel itself.",
+      "why": "If I read the heading aloud ('click Lambert Azimuthal Equal-Area'), students won't find that name in the tray.",
+      "severity": "minor",
+      "suggestion": "Use the tray name as the heading and put the full name underneath in smaller text.",
+      "needs_live_app": false
+    },
+    {
+      "where": "c24 / p02 Country card after 'Equator': big '1.0× its real size' and 'It looks only 0.06× as big here as in its real place (dashed outline).'; Mercator 'TRY THIS': 'How big is it really?'",
+      "what": "There are three possible answers on screen: '834,000 sq mi', '1.0×' and '0.06×'. Two different comparisons ('its real size' vs 'its real place') are expressed as decimals. Most 8th graders won't read '0.06×' as 'about one-sixteenth'.",
+      "why": "This is the headline activity. I'll get a mix of '1', '0.06' and '834,000' as answers and have to untangle what each number means on the spot.",
+      "severity": "slows it down",
+      "suggestion": "Use words and fractions, e.g. 'At its real size. Up north this map draws it about 16 times too big.' Then say in the 'Try this' which number answers 'How big is it really?'.",
+      "needs_live_app": false
+    },
+    {
+      "where": "p01, p02, p03 (projector 1280×720): on-map labels ('1.0× its real size', 'still round'), tray captions ('Simple grid', 'Web maps'), Greenland at the Equator in p02",
+      "what": "At projector size, the on-map labels and captions are very small. Greenland at the Equator is a tiny yellow shape, and the Mercator map uses only the middle third of the map area.",
+      "why": "Students at the back won't be able to read the numbers I'm pointing at during the demo.",
+      "severity": "slows it down",
+      "suggestion": "Add a 'Present' option that enlarges on-map labels and the key number. Alternatively, have the Equator/60° N buttons zoom to the moved country automatically.",
+      "needs_live_app": false
+    },
+    {
+      "where": "Packet, 'About dialog, full text', ANIMATION CHECK: 'Last morph: Mercator → Equal Earth, 51 frames in 500017.6 s (0 frames per second).'",
+      "what": "The About dialog has a technical line saying the last animation took 500,017 seconds at 0 frames per second.",
+      "why": "If I open About looking for help, this reads like an error report and makes me worry something is broken on my Chromebook.",
+      "severity": "minor",
+      "suggestion": "Remove the animation check from the teacher-facing About, or put it under a collapsed 'Technical details' heading with a correct reading.",
+      "needs_live_app": false
+    },
+    {
+      "where": "c03 Plate Carrée: 'TRY THIS Drag the measuring circle from the Equator toward the North Pole. Does it stretch up and down, or side to side?' and the circle label '1.4× size / a little squashed'",
+      "what": "The circle starts over North America (about 48°N), not at the Equator, so students first have to find the Equator. The label says 'a little squashed' but the question asks about 'stretch'. Students may answer 'squashed', which is neither option.",
+      "why": "It costs time getting everyone to the starting point and leaves me judging an answer that uses the app's own word but doesn't match the question.",
+      "severity": "minor",
+      "suggestion": "Say 'First drag the circle to the Equator line', and use the same words in the label and the question (e.g. label 'stretched side to side').",
+      "needs_live_app": false
+    }
+  ]
+}

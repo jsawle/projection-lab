@@ -1,0 +1,141 @@
+{
+  "persona": "T3 Luis: shared devices and short periods",
+  "overall": "The Greenland-to-the-Equator idea is exactly the kind of thing I'd put up on the projector, and it's nice that it works on phones with no sign-in. But on my 1280x720 projector the map only takes up about a third of the screen and most of the text is too small for the back rows. If the district filter or our slow network gets in the way there's nothing to fall back on: no paper version, and no list of addresses I could send IT. So I'd try it at the front of the room first, and only book the cart once I knew it got through the filter.",
+  "works": [
+    "Nothing to install and no sign-in, so a borrowed cart Chromebook or a student's phone can open it straight away.",
+    "The key result is written on the map itself, right next to the country or circle (e.g. 'United States 2.3x its real size', '2.0x size still round'), so students don't have to find it in the side panel.",
+    "The Equator / 60° N / 60° S / Real place buttons mean nobody has to drag a tiny country with a finger or a trackpad. They're also easy for me to click quickly at the front.",
+    "On a phone the page drops into one column with the map at full width, and nothing is cut off at the sides (m01-m04).",
+    "The TRY THIS boxes are short questions with a clear purpose, and I could put them on a paper worksheet."
+  ],
+  "findings": [
+    {
+      "where": "Packet 'How it behaves': the 'can't reach ArcGIS' screen and the list of web addresses it needs; About dialog (c28-c30)",
+      "what": "The app needs six addresses (jsawle.github.io, js.arcgis.com, services.arcgis.com, services.arcgisonline.com, fonts.googleapis.com, fonts.gstatic.com), but the app never tells the teacher this. The About dialog doesn't list them, and neither does the error screen.",
+      "why": "Our district filter decides what loads. To get it unblocked I'd need to send IT an exact list before booking the cart a week ahead. Right now I'd only find out it's blocked in front of 30 kids.",
+      "severity": "slows it down",
+      "suggestion": "Add a short 'For teachers / IT' line in About (and a link to it on the error screen) listing every address the app needs.",
+      "needs_live_app": false
+    },
+    {
+      "where": "Packet 'How it behaves': error text “The maps couldn’t load.” “This lab needs an internet connection to reach ArcGIS. Check your connection, then try again.”",
+      "what": "When it's the filter blocking ArcGIS, the message still tells students to check their connection and try again. Their Wi-Fi is fine, so 'Try again' will just keep failing.",
+      "why": "Thirty students will press Try again and call me over. I lose five minutes of a 45-minute period before I realise it's the filter, not the network.",
+      "severity": "slows it down",
+      "suggestion": "Reword it to something like 'Your network may be blocking ArcGIS. Ask your teacher.' and show the list of needed addresses under the message.",
+      "needs_live_app": false
+    },
+    {
+      "where": "Whole packet (page text, About dialog, error screen)",
+      "what": "Nothing is there to fall back on if the app doesn't load: no printable sheet of the nine maps with the circles, no student worksheet, no offline or image-only version. Everything depends on live ArcGIS.",
+      "why": "My class often follows on paper while I project. If the app is blocked or crawling, the lesson simply stops. A one-page handout would save the period, and I could use it for the students who don't get a device.",
+      "severity": "stops the lesson",
+      "suggestion": "Link a downloadable PDF from About and from the error screen: the nine projections with the same-size circles, Greenland at its real place and at the Equator, and the TRY THIS questions as a worksheet.",
+      "needs_live_app": false
+    },
+    {
+      "where": "Packet 'How it behaves': loading messages (Loading the ArcGIS projection engine… through Draping the satellite imagery…)",
+      "what": "There's no screenshot of the loading screen and no timing. I can't tell how long it takes to get through six loading steps plus the satellite imagery when a whole cart loads it at once over school Wi-Fi, or whether old cart Chromebooks run the 2-second morph smoothly.",
+      "why": "In a 45-minute period, a 2-3 minute load on every device is a big part of the lesson. I need to know before I plan around it.",
+      "severity": "slows it down",
+      "suggestion": "Show the real progress on the loading screen, and offer a lighter start with the imagery off when loading is slow.",
+      "needs_live_app": true
+    },
+    {
+      "where": "Packet 'How it behaves': the list of needed web addresses",
+      "what": "I can't tell what happens if only part of it gets through, for example Google Fonts or the satellite pictures (services.arcgisonline.com) are blocked but the country outlines aren't. Does it still run with plain maps, or does it fail completely?",
+      "why": "District filters often block just one domain. If the circles and countries still worked without imagery, I could still teach the lesson.",
+      "severity": "slows it down",
+      "suggestion": "If imagery or fonts fail, keep running with the imagery switched off and a short note, instead of showing 'The maps couldn’t load'.",
+      "needs_live_app": true
+    },
+    {
+      "where": "p01-projector-first-view.png: map panel (left), Mercator map about x 190-680 of 1280",
+      "what": "At 1280x720 the Mercator map is only about 490 px wide. There's empty dark space on both sides, and the side panel and the projection tray take up the rest of the screen. The circles at the Equator are about 20 px across.",
+      "why": "From the back of my room, students can just about see that the top circles are bigger than the middle ones. Any finer difference is lost. I teach mostly from the projector, so the map has to be the biggest thing on screen.",
+      "severity": "slows it down",
+      "suggestion": "Add a 'Present' button that hides the side panel and tray, makes the map fill the screen, and puts the main number in large type.",
+      "needs_live_app": false
+    },
+    {
+      "where": "p01-projector-first-view.png and p03-projector-measure.png: on-map labels ('Greenland', 'Africa', '2.0× size still round'), property card sub-text ('Distorted', 'Kept · Compass headings'), 'WHAT THE CIRCLES SHOW', tray sub-labels ('Simple grid', 'Equal area'), Measure footnote",
+      "what": "At 1280x720 a lot of the text is only about 10-12 px. Some of it is pale red or green on dark navy, like 'Distorted' and 'Kept · For small areas'. Only the panel's main body text and the big numbers are larger.",
+      "why": "Students past the third row can't read the labels or which properties are kept or distorted. I'd have to read every line out loud.",
+      "severity": "slows it down",
+      "suggestion": "Add a large-text or presentation setting that makes the on-map labels and the Area/Shape/Distance/Direction cards at least 1.5x bigger, with brighter text.",
+      "needs_live_app": false
+    },
+    {
+      "where": "p02-projector-country.png: Greenland at the Equator on the map (yellow outline near 0°, 40°W) and the panel sentence 'It looks only 0.06× as big here as in its real place (dashed outline).'",
+      "what": "On the projector, Greenland at the Equator is a yellow shape about 15 px tall with a small label ('1.0× its real size'). The comparison with its real place appears only in the panel, as the decimal '0.06×', in about 13 px bold text.",
+      "why": "This is the 'wow' moment of the lesson. The back rows can't see the small shape or read the sentence, and '0.06×' means nothing to many of my 8th graders. '16 times smaller' would land straight away.",
+      "severity": "slows it down",
+      "suggestion": "Put the comparison on the map in large type, worded as a whole number, e.g. 'Drawn 16 times bigger up north than here'.",
+      "needs_live_app": false
+    },
+    {
+      "where": "p01-projector-first-view.png: Projection panel bottom edge (box cut off below the TRY THIS box)",
+      "what": "At 1280x720 the panel ends just below TRY THIS. 'More about Mercator' is cut off and the panel needs scrolling.",
+      "why": "It's a small thing, but scrolling inside a panel at the front breaks the flow, and students watching don't realise there's more below.",
+      "severity": "minor",
+      "suggestion": "Tighten the spacing at 720 px tall so the 'More about' line is visible without scrolling.",
+      "needs_live_app": false
+    },
+    {
+      "where": "p01-projector-first-view.png: right-hand button of the − / + group under the map (corner-bracket icon); packet controls list: hover text 'Show the whole world (0)'",
+      "what": "The third zoom button uses the four-corner icon that usually means 'full screen', but what it does is 'Show the whole world'. As far as the packet shows, there is no full-screen button.",
+      "why": "The first thing I'd click on the projector is that icon to go full screen. When nothing happens, I lose time.",
+      "severity": "minor",
+      "suggestion": "Use a globe or 'fit' icon for 'Show the whole world', and add a real full-screen button next to it.",
+      "needs_live_app": false
+    },
+    {
+      "where": "m01-phone-first-view.png / m02-phone-full-page.png: TRY THIS box 'Then press 4 to morph to Equal Earth'; Equal Earth TRY THIS 'Press 3 for Mercator and 4 for Equal Earth a few times'; phone projection tiles",
+      "what": "The prompts say to press number keys, but phones have no keyboard. The phone tiles also drop the 1-9 numbers that the Chromebook tray shows, so a student can't even work out which tile is '4'.",
+      "why": "My students on phones will get stuck on the main activity and put their hands up.",
+      "severity": "slows it down",
+      "suggestion": "Word the prompts by name, e.g. 'tap Equal Earth (or press 4)', and keep the small numbers on the phone tiles.",
+      "needs_live_app": false
+    },
+    {
+      "where": "m03-phone-country.png / m04-phone-measure.png: the Country and Measure readouts and the Equator / 60° N / 60° S / Real place buttons, below the 3x3 projection tiles",
+      "what": "On a phone, the Country and Measure readouts and the 'Move it to' buttons sit under the nine projection tiles, about a full screen below the map. After pressing 'Equator' the student has to scroll back up to see what happened on the map. The sentence comparing the size with its real place is never on screen together with the map.",
+      "why": "For pairs sharing one phone, every move means scrolling up and down, which wastes time and loses the 'watch it change' effect.",
+      "severity": "slows it down",
+      "suggestion": "On narrow screens, put the tab panel straight under the map and move the projection tiles to a single swipeable row (or below the panel).",
+      "needs_live_app": false
+    },
+    {
+      "where": "m01-phone-first-view.png: the five round buttons under the map (flag, imagery, circles, grid, wave); p01 the same row with only 'Country' labelled",
+      "what": "On the phone the round buttons are icons only, with no words, not even 'Country' beside the flag. On a touch screen there's no hover text to explain them.",
+      "why": "When I tell the class 'turn the grid off' or 'turn Animate on', the students on phones (and some on Chromebooks) will have to guess which icon is which.",
+      "severity": "slows it down",
+      "suggestion": "Add a one-word label under each round button (Country, Imagery, Circles, Grid, Animate), at least on phones.",
+      "needs_live_app": false
+    },
+    {
+      "where": "m03-phone-country.png / m04-phone-measure.png: the map at the top of the phone page",
+      "what": "I can't tell whether dragging a country or the white circle on a phone moves it or scrolls the page. I also can't tell whether a tiny shape, like Greenland at the Equator on Mercator, can be grabbed with a finger.",
+      "why": "If dragging scrolls the page instead, half of the Country and Measure activities won't work on my students' phones.",
+      "severity": "slows it down",
+      "suggestion": "Make sure a drag that starts on the map never scrolls the page, and give the chosen country or circle a bigger touch target than its drawn size.",
+      "needs_live_app": true
+    },
+    {
+      "where": "Packet c02 note 'it opens on Mercator, Projection tab'",
+      "what": "I can't tell whether a link can open the app already set up, e.g. on the Country tab with Greenland chosen.",
+      "why": "In 45 minutes, with devices handed out late from the cart, a link I can post that opens the exact starting point would save several minutes of 'click here, now there'.",
+      "severity": "minor",
+      "suggestion": "Support links that set the starting projection, tab and country, and add a 'Copy link to this view' button.",
+      "needs_live_app": true
+    },
+    {
+      "where": "About dialog, ANIMATION CHECK: 'Last morph: Mercator → Equal Earth, 51 frames in 500017.6 s (0 frames per second).'",
+      "what": "The animation check says 500,017 seconds and 0 frames per second for a 2-second morph, which is obviously wrong.",
+      "why": "This is the only line that could tell me whether the morph runs well on an old cart Chromebook, and it gives a meaningless answer.",
+      "severity": "minor",
+      "suggestion": "Fix the timing, and add a plain verdict such as 'Smooth on this device' or 'Slow on this device: try turning Animate off'.",
+      "needs_live_app": false
+    }
+  ]
+}

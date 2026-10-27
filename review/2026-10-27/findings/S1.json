@@ -1,0 +1,133 @@
+{
+  "persona": "S1 Jordan (8th grader, reads below grade level, on own Chromebook)",
+  "overall": "I'd use it. The map is cool, the yellow Try this box is easy to find, and the Equator button made the Greenland one easy. What stops me is the words (Distorted, morph, equal-area, 60° north) and some tasks I can't do without asking, like putting the circle at 60° north when nothing tells me where that is. Also when a task says to press another map, my question disappears.",
+  "works": [
+    "Every map fits on one Chromebook screen: picture, short one-line description and the yellow TRY THIS box, no scrolling (c02-first-view.png).",
+    "The tray of nine pictures with numbers makes switching maps quick, and the gold outline shows which one I'm on.",
+    "The Country tab's Equator / 60° N / 60° S / Real place buttons mean I don't have to drag carefully, and the map label \"16× its real size\" on Greenland is easy to get (c23-country-greenland.png).",
+    "The red ✕ and green ✓ chips for Area, Shape, Distance and Direction let me compare maps without reading much.",
+    "The Measure tab's two pictures (REAL CIRCLE next to ON THIS MAP) and plain sentences like \"Still round\" or \"Very stretched\" show what the numbers mean (c20-measure-equal-earth.png)."
+  ],
+  "findings": [
+    {
+      "where": "c12-glossary-open.png, \"What do these words mean?\" list, and the chips above it in c02-first-view.png (\"Distorted\", \"Kept\", \"Nearly kept\", \"Partly kept\", and the ✕ ✓ ≈ ◐ symbols)",
+      "what": "The word help explains Area, Shape, Distance and Direction, but not \"Distorted\", which is on every map. It also doesn't say what ≈ and ◐ mean or how \"Nearly kept\" is different from \"Partly kept\".",
+      "why": "Distorted is the main word I need to decide which map is fairest, and I don't know it. I can guess from the red ✕, but I can't explain my answer.",
+      "severity": "slows it down",
+      "suggestion": "Add to the word list: \"Distorted: changed. Made bigger, smaller or squashed\", plus a one-line key: ✓ kept · ≈ nearly kept · ◐ kept only in some places · ✕ changed.",
+      "needs_live_app": false
+    },
+    {
+      "where": "Packet text, Projection tab: Mercator TRY THIS \"Then press 4 to morph to Equal Earth\"; Equal Earth \"A newer equal-area map\"; Robinson \"A compromise map\"; Plate Carrée \"every line of latitude and longitude is evenly spaced\"; tray subtitles \"Equal area\" and \"Compromise\"",
+      "what": "These are the words that stop me on the main screens: morph, equal-area, compromise, latitude, longitude, Equator, poles, 60° north, 45° north and south. None of them are in the word help. (In More about there are also cylindrical, conformal, pseudocylindrical, azimuthal and WKID, but I'd skip that part.)",
+      "why": "When I hit a word I don't know in a short task, I stop and ask or I give up on that map. Gall–Peters says the same idea in plain words (\"Shows every country at its true size compared with the others\"), so I can tell it can be done.",
+      "severity": "slows it down",
+      "suggestion": "Change \"morph to\" to \"switch to\", change Equal Earth's line to \"Shows every country at its true size, with shapes more like a globe\", and add equal area, compromise, Equator and latitude to the word list.",
+      "needs_live_app": false
+    },
+    {
+      "where": "c07-proj-robinson.png, TRY THIS: \"Put the measuring circle at 60° north, then switch to Mercator.\" Also c03-proj-plate-carree.png: \"Drag the measuring circle from the Equator toward the North Pole.\"",
+      "what": "On the Projection tab nothing tells me where 60° north or the Equator is. The grid lines have no labels, and the white circle's label only says \"1.2× size\". Its latitude only shows on the Measure tab (\"Circle center: 48°N, 97°W\"), and the Try this doesn't tell me to go there.",
+      "why": "I can't do this task without asking. I'd just drag it somewhere near the top and hope.",
+      "severity": "slows it down",
+      "suggestion": "Show the latitude in the white circle's map label (for example \"48°N · 1.2× size\"), or label the Equator and 60° N lines on the map.",
+      "needs_live_app": false
+    },
+    {
+      "where": "c03-proj-plate-carree.png, TRY THIS \"Drag the measuring circle...\", and the white ring with a dot on the map over the USA",
+      "what": "The Projection tab never says which thing is \"the measuring circle\" or that I can drag it. \"Drag the white circle on the map\" only appears on the Measure tab. There are 55 pink circles plus one white one.",
+      "why": "I might try dragging a pink circle, or the whole map, and think it's broken.",
+      "severity": "slows it down",
+      "suggestion": "Write \"Drag the white circle\" in every Try this that uses it, instead of \"the measuring circle\".",
+      "needs_live_app": false
+    },
+    {
+      "where": "c06-proj-equal-earth.png TRY THIS \"Press 3 for Mercator and 4 for Equal Earth a few times... Which map shows their true sizes?\"; also Robinson (c07) \"switch to Mercator. How much bigger does it get?\", Winkel Tripel (c08) and Polar Equal-Area (c11)",
+      "what": "These tasks tell me to switch to another map. When I do, the whole panel changes to that map's text, so the question I was answering disappears (c05 shows the Mercator Try this, not the Equal Earth one).",
+      "why": "I forget the question halfway, have to go back to find it, and then the map switches again. That costs time and I lose track of which task I'm on.",
+      "severity": "slows it down",
+      "suggestion": "When a Try this sends you to another map, keep that question showing at the top of the new map's panel (for example \"Your task from Robinson: How much bigger does it get?\") until you go back.",
+      "needs_live_app": false
+    },
+    {
+      "where": "c02-first-view.png, Mercator TRY THIS: \"Open the Country tab, tap Greenland and move it to the Equator. How big is it really? Then press 4 to morph to Equal Earth.\"",
+      "what": "Four steps and a question are all in one paragraph: open a tab, tap a country, move it, answer, press a key.",
+      "why": "I give up on long instructions. I'll do the first step, then lose my place in the sentence.",
+      "severity": "slows it down",
+      "suggestion": "Show the Try this steps as a numbered list (1. Open Country. 2. Tap Greenland. 3. Press Equator. 4. Press 4.) with the question on its own line.",
+      "needs_live_app": false
+    },
+    {
+      "where": "c24-country-greenland-equator.png, Country tab card: big yellow \"1.0× its real size\" and below it \"It looks only 0.06× as big here as in its real place (dashed outline).\" Same in c27-country-brazil-polar.png: \"1.1×\" and \"only 0.6× as big\"",
+      "what": "There are two numbers that seem to say opposite things: the big one says it's real size (or bigger), the sentence says it's tiny. \"0.06×\" is a decimal less than 1.",
+      "why": "The Try this asks \"How big is it really?\" and I can't tell which number answers it. I don't know what 0.06 times means.",
+      "severity": "slows it down",
+      "suggestion": "Say it in whole numbers: \"Here it looks about 16 times smaller than in its real place\". Under the big 1.0× add \"= its true size\".",
+      "needs_live_app": false
+    },
+    {
+      "where": "c02-first-view.png map label next to the white circle \"2.0× size / still round\"; c09-proj-spilhaus.png \"12× size\"; compare the Country tab label \"2.3× its real size\" (c22-country-default.png)",
+      "what": "On the Projection tab the label says \"× size\" but not compared with what. On the Country tab a similar label means \"compared with its real size\". The Measure tab explains it's compared with a circle at the map's center, but only in small print at the bottom.",
+      "why": "I'd read \"12× size\" as \"12 times its real size\" and say that in class, which mixes up two different things.",
+      "severity": "minor",
+      "suggestion": "Change the label to \"2.3× bigger than in the middle of the map\", or match the Country tab wording if it means the same thing.",
+      "needs_live_app": false
+    },
+    {
+      "where": "c18-measure-default.png, Measure tab: \"1.0 : 1 / long : wide\", \"size vs. center\", \"Much bigger than at the map's center (0°, 0°)\", \"Circle center: 48°N, 97°W\", \"784,000 sq mi\"",
+      "what": "Most of the Measure numbers are written in ways I don't read easily: a ratio with a colon, \"vs.\", a place written as (0°, 0°) that isn't marked on the map, and \"sq mi\".",
+      "why": "I'd only use the big pink number and skip the rest. The bold sentence helps, but \"(0°, 0°)\" in the middle of it makes me stop.",
+      "severity": "minor",
+      "suggestion": "Replace \"1.0 : 1 long : wide\" with a word (\"Round\" / \"3 times longer than wide\"), write \"square miles\" in full, and either mark the map's center on the map or drop \"(0°, 0°)\" from the sentence.",
+      "needs_live_app": false
+    },
+    {
+      "where": "c10-proj-polar-equidistant.png, TRY THIS: \"Drag the measuring circle from near the North Pole down to South America.\"",
+      "what": "Only Greenland and Africa have labels. On this round map seen from the top I can't find South America. The North Pole isn't labelled either.",
+      "why": "I'd waste time hunting, or drag the circle to the wrong place and get the wrong answer.",
+      "severity": "slows it down",
+      "suggestion": "Label the North Pole and any continent a Try this names (South America here, Antarctica on maps 6 and 9).",
+      "needs_live_app": false
+    },
+    {
+      "where": "c11-proj-polar-equal-area.png: tray says \"Polar Equal-Area\" but panel title says \"Lambert Azimuthal Equal-Area\"; c10 tray \"Polar Equidistant\" vs title \"Polar Azimuthal Equidistant\"; c09 tray \"Spilhaus\" vs \"Spilhaus World Ocean Map\"",
+      "what": "The map I click has a different name at the top of the panel.",
+      "why": "I think I clicked the wrong one, or I write down a name I can't read out when I say which map is fairest.",
+      "severity": "minor",
+      "suggestion": "Use the tray name as the big title and put the long name underneath in small text (\"also called Lambert Azimuthal Equal-Area\").",
+      "needs_live_app": false
+    },
+    {
+      "where": "c02-first-view.png, Mercator chips: \"Area: Distorted\" next to \"Shape: Kept · For small areas\"",
+      "what": "\"Area\" is used two ways side by side. Area is ✕ but Shape is kept \"for small areas\".",
+      "why": "I read it as \"area is distorted but also kept\" and get confused about whether Mercator is fair.",
+      "severity": "minor",
+      "suggestion": "Change \"Kept · For small areas\" to \"Kept · For small places\".",
+      "needs_live_app": false
+    },
+    {
+      "where": "c12-glossary-open.png, right-hand panel after opening \"What do these words mean?\"",
+      "what": "Opening the word help pushes the TRY THIS box off the bottom of the panel, so I have to scroll to find my task again.",
+      "why": "Using the word help hides the task. I might not notice it's still there below.",
+      "severity": "minor",
+      "suggestion": "Put the word help below the TRY THIS box, or open it as a small pop-up that doesn't move the task.",
+      "needs_live_app": false
+    },
+    {
+      "where": "c09-proj-spilhaus.png, top-left of the map: the white circle's label \"12× size / still round\" sits on top of the \"Greenland\" label; corners of the square look smeared (also c21, c26)",
+      "what": "Two labels overlap so I can't read either one well, and the brown streaky corners look like the picture didn't load properly.",
+      "why": "On the Spilhaus map I'd think something broke, and I can't read the number the Try this asks about.",
+      "severity": "minor",
+      "suggestion": "Move the circle's label to the side away from other labels, and add one line to the Spilhaus text: \"The streaky corners are the picture being stretched a lot, not an error.\"",
+      "needs_live_app": false
+    },
+    {
+      "where": "c24-country-greenland-equator.png and the Mercator TRY THIS \"...Then press 4 to morph to Equal Earth\"",
+      "what": "I can't tell from the packet whether pressing 4 still changes the map if I last clicked in the \"Choose a country\" drop-down or the Zoom to it button. A drop-down usually takes the keypress itself.",
+      "why": "If nothing happens when I press 4, I'll think the app froze or I did it wrong.",
+      "severity": "slows it down",
+      "suggestion": "Make number keys 1 to 9 switch maps even when the country drop-down has focus, or write \"press 4 (or tap Equal Earth in the bottom row)\" in the Try this.",
+      "needs_live_app": true
+    }
+  ]
+}
