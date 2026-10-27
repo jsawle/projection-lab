@@ -322,19 +322,8 @@ details.glossary p { margin: 8px 0 0; color: var(--ink-soft); }
 .units button { font: 700 0.8rem/1 var(--font-body); min-height: 34px; padding: 0 14px; border: 0; background: transparent; color: var(--ink-soft); cursor: pointer; }
 .units button[aria-pressed="true"] { background: var(--sun); color: var(--sun-ink); }
 
-.pairs { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }
 .pair-btn { font: 700 0.82rem/1.15 var(--font-body); min-height: 36px; padding: 6px 12px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--night-2); color: var(--ink); cursor: pointer; }
 .pair-btn[aria-pressed="true"] { border-color: var(--sun); color: var(--sun); }
-.bars { margin-top: 14px; display: grid; gap: 12px; }
-.bar-group h4 { margin: 0 0 6px; font: 700 0.72rem/1.2 var(--font-body); letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-soft); }
-.bar-row { display: grid; grid-template-columns: 84px 1fr; align-items: center; gap: 8px; margin-top: 4px; }
-.bar-row .nm { font-size: 0.84rem; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.bar-track { height: 16px; border-radius: 8px; background: var(--night-2); border: 1px solid var(--line); position: relative; overflow: hidden; }
-.bar-fill { position: absolute; inset: 0 auto 0 0; border-radius: 8px; transition: width .6s ease; min-width: 4px; }
-.bar-fill.a { background: var(--sun); } .bar-fill.b { background: var(--sky); }
-.cmp-text { margin-top: 12px !important; }
-.cmp-text strong { font-family: var(--font-data); color: var(--sun); }
-.verdict { margin-top: 10px !important; font-weight: 700; padding: 9px 12px; border-radius: 12px; background: var(--night-2); border: 1px solid var(--line); }
 
 /* ---------- About dialog ---------- */
 dialog { width: min(720px, calc(100vw - 32px)); max-height: calc(100dvh - 48px); border: 1px solid var(--line); border-radius: 20px; padding: 0; background: var(--panel); color: var(--ink); }
@@ -357,7 +346,7 @@ kbd { font-family: var(--font-data); font-size: 0.85em; border: 1px solid var(--
 
 @media (prefers-reduced-motion: reduce) {
   .mark .blob { animation: none; }
-  .bar-fill, .loading .bar span, .tile { transition: none; }
+  .loading .bar span, .tile { transition: none; }
 }
 @media (max-width: 520px) {
   .status { display: none; }
@@ -437,9 +426,9 @@ kbd { font-family: var(--font-data); font-size: 0.85em; border: 1px solid var(--
 .c-moves { display: flex; gap: 6px; }
 .c-moves .pair-btn { flex: 1 1 auto; min-width: 0; padding: 6px 4px; text-align: center; }
 .c-note { margin-top: 10px !important; font-size: 0.82rem; }
-/* v1.3.3: Measure and Compare use the same card as Country */
+/* v1.3.3: Measure uses the same card as Country */
 .hint.tight.first, .c-lbl.first { margin-top: 0 !important; }
-#panel-measure, #panel-compare { padding-top: 12px; }
+#panel-measure { padding-top: 12px; }
 .m-card .c-h.r, .m-card .c-num { color: var(--coral); }
 .m-card .c-num.real { color: var(--ink); }
 .m-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
@@ -449,28 +438,12 @@ kbd { font-family: var(--font-data); font-size: 0.85em; border: 1px solid var(--
 .m-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px 12px; margin-top: 10px; }
 .m-row .where { margin: 0 !important; }
 .m-row .units { margin-top: 0; }
-.k-pairs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin-top: 0; }
-.k-pairs .pair-btn { min-height: 44px; padding: 5px 4px; text-align: center; line-height: 1.15; }
-.k-pairs .pair-btn span { display: block; }
-@container (max-width: 359px) { .k-pairs { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-.k-card { grid-template-columns: auto minmax(0, 1fr) minmax(0, 1fr); column-gap: 10px; row-gap: 6px; align-items: center; }
-.k-card .nm { font-size: 0.84rem; font-weight: 700; white-space: nowrap; }
-.k-card .bar-track { height: 14px; }
-.k-card .c-col { margin-top: 2px; }
-.k-card .c-num.real { padding-top: 0; }
-#cmpSizes { margin-top: 8px !important; }
-#cmpSizes b { font-size: 0.84rem; }
-.nw { white-space: nowrap; }
 @media (min-width: 900px) and (max-height: 760px) {
   #panel-country { padding-top: 10px; }
   .c-card svg { max-height: 52px; margin: 2px 0 4px; } .c-num { font-size: 1.3rem; } .c-num.real { font-size: 1.1rem; }
   .c-head + .hint.tight { display: none; } .c-card { margin-top: 8px; padding: 8px 10px 10px; } .c-verdict { margin-top: 8px !important; padding-top: 7px; font-size: 0.88rem; }
   .c-lbl { margin: 8px 0 5px !important; }
-  #panel-measure, #panel-compare { padding-top: 10px; }
-  .k-card { row-gap: 5px; }
-  #panel-compare .c-lbl.first { margin-bottom: 5px !important; }
-  .k-pairs .pair-btn { min-height: 40px; padding: 4px; }
-  @container (max-width: 359px) { #panel-compare .c-lbl.first { display: none; } }
+  #panel-measure { padding-top: 10px; }
 }
 .viz-key .k-country { background: rgba(255, 201, 60, 0.5); border: 1.5px solid var(--sun); }
 .metric .val.sunv { color: var(--sun); }
@@ -541,7 +514,6 @@ kbd { font-family: var(--font-data); font-size: 0.85em; border: 1px solid var(--
       <button class="tab" role="tab" id="tab-proj" aria-controls="panel-proj" aria-selected="true" type="button">Projection</button>
       <button class="tab" role="tab" id="tab-country" aria-controls="panel-country" aria-selected="false" tabindex="-1" type="button">Country</button>
       <button class="tab" role="tab" id="tab-measure" aria-controls="panel-measure" aria-selected="false" tabindex="-1" type="button">Measure</button>
-      <button class="tab" role="tab" id="tab-compare" aria-controls="panel-compare" aria-selected="false" tabindex="-1" type="button">Compare</button>
     </div>
     <div class="panels">
       <section class="panel" role="tabpanel" id="panel-proj" aria-labelledby="tab-proj" tabindex="0">
@@ -635,31 +607,6 @@ kbd { font-family: var(--font-data); font-size: 0.85em; border: 1px solid var(--
         <p class="hint c-note"><span id="probeTrue"></span> <span class="ver" id="probeVer"></span></p>
       </section>
 
-      <section class="panel" role="tabpanel" id="panel-compare" aria-labelledby="tab-compare" tabindex="0" hidden>
-        <p class="c-lbl first" id="pairsLbl">Highlight two places on the map</p>
-        <div class="pairs k-pairs" id="pairs" role="group" aria-labelledby="pairsLbl"></div>
-        <div id="cmpBody">
-          <div class="c-card k-card">
-            <p class="sr-only" id="cmpReal"></p>
-            <p class="sr-only" id="cmpMap"></p>
-            <span aria-hidden="true"></span>
-            <div class="c-h" aria-hidden="true">Real Earth</div>
-            <div class="c-h" aria-hidden="true">On this map</div>
-            <span class="nm" id="bnA" aria-hidden="true"></span>
-            <span class="bar-track" aria-hidden="true"><span class="bar-fill a" id="bReal1"></span></span>
-            <span class="bar-track" aria-hidden="true"><span class="bar-fill a" id="bMap1"></span></span>
-            <span class="nm" id="bnB" aria-hidden="true"></span>
-            <span class="bar-track" aria-hidden="true"><span class="bar-fill b" id="bReal2"></span></span>
-            <span class="bar-track" aria-hidden="true"><span class="bar-fill b" id="bMap2"></span></span>
-            <span aria-hidden="true"></span>
-            <div class="c-col" aria-hidden="true"><div class="c-num real" id="kReal">–</div><div class="c-sub" id="kRealLbl"></div></div>
-            <div class="c-col" aria-hidden="true"><div class="c-num real" id="kMap">–</div><div class="c-sub" id="kMapLbl"></div></div>
-            <p class="c-verdict" id="cmpVerdict"></p>
-          </div>
-          <p class="where" id="cmpSizes"></p>
-        </div>
-        <p class="hint c-note">The Real Earth bars use real sizes. The On this map bars show how much space this map gives each place. On a map that keeps area, the two sets match. <span class="ver" id="cmpVer"></span></p>
-      </section>
 
     </div>
   </aside>
@@ -712,16 +659,15 @@ kbd { font-family: var(--font-data); font-size: 0.85em; border: 1px solid var(--
    Versions: app + one version per model. Bump a model's version when
    its maths or data handling changes, and the app version every release.
    ================================================================== */
-const APP_VERSION = '1.4.1';
+const APP_VERSION = '1.5.0';
 const SDK_VERSION = '5.1';
 const MODELS = {
   morph:   { name: 'Morph engine',       v: '1.5', what: 'Slides every projected point from one map to the next (eased, 2 seconds). The satellite picture is moved on the graphics card. Can be switched off. Morphs to and from Spilhaus use the satellite triangles split along its cut, so the world opens along that line.' },
   view:    { name: 'Zoom and centering', v: '1.1', what: 'All nine maps are fitted around one shared center and use the whole map area (the buttons sit below the map). Mercator is fitted to 82.5° N and S and drawn to 85°. Zoom 1–12×. The place in the middle of the view stays in the middle while the map morphs.' },
-  imagery: { name: 'Imagery basemap',    v: '1.1', what: 'Esri World Imagery, zoom level 3 tiles (level 4 once you zoom in past 2×), reshaped to a latitude–longitude grid and draped over a 2° mesh. For Spilhaus the mesh is also split along its cut and made finer wherever an edge would be longer than 1% of the square (its corners magnify hugely); the very ends of the cut are drawn in the corners.' },
+  imagery: { name: 'Imagery basemap',    v: '1.2', what: 'Esri World Imagery, zoom level 3 tiles (level 4 once you zoom in past 2×), reshaped to a latitude–longitude grid and draped over a 2° mesh. For Spilhaus the mesh is also split along its cut and made finer wherever an edge would be longer than 1% of the square (its corners magnify hugely); the very ends of the cut are drawn in the corners.' },
   circles: { name: 'Same-size circles',  v: '1.1', what: '55 geodesic circles, 500-mile radius, every 30° of longitude at 60°S, 30°S, 0°, 30°N and 60°N. Split along the Spilhaus cut.' },
   probe:   { name: 'Measuring circle',   v: '1.2', what: 'Map area ÷ real area, compared with a circle at the center of the map; shape and tilt from the circle’s longest and shortest axes. On Spilhaus the circle is kept off the edge of the square.' },
-  country: { name: 'Country mover',      v: '1.0', what: 'Turns the country over the globe (a rotation, so its real size and shape never change), then projects it. Its size on the map compared with its real size, and with its size in its real place. Split along the Spilhaus cut and the 180° line; the card shows the biggest piece.' },
-  compare: { name: 'Compare sizes',      v: '1.0', what: 'Real (geodetic) area versus flat area on the projected map.' },
+  country: { name: 'Country mover',      v: '1.1', what: 'Turns the country over the globe (a rotation, so its real size and shape never change), then projects it. Its size on the map compared with its real size, and with its size in its real place. Split along the Spilhaus cut and the 180° line; the card shows the biggest piece.' },
   data:    { name: 'Country data',       v: '1.2', what: 'Living Atlas World Countries (Generalized). Map: simplified to 0.1°, and split along the Spilhaus cut (half a great circle on the conformal sphere from 115°E 30°N through 113°W 50°N to 65°W 30°S). Points on the cut are nudged to their own side only for Spilhaus, by the smallest amount the projection engine accepts. Your country: finer detail (0.01°–0.1°, by size), joined across the 180° line.' },
 };
 
@@ -871,20 +817,13 @@ const FAMILIES = [
 const STATE_WORDS = { kept: 'Kept', nearly: 'Nearly kept', partly: 'Partly kept', changed: 'Distorted' };
 const STATE_ICONS = { kept: '✓', nearly: '≈', partly: '◐', changed: '✕' };
 
-/* ---------- Size comparison subjects ---------- */
+/* ---------- Greenland and Africa, highlighted on the map in the Projection and Measure tabs ---------- */
 const AFRICA_ISO = ['DZ','AO','BJ','BW','BF','BI','CV','CM','CF','TD','KM','CG','CD','CI','DJ','EG','GQ','ER','SZ','ET','GA','GM','GH','GN','GW','KE','LS','LR','LY','MG','MW','ML','MR','MU','YT','MA','MZ','NA','NE','NG','RE','RW','SH','ST','SN','SC','SL','SO','ZA','SS','SD','TZ','TG','TN','UG','ZM','ZW','EH'];
 const SUBJECTS = {
   GL: { label: 'Greenland', match: f => f.ISO === 'GL', anchor: [-41, 73] },
   AF: { label: 'Africa', match: f => AFRICA_ISO.includes(f.ISO) || f.COUNTRY === 'Canarias', anchor: [19, 6] },
-  CD: { label: 'DR Congo', match: f => f.ISO === 'CD', anchor: [23.5, -2.5] },
-  RU: { label: 'Russia', match: f => f.ISO === 'RU', anchor: [98, 63] },
 };
-const PAIRS = [
-  { id: 'gl-af', a: 'GL', b: 'AF', label: 'Greenland vs Africa' },
-  { id: 'gl-cd', a: 'GL', b: 'CD', label: 'Greenland vs DR Congo' },
-  { id: 'ru-af', a: 'RU', b: 'AF', label: 'Russia vs Africa' },
-  { id: 'none', label: 'None' },
-];
+const HIGHLIGHT = { a: 'GL', b: 'AF' };
 
 /* ---------- Map colors (single dark look) ---------- */
 const C = {
@@ -910,7 +849,6 @@ const state = {
   showCircles: true,
   showGrid: true,
   units: 'mi',
-  pair: 'gl-af',
   probe: { lon: -105, lat: 45 },
   animate: !reduceMotion.matches,
   animateChosen: false,
@@ -935,7 +873,7 @@ let SpatialReference, Point, Polygon, Multipoint, WGS;
 
 /* ---------- Geometry stores ---------- */
 let FEATURES = [];
-const world = { ll: null, outline: [], gratMinor: [], gratMajor: [], countries: [], circles: [], anchors: {}, subjectTrueKm2: {} };
+const world = { ll: null, outline: [], gratMinor: [], gratMajor: [], countries: [], circles: [], anchors: {} };
 const mesh = { ll: null, uv: null, idx: null, count: 0 };
 const probe = { ll: null, trueM2: 0, cache: {}, label: null };
 
@@ -957,14 +895,12 @@ const CM = {
    Startup
    ================================================================ */
 buildDial();
-buildPairs();
 const selectTab = buildTabs();
 updateInfo();
 updateUnitsUI();
 updateToggles();
 updateZoomUI();
 $('probeVer').textContent = 'v' + MODELS.probe.v;
-$('cmpVer').textContent = 'v' + MODELS.compare.v;
 $('countryVer').textContent = 'v' + MODELS.country.v;
 buildVersionTable();
 resize();
@@ -1362,12 +1298,7 @@ function buildWorld(features) {
     if (!rings.length) return;
     const attrs = f.attributes;
     const c = { name: attrs.COUNTRY, iso: attrs.ISO, fi, rings, subjects: [] };
-    for (const [sid, s] of Object.entries(SUBJECTS)) {
-      if (s.match(attrs)) {
-        c.subjects.push(sid);
-        world.subjectTrueKm2[sid] = (world.subjectTrueKm2[sid] || 0) + geodeticAreaOperator.execute(g, { unit: 'square-kilometers' });
-      }
-    }
+    for (const [sid, s] of Object.entries(SUBJECTS)) if (s.match(attrs)) c.subjects.push(sid);
     world.countries.push(c);
   });
 
@@ -1613,13 +1544,6 @@ function projectWorld(p) {
   const xy = projectFlat(new Float64Array(ring.flat()), p);
   const realM2 = geodeticAreaOperator.execute(new Polygon({ rings: [ring], spatialReference: WGS }), { unit: 'square-kilometers' }) * 1e6;
   p.kRef = Math.abs(shoelace(xy, 0, xy.length / 2)) / realM2;
-  p.subjectMapM2 = {};
-  for (const c of world.countries) {
-    if (!c.subjects.length) continue;
-    let a = 0;
-    for (const [s, n] of c.rings) a += shoelace(p.xy, s, n);
-    for (const sid of c.subjects) p.subjectMapM2[sid] = (p.subjectMapM2[sid] || 0) + Math.abs(a);
-  }
 }
 
 function shoelace(xy, s, n) {
@@ -2448,7 +2372,7 @@ function drawScene(g, cur, morphing, cull) {
     }
   }
 
-  const pair = PAIRS.find(p => p.id === state.pair);
+  const pair = HIGHLIGHT;
   if (circlesMode && pair && pair.a) {
     for (const [sid, fill, line] of [[pair.a, C.hiA, C.hiAline], [pair.b, C.hiB, C.hiBline]]) {
       g.beginPath();
@@ -2631,7 +2555,7 @@ function render() {
     ctx.clearRect(0, 0, W, H);
     drawScene(ctx, f.world, true, false);
   } else {
-    const key = [state.current, W, H, DPR, state.mode, state.showCircles, state.showGrid, state.showImagery, glReady, state.pair, fontsReady].join('|');
+    const key = [state.current, W, H, DPR, state.mode, state.showCircles, state.showGrid, state.showImagery, glReady, fontsReady].join('|');
     const viewKey = `${VT.z.toFixed(5)}|${VT.kx.toFixed(2)}|${VT.ky.toFixed(2)}`;
     const stale = key !== base.key || viewKey !== base.viewKey;
     ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -2829,7 +2753,7 @@ function sizeWords(r) {
   return 'Much smaller than';
 }
 
-function updateReadouts() { updateProbeReadout(); updateCompare(); updateCountryReadout(true); }
+function updateReadouts() { updateProbeReadout(); updateCountryReadout(true); }
 
 function updateProbeReadout() {
   if (!state.ready) return;
@@ -2976,63 +2900,6 @@ function countryAnnouncement() {
   return `${CM.name} at ${fmtLat(CM.pos.lat)}, ${fmtLon(CM.pos.lon)}. On this ${PROJ[state.current].short} map it is drawn ${fmtX(st.vsTrue)} times its real size, and ${fmtX(st.vsHome)} times its size in its real place.`;
 }
 
-function updateCompare() {
-  const pair = PAIRS.find(p => p.id === state.pair);
-  document.querySelectorAll('.pair-btn[data-id]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.id === state.pair)));
-  const body = $('cmpBody');
-  if (!pair.a) { body.hidden = true; return; }
-  body.hidden = false;
-  const A = SUBJECTS[pair.a], B = SUBJECTS[pair.b];
-  $('bnA').textContent = A.label; $('bnB').textContent = B.label;
-  if (!state.ready) { $('cmpReal').textContent = 'Loading real sizes…'; $('cmpMap').textContent = ''; $('cmpVerdict').textContent = ''; $('cmpSizes').textContent = ''; return; }
-  const p = PROJ[state.current];
-  const ta = world.subjectTrueKm2[pair.a], tb = world.subjectTrueKm2[pair.b];
-  const ma = p.subjectMapM2[pair.a], mb = p.subjectMapM2[pair.b];
-  const realMax = Math.max(ta, tb), mapMax = Math.max(ma, mb);
-  $('bReal1').style.width = (100 * ta / realMax) + '%';
-  $('bReal2').style.width = (100 * tb / realMax) + '%';
-  $('bMap1').style.width = (100 * ma / mapMax) + '%';
-  $('bMap2').style.width = (100 * mb / mapMax) + '%';
-  const realRatio = tb / ta, mapRatio = mb / ma;
-  const sentence = (r, a, b, verb) => {
-    if (r >= 1.05) return `${b.label} ${verb} <strong>${fmtX(r)}×</strong> bigger than ${a.label}`;
-    if (r <= 1 / 1.05) return `${a.label} ${verb} <strong>${fmtX(1 / r)}×</strong> bigger than ${b.label}`;
-    return `${a.label} and ${b.label} ${verb === 'is' ? 'are' : 'look'} about the same size`;
-  };
-  $('cmpReal').innerHTML = `<b>Real Earth:</b> ${sentence(realRatio, A, B, 'is')}.`;
-  $('cmpMap').innerHTML = `<b>On this ${p.short} map:</b> ${sentence(mapRatio, A, B, 'looks')}.`;
-  const column = (r, verb) => {
-    if (r < 1.05 && r > 1 / 1.05) return ['≈ 1×', verb === 'is' ? 'about the same size' : 'look about the same size'];
-    const big = r >= 1 ? B : A;
-    return [`${fmtX(Math.max(r, 1 / r))}×`, `${big.label} ${verb} bigger`];
-  };
-  const [rn, rl] = column(realRatio, 'is'), [mn, ml] = column(mapRatio, 'looks');
-  $('kReal').textContent = rn; $('kRealLbl').textContent = rl;
-  $('kMap').textContent = mn; $('kMapLbl').textContent = ml;
-  $('cmpSizes').innerHTML = `Real sizes: <span class="nw">${A.label} <b>${fmtArea(ta)}</b></span> · <span class="nw">${B.label} <b>${fmtArea(tb)}</b></span>`;
-  const off = mapRatio / realRatio;
-  $('cmpVerdict').textContent = Math.abs(off - 1) < 0.05
-    ? 'Same as real life. This map keeps area.'
-    : `This map draws ${off < 1 ? A.label : B.label} too big compared with ${off < 1 ? B.label : A.label}.`;
-}
-
-function buildPairs() {
-  const box = $('pairs');
-  for (const pr of PAIRS) {
-    const b = document.createElement('button');
-    b.type = 'button'; b.className = 'pair-btn'; b.dataset.id = pr.id;
-    if (pr.a) b.innerHTML = `<span>${SUBJECTS[pr.a].label}</span> <span>vs ${SUBJECTS[pr.b].label}</span>`;
-    else b.textContent = pr.label;
-    b.addEventListener('click', () => {
-      state.pair = pr.id;
-      updateCompare(); updateAria(); requestRender();
-      if (pr.a) announce(`${pr.label}. ${$('cmpReal').textContent} ${$('cmpMap').textContent} ${$('cmpVerdict').textContent}`);
-    });
-    box.appendChild(b);
-  }
-  updateCompare();
-}
-
 function updateUnitsUI() {
   $('uMi').setAttribute('aria-pressed', String(state.units === 'mi'));
   $('uKm').setAttribute('aria-pressed', String(state.units === 'km'));
@@ -3042,7 +2909,6 @@ $('uKm').addEventListener('click', () => { state.units = 'km'; updateUnitsUI(); 
 
 function updateAria() {
   const p = PROJ[state.current];
-  const pair = PAIRS.find(x => x.id === state.pair);
   const zoom = view.z > 1.0001 ? ` Zoomed in ${view.z.toFixed(1)} times.` : '';
   if (state.mode === 'country' && CM.moved) {
     canvas.setAttribute('aria-label', `${state.showImagery && glReady ? 'Satellite map' : 'Map'} of the world in the ${p.name} projection. ${countryAnnouncement()} A dashed outline shows it in its real place.${zoom}`);
@@ -3050,7 +2916,7 @@ function updateAria() {
   }
   canvas.setAttribute('aria-label',
     `${state.showImagery && glReady ? 'Satellite map' : 'Map'} of the world in the ${p.name} projection, with ${world.circles.length || 55} circles that are all the same real size. ${p.summary}` +
-    (pair.a ? ` ${SUBJECTS[pair.a].label} and ${SUBJECTS[pair.b].label} are highlighted.` : '') +
+    ` ${SUBJECTS.GL.label} and ${SUBJECTS.AF.label} are highlighted.` +
     ` The measuring circle is at ${fmtLat(state.probe.lat)}, ${fmtLon(state.probe.lon)}.${zoom}`);
 }
 
@@ -3072,7 +2938,7 @@ function updateToggles() {
 $('modeBtn').addEventListener('click', () => setMode(state.mode === 'country' ? 'circles' : 'country'));
 $('togImagery').addEventListener('click', () => { if (!glReady) return; state.showImagery = !state.showImagery; updateToggles(); updateAria(); requestRender(); });
 $('togCircles').addEventListener('click', () => {
-  if (state.mode === 'country') { announce('The circles are hidden on the Country tab. Choose the Projection, Measure or Compare tab to see them.'); return; }
+  if (state.mode === 'country') { announce('The circles are hidden on the Country tab. Choose the Projection or Measure tab to see them.'); return; }
   state.showCircles = !state.showCircles; updateToggles(); requestRender();
 });
 $('togGrid').addEventListener('click', () => { state.showGrid = !state.showGrid; updateToggles(); requestRender(); });
