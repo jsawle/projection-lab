@@ -712,7 +712,7 @@ kbd { font-family: var(--font-data); font-size: 0.85em; border: 1px solid var(--
    Versions: app + one version per model. Bump a model's version when
    its maths or data handling changes, and the app version every release.
    ================================================================== */
-const APP_VERSION = '1.4.0';
+const APP_VERSION = '1.4.1';
 const SDK_VERSION = '5.1';
 const MODELS = {
   morph:   { name: 'Morph engine',       v: '1.5', what: 'Slides every projected point from one map to the next (eased, 2 seconds). The satellite picture is moved on the graphics card. Can be switched off. Morphs to and from Spilhaus use the satellite triangles split along its cut, so the world opens along that line.' },
@@ -3128,7 +3128,9 @@ function screenToLonLat(px, py) {
   const p = PROJ[state.current];
   if (!p.fit) return null;
   const b = toBase(px, py);
-  if (!insideRings(p.screen, world.outline, b.x, b.y)) return null;
+  // Is the point on the map? Spilhaus's map is its square (its lat/long frame is just one line there)
+  const r = p.fit.rect;
+  if (p.spil ? (b.x < r.l || b.x > r.r || b.y < r.t || b.y > r.b) : !insideRings(p.screen, world.outline, b.x, b.y)) return null;
   return invProj(p, (b.x - p.fit.tx) / p.fit.s, (p.fit.ty - b.y) / p.fit.s);
 }
 function insideRings(scr, rings, px, py) {
