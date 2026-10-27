@@ -2,15 +2,15 @@
 
 A browser app for middle school students. The world morphs between nine map projections, and 55 circles that are all the same real size (500-mile radius) show how each projection stretches area, shape and distance.
 
-**Live app:** https://jsawle.github.io/projection-lab/ (v1.3.4)
+**Live app:** https://jsawle.github.io/projection-lab/ (v1.5.0)
 
-- Esri World Imagery that morphs with the map, with same-size circles, a measuring circle and size comparisons
+- Esri World Imagery that morphs with the map, with same-size circles and a measuring circle; Greenland and Africa are highlighted
 - Zoom (1–12×) that keeps the place in the middle of the view centred through each morph
-- **Country** tab: tap any country to choose it, then drag it over the globe at its real size and shape to see what each projection does to it; a globe-vs-map card shows its real size, its size compared with at home, and how many times its real size the map draws it
+- **Country** tab: tap any country to choose it, then drag it over the globe at its real size and shape to see what each projection does to it; a globe-vs-map card shows its real size, how many times its real size the map draws it, and how that compares with its real place
 - Map buttons sit below the map, so every projection uses the full height
-- Country, Measure and Compare each show their result in a real-versus-this-map card that fits without scrolling on laptop screens
+- Country and Measure each show their result in a real-versus-this-map card that fits without scrolling on laptop screens
 
-**Lab version:** https://jsawle.github.io/projection-lab/lab/ — test copy for trying new features before they reach the live app. Now testing v1.5.0: the Spilhaus World Ocean Map replaces Mollweide, the Compare tab is removed (Greenland and Africa stay highlighted on the map), and the clearer Country card from v1.3.5–1.3.6 (“real place” instead of “home”).
+**Lab version:** https://jsawle.github.io/projection-lab/lab/ — test copy for trying new features before they reach the live app. Currently the same as the live app.
 
 
 ## Projections
@@ -18,11 +18,11 @@ A browser app for middle school students. The world morphs between nine map proj
 | Family | Projections |
 | --- | --- |
 | Rectangles (cylindrical) | Plate Carrée, Mercator, Gall–Peters |
-| Rounded | Robinson, Winkel Tripel, Mollweide (live app), Equal Earth |
-| Square | Spilhaus World Ocean Map (lab: replaces Mollweide) |
+| Rounded | Robinson, Winkel Tripel, Equal Earth |
+| Square | Spilhaus World Ocean Map (the world's oceans as one body of water) |
 | Polar (North Pole) | Azimuthal Equidistant, Lambert Azimuthal Equal-Area |
 
-Equal-area: Gall–Peters, Equal Earth, Lambert Azimuthal Equal-Area, and Mollweide in the live app.
+Equal-area: Gall–Peters, Equal Earth, Lambert Azimuthal Equal-Area.
 
 ## Built with
 
