@@ -1,0 +1,133 @@
+{
+  "persona": "T1 Mark: the typical veteran",
+  "overall": "This beats my projections worksheet, and it does what The True Size Of does while also showing why, so I'd try it for a 20 to 30 minute chunk of a period. What stops me running it tomorrow is that there's nothing for the teacher: no suggested lesson flow, no student sheet and no answers to the Try This questions, so I'd be writing the worksheet tonight. I'd also have to check it gets through our district filter on a student Chromebook before I post it in Google Classroom.",
+  "works": [
+    "It opens straight onto Mercator with the same-size circles getting bigger toward the poles, so the point lands in seconds. The TRY THIS box tells kids what to do next (c02-first-view.png).",
+    "On the Country tab one click on \"Equator\" moves Greenland. On Equal Earth the card then says \"Same size here as in its real place (dashed outline). This map keeps area.\" That's The True Size Of plus switching the projection (c25).",
+    "It starts on the United States (c22), with \"3.7 million sq mi in real life\" and \"2.3× its real size\". That's a good hook for my US kids.",
+    "The Area / Shape / Distance / Direction cards with ✓ and ✕, and the plain-language \"What do these words mean?\", match the vocabulary in my map-skills unit (c12).",
+    "There's no sign-in and nothing to install, so it runs on our Chromebooks. Keys 1 to 9 with the 2-second morph would make a quick whole-class demo (c14)."
+  ],
+  "findings": [
+    {
+      "where": "About dialog (c28-about-top.png, c29-about-middle.png, c30-about-bottom.png; packet 'About dialog, full text')",
+      "what": "The only background text is the About dialog. It covers HOW IT WORKS (\"geodesic buffer operator\", \"geodetic area operator\"), KEYBOARD and a VERSIONS table of WKIDs. Nothing in it is for a teacher: no grade level, no learning goal, no suggested order for a 50-minute period and no student handout.",
+      "why": "I have about ten minutes to prep. I'd have to piece a lesson together from nine separate TRY THIS boxes and write my own sheet for five sections.",
+      "severity": "slows it down",
+      "suggestion": "Add a short 'For teachers' section or page: one learning goal, a 30 to 50 minute sequence built from the existing TRY THIS prompts (Mercator, then Greenland to the Equator, then Equal Earth, then Measure), and a one-page student sheet I can copy into Google Classroom.",
+      "needs_live_app": false
+    },
+    {
+      "where": "c08-proj-winkel-tripel.png TRY THIS \"Switch between Robinson and Winkel Tripel. Watch Greenland and Antarctica. Which map makes them bigger?\" and c11-proj-polar-equal-area.png TRY THIS \"...Look at Antarctica around the outer edge. Which map makes it bigger?\"",
+      "what": "Every projection ends with a question, but the app never gives the answer and students have nowhere to write theirs.",
+      "why": "I don't know the Robinson vs Winkel Tripel answer off the top of my head. If I can't check answers quickly, I can't grade them or run a class discussion.",
+      "severity": "slows it down",
+      "suggestion": "Give each TRY THIS a 'Check your answer' reveal, or list the answers in the teacher section.",
+      "needs_live_app": false
+    },
+    {
+      "where": "c24-country-greenland-equator.png Country card: \"1.0× its real size\" next to \"It looks only 0.06× as big here as in its real place (dashed outline).\" Also c18/c19 Measure \"2.3× size vs. center\", the map label \"2.0× size\" (c02), and c21 \"Much bigger than at the map’s center (50°S, 67°E)\"",
+      "what": "The numbers use different comparisons: \"its real size\", \"in its real place\", \"size vs. center\" and a bare \"size\" on the map label. On Spilhaus, \"center\" also stops meaning 0°, 0°. The Greenland card shows 1.0× and 0.06× at the same moment.",
+      "why": "The Mercator TRY THIS asks \"How big is it really?\" My 8th graders will read 1.0× and 0.06× and not know which one answers it. They won't get \"0.06×\" means about 16 times smaller.",
+      "severity": "slows it down",
+      "suggestion": "Word the comparison as a plain sentence with whole numbers, e.g. \"In its real place this map draws it 16 times as big as here\". Make the map label say what it's compared with (\"2.3× bigger than at the center\").",
+      "needs_live_app": false
+    },
+    {
+      "where": "Packet 'How it behaves', last two bullets: needs js.arcgis.com, services.arcgis.com, services.arcgisonline.com, fonts.googleapis.com / fonts.gstatic.com. Otherwise it shows \"The maps couldn’t load.\"",
+      "what": "The whole lab depends on several outside addresses. If our district filter blocks any of them on student Chromebooks, students get the error screen and nothing else.",
+      "why": "Our filter blocks plenty of sites. If this fails in first period, the lesson is dead for all five sections, and I can't tell from home whether it'll work on a student account.",
+      "severity": "stops the lesson",
+      "suggestion": "In the teacher section, list the addresses with a line saying 'open this on a student Chromebook the day before'. Make the error screen say which address failed, so I can send IT one specific request.",
+      "needs_live_app": true
+    },
+    {
+      "where": "c30-about-bottom.png: About ends with \"Created by Jason Sawle.\" The packet's About text has no privacy line and no contact",
+      "what": "There's no statement about student data and no way to contact anyone. The only sign of who's behind it is the credit line and \"Powered by Esri\".",
+      "why": "Before I post a site in Google Classroom, our district asks whether it collects student data. With no sign-in it probably doesn't, but the app never says so, and with PBS or Smithsonian I can point to a policy.",
+      "severity": "slows it down",
+      "suggestion": "Add one line to About, e.g. 'No sign-in. No student data is collected or stored', plus a contact or feedback link.",
+      "needs_live_app": false
+    },
+    {
+      "where": "Packet 'How it behaves': nothing says whether a link can open on a chosen projection, tab or country",
+      "what": "I can't tell whether I can post a link that opens on, for example, Mercator, Country tab, Greenland.",
+      "why": "With five sections, having every student start in the same place saves the first few minutes of each period.",
+      "severity": "minor",
+      "suggestion": "If it doesn't exist yet, add a 'Copy link to this view' that keeps the projection, tab and chosen country.",
+      "needs_live_app": true
+    },
+    {
+      "where": "c24-country-greenland-equator.png and c25: Greenland moved to the Equator sits next to South America, and Africa is no longer highlighted (on the Projection tab, c02, Africa is outlined in cyan)",
+      "what": "In the screenshots only one chosen country is on the map at a time, and the Africa highlight disappears on the Country tab. Students can't put Greenland right next to Africa to compare.",
+      "why": "Greenland next to Africa is the classic hook. On The True Size Of my kids drag several countries side by side, and that's the comparison they remember.",
+      "severity": "minor",
+      "suggestion": "Keep Africa outlined on the Country tab, or let students drop a second country to compare with.",
+      "needs_live_app": true
+    },
+    {
+      "where": "c07-proj-robinson.png and c08-proj-winkel-tripel.png: all four cards read \"≈ Nearly kept\" on both",
+      "what": "Robinson and Winkel Tripel have identical cards, so nothing on the cards tells them apart.",
+      "why": "The Winkel Tripel TRY THIS asks kids to compare the two. When the cards are the same they'll say 'there's no difference' and move on.",
+      "severity": "minor",
+      "suggestion": "Add one line per card saying what each does a bit better or worse than the other (e.g. which one enlarges Antarctica more).",
+      "needs_live_app": false
+    },
+    {
+      "where": "c07-proj-robinson.png TRY THIS \"Put the measuring circle at 60° north, then switch to Mercator. How much bigger does it get?\"",
+      "what": "On the Projection tab the white circle's label only says \"1.2× size\". The grid lines have no degree numbers, and the \"Circle center: 48°N, 97°W\" readout only appears on the Measure tab (c18).",
+      "why": "Kids won't know when they're at 60° north unless they think to switch tabs. I'll have hands up asking 'is this 60?'",
+      "severity": "minor",
+      "suggestion": "Show the circle's latitude in its map label, or say \"(open the Measure tab to see where it is)\" in that TRY THIS.",
+      "needs_live_app": false
+    },
+    {
+      "where": "c09-proj-spilhaus.png and c21-measure-spilhaus.png: smeared streaks in the top-right and bottom-left corners, half-circles along the edges. c26-country-us-spilhaus.png: the \"United States 9.3× its real size\" label floats in the dark area outside the map, with the US in pieces at the corners",
+      "what": "The Spilhaus map looks broken, and the Country tab's default country (the US) shows up as fragments with its label off the map.",
+      "why": "Kids pressing 1 to 9 will hit 7. The first thing they'll say is 'it's glitching', and I'll spend time explaining corners instead of distortion.",
+      "severity": "slows it down",
+      "suggestion": "Keep the country label inside the map square, and add a one-line note on the Spilhaus card that the blurry corners are where the map stretches the most.",
+      "needs_live_app": false
+    },
+    {
+      "where": "c09-proj-spilhaus.png: \"12× size still round\" runs into the \"Greenland\" label. c10-proj-polar-equidistant.png: \"1.1× size still round\" sits right on top of \"Greenland\"",
+      "what": "Map labels overlap each other.",
+      "why": "It's hard to read on a Chromebook and impossible on the projector.",
+      "severity": "minor",
+      "suggestion": "Move the measuring circle's label away from country labels when they collide.",
+      "needs_live_app": false
+    },
+    {
+      "where": "c30/packet About text, ANIMATION CHECK: \"Last morph: Mercator → Equal Earth, 51 frames in 500017.6 s (0 frames per second).\" Also c13-more-open.png: \"ArcGIS WKID 3857 · WGS 1984 Web Mercator (Auxiliary Sphere)\" and type lines like \"Pseudocylindrical · compromise\"",
+      "what": "There's what looks like a debug readout with a nonsense time (500,017 seconds, 0 frames per second), plus GIS codes and jargon in the student-facing \"More about\" sections.",
+      "why": "The animation line makes me think something is broken. The WKID codes and \"Auxiliary Sphere\" mean nothing to me or my 8th graders, and they'll ask.",
+      "severity": "minor",
+      "suggestion": "Hide the animation-check line unless something is actually wrong. Keep the WKID line only in the About versions table, not in the student panel.",
+      "needs_live_app": false
+    },
+    {
+      "where": "c02-first-view.png: yellow \"Country\" button with a flag under the map, and the \"Country\" tab at the top right",
+      "what": "There are two \"Country\" controls in different places.",
+      "why": "The TRY THIS says \"Open the Country tab\". Half the class will click the map button and ask if that's the same thing.",
+      "severity": "minor",
+      "suggestion": "Keep one, or make both visibly the same control (e.g. the map button just highlights the tab).",
+      "needs_live_app": false
+    },
+    {
+      "where": "c02-first-view.png: four round icon buttons under the map (pie, circle, grid, wave). Their names (\"Satellite imagery\", \"Same-size circles\", \"Grid lines\", \"Animate map changes\") only appear as hover text",
+      "what": "The toggles have no visible words.",
+      "why": "When I say 'turn off the circles', kids have to guess which icon. On a touchscreen Chromebook there's no hover to help.",
+      "severity": "minor",
+      "suggestion": "Put a one-word label under each icon (Satellite, Circles, Grid, Animate).",
+      "needs_live_app": false
+    },
+    {
+      "where": "p01-projector-first-view.png (1280×720): Mercator fills about 490 of 1280 pixels across, the panel text is small, and the \"More about Mercator\" box is cut off at the bottom of the panel. The square button is \"Show the whole world\", not full screen",
+      "what": "On my projector the map is under half the screen width, and the card text and map labels are small.",
+      "why": "I'd demo moving Greenland to the class first. The back rows won't be able to read \"16× its real size\" or the card numbers.",
+      "severity": "minor",
+      "suggestion": "Add a 'present' option that makes the map and its label bigger, or check that browser zoom keeps everything on one screen.",
+      "needs_live_app": true
+    }
+  ]
+}

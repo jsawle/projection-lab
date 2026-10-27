@@ -1,0 +1,125 @@
+{
+  "persona": "T5 Ruth: Texas teacher, careful about scrutiny",
+  "overall": "The core activity is good: moving Greenland to the Equator and watching it shrink is the clearest demonstration of Mercator distortion I've seen, and most of the numbers and dates I checked hold up. Before I put it in front of 8th graders I need to know who stands behind it, what it collects, and which skills it covers. I also need the few wobbly spots fixed: 'Nearly kept' on Robinson and Winkel Tripel, Puerto Rico listed as a 'country', and no disclaimer on disputed borders. Right now I couldn't hand it to a district reviewer and defend every line.",
+  "works": [
+    "It never says one map is 'right' or 'best'. Every projection gets the same four-property card, and the glossary line 'every flat map changes at least one of these' frames it as trade-offs, not opinion.",
+    "The data sources are named in the About dialog (Esri World Imagery, World Countries (Generalized), Garmin, CIA World Factbook, National Geographic Society), with layer names I could look up.",
+    "Numbers I could check hold up: a 1,000-mile circle covering about 784,000 sq mi, Mercator drawing 60° N about 4 times bigger, Brazil at 3.3 million sq mi, Greenland at about 834,000 sq mi, Mercator 1569, Robinson 1963, Winkel Tripel 1921, National Geographic 1988–1998 and 1998 on.",
+    "The Country tab demo (Greenland at the Equator: '1.0× its real size', 'only 0.06× as big here as in its real place') takes on the classic misconception directly, using the app's own measurements.",
+    "No sign-in and nothing to install, so there are no student accounts for me to justify."
+  ],
+  "findings": [
+    {
+      "where": "About dialog, full text (c28-about-top.png to c30-about-bottom.png) and the whole page text",
+      "what": "Nowhere does it state a grade level, learning objectives or the skills it supports, or link a teacher guide. The only framing is 'Every flat map stretches the round Earth.'",
+      "why": "I plan against the TEKS and a district scope and sequence. Without a stated grade band and skill, I have to write the alignment myself, and I have nothing from the maker to show a reviewer that it was built for 8th grade.",
+      "severity": "slows it down",
+      "suggestion": "Add a short 'For teachers' section to About giving the grade band, two or three objectives (e.g. compare how projections distort area, shape, distance and direction), the map-skills strand it supports, and a suggested lesson length.",
+      "needs_live_app": false
+    },
+    {
+      "where": "Map footer 'Created by Jason Sawle' and 'Powered by Esri' (c02-first-view.png, bottom of map); About dialog last line 'Created by Jason Sawle.' (c30-about-bottom.png); Equal Earth 'Its story': 'Bojan Šavrič (who works at Esri)'; Spilhaus 'Its story': 'Esri mapmakers Bojan Šavrič and David Burrows'",
+      "what": "There is a name but no role, organization, contact or last-updated date. I can't tell whether this is an Esri product, a personal project on a jsawle.github.io address, or something else. Esri staff are singled out by employer in the history text.",
+      "why": "The first question a district reviewer or parent will ask is 'who made this and who is responsible for it?' With 'Powered by Esri' and employer call-outs but no statement of who stands behind it, it could look like vendor marketing, and I'd have no one to contact if a parent complains.",
+      "severity": "slows it down",
+      "suggestion": "Add one line to About saying who made it, in what capacity, whether any organization endorses or maintains it, a contact address and the date of the last update.",
+      "needs_live_app": false
+    },
+    {
+      "where": "About dialog, full text: no privacy section. Packet 'How it behaves' lists the outside addresses used: js.arcgis.com, services.arcgis.com, services.arcgisonline.com, fonts.googleapis.com, fonts.gstatic.com",
+      "what": "Neither the page nor the About dialog says whether anything about the user is collected, stored or sent, even though the page loads content from Esri and Google servers.",
+      "why": "Before a free web tool goes to students, my district will ask what data it collects. 'No sign-in' helps, but I need it in writing from the maker. I can't assume it.",
+      "severity": "slows it down",
+      "suggestion": "Add a short privacy note to About saying what, if anything, is collected or stored, and that the page loads maps from Esri and fonts from Google.",
+      "needs_live_app": false
+    },
+    {
+      "where": "'More about' sections: Gall–Peters 'In 2017, Boston Public Schools started using it in classrooms.'; Equal Earth 'News that Boston schools had switched to Gall–Peters inspired them…'; Spilhaus 'After it went viral online in 2018…', 'ArcGIS added it in 2020', 'In 2025 the National Maritime Museum in Greenwich, London, opened a giant ocean floor map drawn this way.'; Plate Carrée 'Marinus of Tyre is often credited with it, around the year 100.'",
+      "what": "These are specific factual claims (dates, a named school district, a named museum), but the About 'SOURCES' section only credits the map data. None of the history statements has a reference.",
+      "why": "The Boston story is one some parents will know from the news as a political argument about maps. If a parent or reviewer asks 'where does it say that?', I need to point to a source, not just say 'the app says so'.",
+      "severity": "slows it down",
+      "suggestion": "Add a 'References' list to About with one citation for each 'Its story' and 'Where you'll see it' claim, especially the Boston 2017 and Greenwich 2025 statements.",
+      "needs_live_app": false
+    },
+    {
+      "where": "Equal Earth 'Where you'll see it': 'World maps of data where fair sizes matter'; Lambert Azimuthal Equal-Area 'Where you'll see it': 'because areas stay fair'; Robinson intro 'nothing is perfect, but nothing is badly wrong' and story 'until the world looked right'; Winkel Tripel circles text 'no part of the map is badly wrong' (c07-proj-robinson.png, c08-proj-winkel-tripel.png)",
+      "what": "Value words ('fair', 'right', 'badly wrong') where neutral measurement words would do. 'Fair' is the word from the Gall–Peters argument over which map is fairer to which countries, and the app brings up that history through the Boston references.",
+      "why": "These are exactly the words that draw a complaint under my district's sensitive-materials review. I'd rather the app said 'true to scale' than 'fair', so nobody can read a position into it.",
+      "severity": "minor",
+      "suggestion": "Replace 'fair sizes' with 'correct relative sizes' and 'areas stay fair' with 'areas stay true to scale', and change 'badly wrong' to a measurable phrase such as 'no part is stretched very much'.",
+      "needs_live_app": false
+    },
+    {
+      "where": "c07-proj-robinson.png and c08-proj-winkel-tripel.png, the four property cards: '≈ Area Nearly kept', '≈ Shape Nearly kept', '≈ Distance Nearly kept', '≈ Direction Nearly kept'",
+      "what": "Both compromise maps rate all four properties 'Nearly kept', identically. The app contradicts this on the same screen: the measuring circle on Robinson reads '1.2× size, stretched into an oval'; the Robinson circle text says circles near the poles are 'a bit bigger and a bit squashed'; Winkel Tripel circles 'lean slightly near the edges'; and its Try This asks which map makes Greenland and Antarctica bigger.",
+      "why": "I could not defend 'Distance: Nearly kept' or 'Direction: Nearly kept' to a reviewer. These maps don't keep distances or directions. A student will also reasonably conclude these two maps are the same, which defeats the 'Switch between Robinson and Winkel Tripel' activity.",
+      "severity": "slows it down",
+      "suggestion": "Change the label to 'Distorted a little' (keeping the ≈ icon), name where the distortion is largest (e.g. 'more near the poles'), and give the two maps different notes if they differ.",
+      "needs_live_app": false
+    },
+    {
+      "where": "Country tab drop-down labelled 'Choose a country…' (packet: '250 countries, A to Z'); entries include 'Puerto Rico', 'Guam', 'US Virgin Islands', 'American Samoa', 'Northern Mariana Islands', 'United States Minor Outlying Islands', 'Azores', 'Madeira', 'Canarias', 'Svalbard', 'Bouvet Island', 'Glorioso Islands', 'Juan De Nova Island'",
+      "what": "US territories and parts of other countries (e.g. Spain's Canary Islands, Portugal's Azores) are listed as countries with no sign of who governs them. The map's on-screen instruction also says 'Tap any country'.",
+      "why": "I teach US History. Calling Puerto Rico and Guam 'countries' is a factual error my students will repeat, and a parent would be right to object.",
+      "severity": "slows it down",
+      "suggestion": "Relabel the control 'Choose a country or territory' and tag dependent places with their sovereign, e.g. 'Puerto Rico (U.S.)', 'Canarias (Spain)'.",
+      "needs_live_app": false
+    },
+    {
+      "where": "Country tab drop-down list (packet 'Every button and control' section) and About dialog 'SOURCES'",
+      "what": "The list includes 'Palestinian Territory' and 'Israel' but has no 'Taiwan', 'Kosovo' or 'Western Sahara'. Nothing says that names and boundaries come from the data source and don't reflect a position. From the screenshots I can't tell how Taiwan, Kashmir, Crimea or Western Sahara are drawn on the map.",
+      "why": "Disputed borders and names are exactly what triggers a materials review in my district. If a student goes looking for Taiwan and finds it missing or merged into another country, I need to be able to say the app takes no position, and right now it doesn't say so.",
+      "severity": "slows it down",
+      "suggestion": "Add a line under SOURCES: 'Country names and boundaries come from Esri's World Countries (Generalized) layer and do not imply any position on disputed territory.' Also state how Taiwan and other disputed areas are shown.",
+      "needs_live_app": true
+    },
+    {
+      "where": "Country tab drop-down list: 'Turkiye', 'Curacao', 'Saint Barthelemy' (next to 'Côte d'Ivoire' and 'Réunion', which keep their accents)",
+      "what": "Some official names are misspelled or missing their accents (Türkiye, Curaçao, Saint-Barthélemy), while others in the same list have them.",
+      "why": "Names are one of the things I check. Inconsistent spellings make the list look careless to a reviewer.",
+      "severity": "minor",
+      "suggestion": "Use the official spellings throughout: 'Türkiye', 'Curaçao', 'Saint-Barthélemy'.",
+      "needs_live_app": false
+    },
+    {
+      "where": "c22-country-default.png, Country card: 'United States … 3.7 million sq mi in real life'",
+      "what": "The commonly published US figure is about 3.8 million sq mi total area, or about 3.5 million sq mi land only. The app's 3.7 million matches neither, and the card doesn't say it was measured from simplified outlines.",
+      "why": "Students will compare this with their textbook. The US is the first country the tab opens on, so this is the number most of them will see, and I'd have to explain the gap.",
+      "severity": "minor",
+      "suggestion": "Add a small note under the number, such as 'measured from simplified outlines; official total ≈ 3.8 million sq mi', or explain this once in the Country tab footnote.",
+      "needs_live_app": false
+    },
+    {
+      "where": "About dialog, 'ANIMATION CHECK' section: 'Last morph: Mercator → Equal Earth, 51 frames in 500017.6 s (0 frames per second).'",
+      "what": "A developer readout in the public About box shows an impossible figure: 500,017 seconds is almost six days for a 2-second animation, at '0 frames per second'.",
+      "why": "The About box is what I or a district reviewer read to judge whether a tool is trustworthy. An obviously wrong number there makes me doubt the other numbers, even the ones that are right.",
+      "severity": "minor",
+      "suggestion": "Remove the ANIMATION CHECK section from the public About dialog (or move it behind a hidden debug option) and fix the timer.",
+      "needs_live_app": false
+    },
+    {
+      "where": "About dialog, VERSIONS table, 'Same-size circles' row (c29-about-middle.png): '55 geodesic circles, 500-mile radius, every 30° of longitude at 60°S, 30°S, 0°, 30°N and 60°N.'",
+      "what": "Every 30° of longitude gives 12 circles per row, which is 60 circles across 5 rows, not 55. In c02-first-view.png each row shows 11 circles, so one longitude (presumably 180°) seems to be skipped without saying so.",
+      "why": "A sharp student or reviewer who does the arithmetic will find the app's own description doesn't add up.",
+      "severity": "minor",
+      "suggestion": "Change the text to say which longitudes are used, e.g. 'every 30° from 150° W to 150° E (11 per row)'.",
+      "needs_live_app": false
+    },
+    {
+      "where": "c02-first-view.png and p01-projector-first-view.png: measuring-circle label '2.0× size still round'; c13-more-open.png and c18-measure-default.png: '2.3× size still round' (Measure tab 'as it first opens', circle center 48°N, 97°W)",
+      "what": "The first screen after loading shows 2.0× for the measuring circle over North America. The same Mercator view a moment later, with the circle in what looks like nearly the same place, shows 2.3×.",
+      "why": "If my class all reads '2.0×' off the projector and a student's Measure tab says '2.3×', I'll spend time on a number I can't explain. I can't tell from the screenshots whether the circle actually moved.",
+      "severity": "minor",
+      "suggestion": "Make sure the first-load label is calculated for the same default position that the Measure tab reports, so both show the same value.",
+      "needs_live_app": true
+    },
+    {
+      "where": "c26-country-us-spilhaus.png: Country card 'United States … 3.7 million sq mi in real life … 9.3× its real size'; map label 'United States 9.3× its real size' drawn outside the right edge of the map square; About 'Country mover' row: 'the card shows the biggest piece'",
+      "what": "On Spilhaus the US is cut into pieces. The card puts '9.3×' next to the whole-country area, but the About dialog says the card shows only the biggest piece. The map label floats outside the map over empty space.",
+      "why": "I can't tell whether 9.3× describes the whole United States or one fragment, so I couldn't defend the number if a student quoted it.",
+      "severity": "minor",
+      "suggestion": "When a country is split, label the figure on the card as 'biggest piece: 9.3×' and keep the map label inside the map.",
+      "needs_live_app": true
+    }
+  ]
+}
