@@ -578,6 +578,7 @@ kbd { font-family: var(--font-data); font-size: 0.85em; border: 1px solid var(--
             <dt>Azimuthal</dt><dd>Made as if a flat sheet touched the globe at one point, here the North Pole. The map is round.</dd>
           </dl>
           <p>A flat map can’t show the round Earth without stretching some parts, so every flat map changes at least one of these.</p>
+          <p>Each map is resized to fit the screen. To compare maps, compare things on the same map, like Greenland with Africa, or use the numbers.</p>
         </div>
         <div class="more-body" id="moreBody" hidden>
             <p class="fullname" id="pFullName" hidden></p>
@@ -675,7 +676,7 @@ kbd { font-family: var(--font-data); font-size: 0.85em; border: 1px solid var(--
       <li>Every point is projected by the ArcGIS projection engine, using the same projection definitions as ArcGIS Pro and ArcGIS Online.</li>
       <li>To morph, each point slides in a straight line from where it sits on one map to where it sits on the next. The graphics card moves the satellite picture.</li>
       <li>The Country tab moves a country over the globe by turning it, the way you would slide a paper cut-out over a real globe. That keeps its real size and shape. The map then projects it, so any change you see comes from the projection.</li>
-      <li>All nine maps share the same center point. When you zoom in, the place in the middle of the view stays in the middle while the map changes.</li>
+      <li>Each map is resized to fit the window, around the same point on the screen. So compare sizes on the same map (a circle with the circles on the Equator, Greenland with Africa), or use the numbers, rather than comparing how big something looks on two different maps. When you zoom in, the place in the middle of the view stays in the middle while the map changes.</li>
       <li>Real areas are measured on the curved Earth with the ArcGIS geodetic area operator. Map areas are measured flat, on the projected map.</li>
     </ul>
     <h3>Keyboard</h3>
@@ -714,7 +715,7 @@ kbd { font-family: var(--font-data); font-size: 0.85em; border: 1px solid var(--
    Versions: app + one version per model. Bump a model's version when
    its maths or data handling changes, and the app version every release.
    ================================================================== */
-const APP_VERSION = '1.5.2';
+const APP_VERSION = '1.5.3';
 const SDK_VERSION = '5.1';
 const MODELS = {
   morph:   { name: 'Morph engine',       v: '1.6', what: 'Slides every projected point from one map to the next (eased, 2 seconds). The satellite picture is moved on the graphics card. Can be switched off. Morphs to and from Spilhaus use the satellite triangles split along its cut, so the world opens along that line. One animation loop runs at a time, however fast you switch maps.' },
@@ -780,7 +781,7 @@ const PROJECTIONS = [
     circles: 'Every circle stays round, but circles get much bigger toward the poles. At 60° north a circle is drawn about 4 times bigger than at the Equator.',
     where: 'Most web maps and phone map apps, because streets and buildings keep their shape when you zoom in. They use Web Mercator, a version that looks the same at this scale. Ship navigators use Mercator too: a straight line on this map follows one compass heading.',
     history: 'Gerardus Mercator, a Flemish mapmaker, published it in 1569. The poles would be infinitely far away, so the web version cuts the map off at about 85° north and south.',
-    task: { uses: 'country', maps: ['mercator', 'equal-earth'], steps: ['Open the Country tab and choose Greenland.', 'Press Equator.', 'Tap Equal Earth (or press 4).'], ask: 'How many times too big does Mercator draw Greenland in its real place? And Equal Earth?' },
+    task: { uses: 'country', maps: ['mercator', 'equal-earth'], steps: ['Open the Country tab and choose Greenland.', 'Press Equator.', 'Tap Equal Earth (key 4).'], ask: 'How many times too big does Mercator draw Greenland in its real place? And Equal Earth?' },
     summary: 'Circles stay round but grow much bigger toward the poles.'
   },
   {
@@ -793,7 +794,7 @@ const PROJECTIONS = [
     circles: 'All circles cover the same amount of map. They get flatter toward the poles, but less than on Gall–Peters.',
     where: 'World maps of data where true sizes matter, such as climate or population maps.',
     history: 'Bojan Šavrič (who works at Esri), Tom Patterson and Bernhard Jenny created it in 2018. News that Boston schools had switched to Gall–Peters inspired them to make an equal-area map with more familiar shapes.',
-    task: { uses: 'map', maps: ['equal-earth', 'mercator'], steps: ['Tap Mercator, then Equal Earth (keys 3 and 4). Do it a few times.', 'Watch Greenland and Africa change size.'], ask: 'Which map shows their true sizes?' },
+    task: { uses: 'map', maps: ['equal-earth', 'mercator'], steps: ['On Mercator (key 3), compare Greenland with Africa.', 'On Equal Earth (key 4), compare them again.'], ask: 'Africa is really 14 times as big as Greenland. Which map shows that?' },
     summary: 'Circles all cover the same area and flatten a little toward the poles.'
   },
   {
@@ -806,7 +807,7 @@ const PROJECTIONS = [
     circles: 'Circles get bigger and flatter toward the poles. At 60° north a circle is about 1.5 times as big as at the Equator. On Mercator it is 4 times as big.',
     where: 'Atlases and classroom wall maps. National Geographic used it for its world maps from 1988 to 1998.',
     history: 'Arthur Robinson designed it in 1963. He did not start from one math rule. He changed the map by looking at it until he liked how the world looked.',
-    task: { uses: 'circle', maps: ['robinson', 'mercator'], steps: ['Drag the white circle to 60°N. Its label shows how far north it is.', 'Tap Mercator (or press 3).'], ask: 'How much bigger does the circle get?' },
+    task: { uses: 'circle', maps: ['robinson', 'mercator'], steps: ['Drag the white circle to 60°N. Compare it with the red circles on the Equator.', 'On Mercator (key 3), compare again.'], ask: 'How many times as big as the Equator circles is it on each map? Its label tells you.' },
     summary: 'Circles get bigger and flatter toward the poles, but much less than on Mercator.'
   },
   {
@@ -819,7 +820,7 @@ const PROJECTIONS = [
     circles: 'Circles get bigger toward the poles, a little more than on Robinson in the middle of the map. Near the left and right edges they tilt.',
     where: 'National Geographic world maps, and many atlases and textbooks.',
     history: 'Oswald Winkel, a German mapmaker, created it in 1921. “Tripel” is German for “triple”: it tries to keep three kinds of error small: area, direction and distance.',
-    task: { uses: 'country', maps: ['winkel-tripel', 'robinson'], steps: ['Tap Robinson, then Winkel Tripel (keys 5 and 6).', 'Watch Greenland and Antarctica change.', 'To check, choose Greenland on the Country tab and switch again.'], ask: 'Which map makes them bigger?' },
+    task: { uses: 'country', maps: ['winkel-tripel', 'robinson'], steps: ['On Robinson (key 5), compare Greenland with Africa.', 'On Winkel Tripel (key 6), compare them again.', 'To check, choose Greenland on the Country tab.'], ask: 'On which map is Greenland bigger next to Africa?' },
     summary: 'Circles get bigger toward the poles and tilt near the edges.'
   },
   {
@@ -858,7 +859,7 @@ const PROJECTIONS = [
     circles: 'Every circle covers the same amount of map. Toward the edge they become wide, thin ovals.',
     where: 'Scientists use it for maps of the Arctic and Antarctic, such as snow and sea ice data, because areas stay true.',
     history: 'Johann Heinrich Lambert, a Swiss mathematician, described it in 1772.',
-    task: { uses: 'map', maps: ['polar-equal-area', 'polar-equidistant'], steps: ['Look at Antarctica, the ring around the outer edge.', 'Tap Polar Equidistant, then Polar Equal-Area (keys 8 and 9).'], ask: 'Which map makes Antarctica bigger?' },
+    task: { uses: 'map', maps: ['polar-equal-area', 'polar-equidistant'], steps: ['Look at Antarctica, the ring around the outer edge.', 'Tap Polar Equidistant (key 8), then Polar Equal-Area (key 9).'], ask: 'Which map makes Antarctica bigger?' },
     summary: 'Circles all cover the same area but flatten toward the edge.'
   },
 ];
