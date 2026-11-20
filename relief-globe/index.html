@@ -1,0 +1,493 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Earth Relief Globe</title>
+<meta name="description" content="A 3D globe of the land and the sea floor. Fly to Challenger Deep, Mount Everest and other places, stretch the heights, and measure how high or deep any place is. Built with ArcGIS.">
+<meta name="theme-color" content="#08142b">
+<link rel="stylesheet" href="https://js.arcgis.com/5.2/esri/themes/dark/main.css">
+<script type="module" src="https://js.arcgis.com/5.2/" id="sdkScript"></script>
+<style>
+/* Earth Relief Globe — lab app. Layout: controls panel on the left, globe on the right.
+   On narrow screens (phones) the globe sits on top and the panel underneath. */
+:root {
+  --night: #08142b;
+  --panel: #0f1f40;
+  --panel-2: #16295a;
+  --line: #2c4278;
+  --ink: #f1f5ff;
+  --ink-soft: #b9c6e6;
+  --sun: #ffc93c;
+  --sun-ink: #1d1500;
+  --sea: #5ce1e6;
+  --land: #9be27a;
+  --r: 12px;
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { height: 100%; margin: 0; }
+body { font-family: var(--font); font-size: 1rem; line-height: 1.45; color: var(--ink); background: var(--night); -webkit-font-smoothing: antialiased; }
+:focus-visible { outline: 3px solid var(--sun); outline-offset: 2px; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.skip { position: absolute; left: 12px; top: -60px; z-index: 50; background: var(--sun); color: var(--sun-ink); padding: 8px 14px; border-radius: 8px; font-weight: 700; text-decoration: none; }
+.skip:focus { top: 12px; }
+
+.app { display: grid; grid-template-columns: minmax(290px, 340px) 1fr; height: 100dvh; }
+.panel { background: var(--panel); border-right: 1px solid var(--line); overflow-y: auto; display: flex; flex-direction: column; }
+.stage { position: relative; min-height: 0; }
+#viewHost, #viewHost arcgis-scene { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+header.top { padding: 16px 18px 12px; border-bottom: 1px solid var(--line); display: flex; align-items: flex-start; gap: 10px; }
+header.top .titles { flex: 1; min-width: 0; }
+h1 { font-size: 1.3rem; margin: 0; letter-spacing: 0.01em; }
+.sub { margin: 2px 0 0; color: var(--ink-soft); font-size: 0.92rem; }
+.lab-tag { display: inline-block; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; background: var(--sun); color: var(--sun-ink); border-radius: 4px; padding: 1px 6px; margin-left: 6px; vertical-align: 3px; }
+.ver-btn { flex: none; font: 600 0.8rem/1 var(--mono); color: var(--ink); background: var(--panel-2); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; cursor: pointer; min-height: 36px; }
+.ver-btn:hover { border-color: var(--ink-soft); }
+
+section.block { padding: 14px 18px 16px; border-bottom: 1px solid var(--line); }
+h2 { font-size: 1rem; margin: 0 0 8px; display: flex; align-items: baseline; gap: 8px; }
+.mver { font: 600 0.72rem/1 var(--mono); color: var(--ink-soft); border: 1px solid var(--line); border-radius: 4px; padding: 2px 5px; }
+.hint { color: var(--ink-soft); font-size: 0.9rem; margin: 6px 0 0; }
+
+.places { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.places button { width: 100%; min-height: 44px; text-align: left; font: 600 0.9rem/1.2 var(--font); color: var(--ink); background: var(--panel-2); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; cursor: pointer; }
+.places button:hover { border-color: var(--ink-soft); }
+.places button[aria-pressed="true"] { background: var(--sun); color: var(--sun-ink); border-color: var(--sun); }
+.place-note { margin: 10px 0 0; font-size: 0.92rem; color: var(--ink); background: rgba(255,255,255,0.04); border-left: 3px solid var(--sea); padding: 8px 10px; border-radius: 0 8px 8px 0; }
+
+.stretch-row { display: flex; align-items: center; gap: 10px; }
+.stretch-row input[type=range] { flex: 1; accent-color: var(--sun); height: 44px; }
+.stretch-out { font: 700 1.1rem/1 var(--mono); min-width: 3.2em; text-align: right; }
+.btn { font: 600 0.9rem/1 var(--font); color: var(--ink); background: var(--panel-2); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; min-height: 44px; cursor: pointer; }
+.btn:hover { border-color: var(--ink-soft); }
+.btn-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+
+.readout { margin-top: 10px; background: rgba(255,255,255,0.04); border: 1px solid var(--line); border-radius: var(--r); padding: 10px 12px; }
+.readout .big { font: 700 1.35rem/1.2 var(--font); }
+.readout .big.below { color: var(--sea); }
+.readout .big.above { color: var(--land); }
+.readout .feet { color: var(--ink-soft); font-size: 0.92rem; }
+.readout .where { font: 0.82rem/1.3 var(--mono); color: var(--ink-soft); margin-top: 4px; }
+.readout .compare { margin-top: 8px; font-size: 0.92rem; }
+
+.radios { display: flex; flex-direction: column; gap: 4px; border: 0; margin: 0; padding: 0; }
+.radios label { display: flex; align-items: center; gap: 10px; min-height: 40px; cursor: pointer; }
+.radios input { width: 20px; height: 20px; accent-color: var(--sun); margin: 0; }
+
+.panel-foot { margin-top: auto; padding: 12px 18px 16px; font-size: 0.8rem; color: var(--ink-soft); }
+
+/* The stretch badge and the credit tag sit on the globe. */
+.badge { position: absolute; left: 12px; top: 12px; z-index: 5; background: rgba(8, 20, 43, 0.82); border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; font-weight: 700; font-size: 0.9rem; pointer-events: none; }
+.badge.true { border-color: var(--land); }
+.credit { position: absolute; right: 12px; bottom: 30px; z-index: 5; font: 700 0.74rem/1 var(--font); color: var(--ink); padding: 7px 10px; border-radius: 8px; background: var(--panel); border: 1px solid var(--line); pointer-events: none; }
+
+.loading { position: absolute; inset: 0; z-index: 20; display: grid; place-items: center; background: var(--night); text-align: center; padding: 24px; }
+.loading p { max-width: 34em; color: var(--ink-soft); }
+.loading strong { display: block; color: var(--ink); font-size: 1.1rem; margin-bottom: 6px; }
+
+dialog { max-width: min(680px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); width: 100%; padding: 0; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 14px; }
+dialog::backdrop { background: rgba(0, 0, 0, 0.6); }
+.dlg-head { position: sticky; top: 0; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 14px 18px; background: var(--panel); border-bottom: 1px solid var(--line); }
+.dlg-head h2 { margin: 0; font-size: 1.15rem; }
+.dlg-body { padding: 4px 18px 18px; }
+.dlg-body h3 { font-size: 1rem; margin: 16px 0 6px; }
+.dlg-body ul { margin: 0; padding-left: 1.2em; }
+.dlg-body li { margin: 4px 0; }
+.dlg-body a { color: var(--sea); }
+.icon-btn { width: 44px; height: 44px; display: grid; place-items: center; color: var(--ink); background: var(--panel-2); border: 1px solid var(--line); border-radius: 8px; cursor: pointer; }
+.icon-btn svg { width: 16px; height: 16px; }
+table { border-collapse: collapse; width: 100%; font-size: 0.88rem; }
+th, td { text-align: left; vertical-align: top; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+th { color: var(--ink-soft); font-weight: 600; }
+td.v { font-family: var(--mono); white-space: nowrap; }
+kbd { font: 0.85em var(--mono); background: var(--panel-2); border: 1px solid var(--line); border-radius: 4px; padding: 1px 5px; }
+
+/* Phones: globe on top, panel underneath. Tablets keep the side panel. */
+@media (max-width: 700px) {
+  .app { grid-template-columns: 1fr; grid-template-rows: 55dvh 1fr; }
+  .panel { border-right: 0; border-top: 1px solid var(--line); order: 2; }
+  .stage { order: 1; }
+}
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+@media (forced-colors: active) { .places button[aria-pressed="true"] { outline: 3px solid CanvasText; } }
+</style>
+</head>
+<body>
+<a class="skip" href="#controls">Skip to the controls</a>
+
+<div class="app">
+  <aside class="panel" id="controls" aria-label="Globe controls">
+    <header class="top">
+      <div class="titles">
+        <h1>Earth Relief Globe<span class="lab-tag">Lab</span></h1>
+        <p class="sub">Mountains and the sea floor in 3D</p>
+      </div>
+      <button class="ver-btn" id="aboutBtn" type="button" aria-haspopup="dialog">v<span id="appVer"></span><span class="sr-only">. About this app and versions</span></button>
+    </header>
+
+    <section class="block" aria-labelledby="placesH">
+      <h2 id="placesH">Go to a place <span class="mver" id="placesVer"></span></h2>
+      <ul class="places" id="places"></ul>
+      <p class="place-note" id="placeNote">Drag the globe to turn it. Choose a place to fly there.</p>
+    </section>
+
+    <section class="block" aria-labelledby="stretchH">
+      <h2 id="stretchH">Stretch the heights <span class="mver" id="stretchVer"></span></h2>
+      <div class="stretch-row">
+        <label for="stretch" class="sr-only">Height stretch</label>
+        <input type="range" id="stretch" min="1" max="15" step="1" value="5">
+        <output id="stretchOut" for="stretch" class="stretch-out">×5</output>
+      </div>
+      <div class="btn-row">
+        <button class="btn" type="button" id="trueBtn">True scale (×1)</button>
+        <button class="btn" type="button" id="defaultBtn">Back to ×5</button>
+      </div>
+      <p class="hint" id="stretchHint">Heights and depths are stretched 5 times so the shapes are easier to see. Real mountains and trenches are much less steep.</p>
+    </section>
+
+    <section class="block" aria-labelledby="measureH">
+      <h2 id="measureH">Measure height or depth <span class="mver" id="probeVer"></span></h2>
+      <p class="hint" style="margin-top:0">Tap or click anywhere on the globe.</p>
+      <div class="btn-row"><button class="btn" type="button" id="centreBtn">Measure the middle of the view</button></div>
+      <div class="readout" id="readout" hidden>
+        <div class="big" id="rBig"></div>
+        <div class="feet" id="rFeet"></div>
+        <div class="where" id="rWhere"></div>
+        <div class="compare" id="rCompare" hidden></div>
+      </div>
+    </section>
+
+    <section class="block" aria-labelledby="colourH">
+      <h2 id="colourH">Map colours</h2>
+      <fieldset class="radios">
+        <legend class="sr-only">Map colours</legend>
+        <label><input type="radio" name="bm" value="ocean" checked> Sea floor colours and names</label>
+        <label><input type="radio" name="bm" value="imagery"> Satellite picture</label>
+      </fieldset>
+    </section>
+
+    <div class="panel-foot">An experiment for AtlasLab. Built with the ArcGIS Maps SDK for JavaScript.</div>
+  </aside>
+
+  <main class="stage" aria-label="3D globe">
+    <div id="viewHost" role="region" aria-label="3D globe of land and sea floor. Select it, then use the arrow keys to move and plus and minus to zoom."></div>
+    <div class="badge" id="badge" aria-hidden="true">Heights ×5</div>
+    <div class="credit">Created by Jason Sawle</div>
+    <div class="loading" id="loading" role="status">
+      <div>
+        <strong id="loadingTitle">Loading the globe…</strong>
+        <p id="loadingSub">Getting the map tools and the height data from ArcGIS.</p>
+      </div>
+    </div>
+  </main>
+</div>
+
+<p id="live" class="sr-only" aria-live="polite"></p>
+
+<dialog id="about" aria-labelledby="aboutTitle">
+  <div class="dlg-head">
+    <h2 id="aboutTitle">About Earth Relief Globe</h2>
+    <button class="icon-btn" id="aboutClose" type="button" aria-label="Close">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+  <div class="dlg-body">
+    <p>A 3D globe where the land and the sea floor have their real shape. The water is taken away, so you can fly down into ocean trenches like Challenger Deep and see the mountains, ridges and canyons under the sea.</p>
+    <h3>How it works</h3>
+    <ul>
+      <li>Heights and depths come from Esri’s <a href="https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/TopoBathy3D/ImageServer" target="_blank" rel="noopener">World Elevation TopoBathy 3D</a> service, which joins land heights and sea-floor depths into one surface.</li>
+      <li>The stretch multiplies every height and depth by the number you choose. At ×1 the globe is at true scale. At global scale the Earth’s relief is very small compared with its size, so a stretch helps you see the shapes.</li>
+      <li>The measurement always uses the true height, whatever the stretch. It asks the service for the most detailed value it has at that point.</li>
+      <li>In the deep ocean the data is a grid of averaged values, so it can read less deep than the deepest point measured by ships and submersibles.</li>
+    </ul>
+    <h3>Moving around</h3>
+    <ul>
+      <li>Drag to turn the globe. Scroll or pinch to zoom. Right-drag, or two-finger drag on a touchscreen, to tilt and turn.</li>
+      <li>The buttons at the top right of the globe zoom, switch between moving and turning, and turn the globe back to north.</li>
+      <li>Keyboard: select the globe, then use the arrow keys to move and <kbd>+</kbd> and <kbd>−</kbd> to zoom. “Measure the middle of the view” measures without a mouse.</li>
+    </ul>
+    <h3>Web addresses it needs</h3>
+    <p>If the globe won’t load at school, ask IT to allow:</p>
+    <ul>
+      <li><b>jsawle.github.io</b>: the app itself</li>
+      <li><b>js.arcgis.com</b>: the ArcGIS Maps SDK (needed)</li>
+      <li><b>elevation3d.arcgis.com</b>: the heights and depths (needed)</li>
+      <li><b>services.arcgisonline.com</b>: the sea-floor colours and the satellite picture</li>
+    </ul>
+    <h3>Versions</h3>
+    <div style="overflow-x:auto"><table id="verTable"></table></div>
+    <h3>Sources</h3>
+    <ul>
+      <li>Heights, depths and map colours: Esri and the data providers named in the line at the bottom of the globe.</li>
+      <li>Challenger Deep depth (10,935 m): Greenaway and others (2021), NOAA, <i>Deep Sea Research Part I</i>, from submersible dives in June 2020.</li>
+      <li>Mount Everest height (8,849 m): the joint Nepal and China survey announced in 2020.</li>
+    </ul>
+    <p style="margin-top:12px">Created by Jason Sawle.</p>
+  </div>
+</dialog>
+
+<noscript><p style="padding:16px">This app needs JavaScript to draw the globe.</p></noscript>
+
+<script type="module">
+/* ==================================================================
+   Earth Relief Globe (lab)
+   Versions: app + one version per model. Bump a model's version when
+   its maths or data handling changes, and the app version every release.
+   ================================================================== */
+const APP_VERSION = '0.1.0';
+const SDK_VERSION = '5.2';
+const MODELS = {
+  stretch: { name: 'Height stretch', v: '1.0', what: 'Multiplies every height and depth from the TopoBathy service by the chosen number (×1 to ×15), tile by tile, leaving no-data cells alone. When the stretch changes, the camera moves with the ground in the middle of the view.' },
+  probe:   { name: 'Height and depth measurement', v: '1.0', what: 'Asks the TopoBathy service for its most detailed true height at the chosen point (never stretched) and shows it in metres and feet, with a Mount Everest comparison for depths over 8,849 m.' },
+  places:  { name: 'Places and camera', v: '1.0', what: 'Flies to each place with the camera set back from it at a set distance, direction and tilt, raised or lowered to match the height stretch.' },
+};
+
+const TOPOBATHY_URL = 'https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/TopoBathy3D/ImageServer';
+const OCEAN_BASE = 'https://services.arcgisonline.com/arcgis/rest/services/Ocean/World_Ocean_Base/MapServer';
+const OCEAN_REF  = 'https://services.arcgisonline.com/arcgis/rest/services/Ocean/World_Ocean_Reference/MapServer';
+const IMAGERY    = 'https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer';
+const DEFAULT_STRETCH = 5;
+const EVEREST_M = 8849;
+
+// Places. heading = the direction the camera looks; dist = metres from the camera to the place; measure = measure it on arrival.
+const PLACES = [
+  { id: 'globe', name: 'Whole globe', lon: 150, lat: 8, globe: true,
+    note: 'The whole Earth with the water taken away. Look for the long ridges in the middle of the oceans and the deep trenches around the Pacific.' },
+  { id: 'challenger', name: 'Challenger Deep', lon: 142.59, lat: 11.37, heading: 10, tilt: 68, dist: 140000, measure: true,
+    note: 'The deepest known place in the ocean, at the southern end of the Mariana Trench. NOAA’s 2021 estimate is 10,935 m (35,876 ft) below sea level. Tap the bottom of the trench to measure it.' },
+  { id: 'mariana', name: 'Mariana Trench', lon: 145.2, lat: 15.5, heading: 270, tilt: 58, dist: 1100000,
+    note: 'Here the Pacific Plate sinks under the Philippine Sea Plate. Look for the curved trench, and the line of volcanic islands beside it.' },
+  { id: 'everest', name: 'Mount Everest', lon: 86.925, lat: 27.988, heading: 0, tilt: 70, dist: 60000, measure: true,
+    note: 'The highest mountain above sea level: 8,849 m (29,032 ft). Compare it with how deep Challenger Deep is.' },
+  { id: 'hawaii', name: 'Hawaii', lon: -155.47, lat: 19.82, heading: 320, tilt: 62, dist: 420000,
+    note: 'The islands are the tops of huge volcanoes that start on the sea floor. Measure the top of Mauna Kea and the sea floor nearby to find how tall it is from its base.' },
+  { id: 'ridge', name: 'Mid-Atlantic Ridge', lon: -31, lat: 28, heading: 0, tilt: 55, dist: 2600000,
+    note: 'A mountain range under the Atlantic Ocean, where two plates are moving apart and new sea floor is made.' },
+  { id: 'canyon', name: 'Grand Canyon', lon: -112.11, lat: 36.1, heading: 0, tilt: 65, dist: 45000,
+    note: 'A canyon carved by the Colorado River. Measure the rim and the river, then compare its depth with an ocean trench.' },
+];
+
+const $ = (id) => document.getElementById(id);
+const live = (msg) => { const el = $('live'); el.textContent = ''; setTimeout(() => { el.textContent = msg; }, 50); };
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
+const nf0 = new Intl.NumberFormat(undefined, { maximumFractionDigits: 0 });
+const nf2 = new Intl.NumberFormat(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+// ---------- Versions in the UI
+$('appVer').textContent = APP_VERSION;
+$('placesVer').textContent = 'v' + MODELS.places.v;
+$('stretchVer').textContent = 'v' + MODELS.stretch.v;
+$('probeVer').textContent = 'v' + MODELS.probe.v;
+$('verTable').innerHTML = '<thead><tr><th scope="col">Part</th><th scope="col">Version</th><th scope="col">What it does</th></tr></thead><tbody>' +
+  [['Earth Relief Globe (app)', APP_VERSION, 'Whole app. Changes with every release.'],
+   ['ArcGIS Maps SDK for JavaScript', SDK_VERSION, 'Esri’s map library, loaded from js.arcgis.com.'],
+   ...Object.values(MODELS).map((m) => [m.name, m.v, m.what])]
+  .map(([a, b, c]) => `<tr><td>${a}</td><td class="v">${b}</td><td>${c}</td></tr>`).join('') + '</tbody>';
+
+// ---------- About dialog
+const about = $('about');
+$('aboutBtn').addEventListener('click', () => about.showModal());
+$('aboutClose').addEventListener('click', () => about.close());
+about.addEventListener('click', (e) => { if (e.target === about) about.close(); });
+
+// ---------- Loading / error
+function showLoadError(extra) {
+  $('loading').hidden = false;
+  $('loadingTitle').textContent = 'The globe could not load';
+  $('loadingSub').textContent = 'This app needs to reach ArcGIS over the internet. At school, a web filter may be blocking it: ask IT to allow js.arcgis.com, elevation3d.arcgis.com and services.arcgisonline.com. Otherwise, check your connection and reload the page.' + (extra ? ' (' + extra + ')' : '');
+}
+$('sdkScript').addEventListener('error', () => showLoadError('map tools did not download'));
+
+// ---------- Small helpers
+// The point dist metres from (lon, lat) along a compass bearing, on a sphere. Good enough for placing a camera.
+function offset(lon, lat, bearingDeg, dist) {
+  const R = 6371008.8, d = dist / R, th = bearingDeg * Math.PI / 180;
+  const p1 = lat * Math.PI / 180, l1 = lon * Math.PI / 180;
+  const p2 = Math.asin(Math.sin(p1) * Math.cos(d) + Math.cos(p1) * Math.sin(d) * Math.cos(th));
+  const l2 = l1 + Math.atan2(Math.sin(th) * Math.sin(d) * Math.cos(p1), Math.cos(d) - Math.sin(p1) * Math.sin(p2));
+  return [((l2 * 180 / Math.PI + 540) % 360) - 180, p2 * 180 / Math.PI];
+}
+const fmtLat = (v) => nf2.format(Math.abs(v)) + '° ' + (v >= 0 ? 'N' : 'S');
+const fmtLon = (v) => nf2.format(Math.abs(v)) + '° ' + (v >= 0 ? 'E' : 'W');
+
+async function start() {
+  if (!window.$arcgis) { showLoadError('map tools did not download'); return; }
+  const [EsriMap, Basemap, TileLayer, ElevationLayer, BaseElevationLayer, Camera, Point, Graphic, GraphicsLayer] = await $arcgis.import([
+    '@arcgis/core/Map.js', '@arcgis/core/Basemap.js', '@arcgis/core/layers/TileLayer.js',
+    '@arcgis/core/layers/ElevationLayer.js', '@arcgis/core/layers/BaseElevationLayer.js',
+    '@arcgis/core/Camera.js', '@arcgis/core/geometry/Point.js', '@arcgis/core/Graphic.js', '@arcgis/core/layers/GraphicsLayer.js',
+  ]);
+
+  // ---------- Height stretch model (v MODELS.stretch.v)
+  // True heights: used for every measurement, and as the source of the stretched ground.
+  const trueElevation = new ElevationLayer({ url: TOPOBATHY_URL });
+  const StretchedElevation = BaseElevationLayer.createSubclass({
+    properties: { exaggeration: DEFAULT_STRETCH, source: null },
+    load() {
+      this.addResolvingPromise(this.source.load().then(() => {
+        // Same tiling as the service, so tiles line up.
+        this.tileInfo = this.source.tileInfo;
+        this.spatialReference = this.source.spatialReference;
+        this.fullExtent = this.source.fullExtent;
+      }));
+    },
+    fetchTile(level, row, col, options) {
+      return this.source.fetchTile(level, row, col, options).then((data) => {
+        const k = this.exaggeration;
+        if (k === 1) return data;
+        const src = data.values, nd = data.noDataValue, out = new Float32Array(src.length);
+        for (let i = 0; i < src.length; i++) out[i] = src[i] === nd ? nd : src[i] * k;
+        return { ...data, values: out, maxZError: (data.maxZError || 0) * k };
+      });
+    },
+  });
+
+  let stretch = DEFAULT_STRETCH;
+  const basemaps = {
+    ocean: new Basemap({ baseLayers: [new TileLayer({ url: OCEAN_BASE })], referenceLayers: [new TileLayer({ url: OCEAN_REF })], title: 'Sea floor' }),
+    imagery: new Basemap({ baseLayers: [new TileLayer({ url: IMAGERY })], title: 'Satellite' }),
+  };
+  const marks = new GraphicsLayer({ title: 'Measurements', elevationInfo: { mode: 'relative-to-ground' }, listMode: 'hide' });
+  const map = new EsriMap({
+    basemap: basemaps.ocean,
+    ground: { layers: [new StretchedElevation({ exaggeration: stretch, source: trueElevation })] },
+    layers: [marks],
+  });
+
+  // ---------- The scene component
+  const sceneEl = document.createElement('arcgis-scene');
+  sceneEl.map = map;
+  for (const tag of ['arcgis-zoom', 'arcgis-navigation-toggle', 'arcgis-compass']) {
+    const c = document.createElement(tag); c.slot = 'top-right'; sceneEl.appendChild(c);
+  }
+  $('viewHost').appendChild(sceneEl);
+  await customElements.whenDefined('arcgis-scene');
+  await sceneEl.viewOnReady();
+  const view = sceneEl.view;
+  try {
+    view.environment.lighting = { type: 'virtual', directShadowsEnabled: false };   // even light everywhere, so relief shows on the night side too
+    view.environment.starsEnabled = true;
+    view.environment.atmosphereEnabled = true;
+  } catch (e) { /* keep the SDK's own lighting */ }
+  view.camera = new Camera({ position: new Point({ longitude: 150, latitude: 8, z: 14000000 }), heading: 0, tilt: 0 });
+
+  trueElevation.load().catch(() => showLoadError('height data did not download'));
+  view.when(() => { $('loading').hidden = true; }, () => showLoadError('the globe did not start'));
+
+  // ---------- Measurement model (v MODELS.probe.v)
+  async function trueHeight(lon, lat, finest) {
+    const r = await trueElevation.queryElevation(new Point({ longitude: lon, latitude: lat }), finest ? { demResolution: 'finest-contiguous' } : undefined);
+    return r && r.geometry && Number.isFinite(r.geometry.z) ? r.geometry.z : null;
+  }
+  let probeToken = 0;
+  async function measure(lon, lat) {
+    const token = ++probeToken;
+    $('readout').hidden = false;
+    $('rBig').className = 'big'; $('rBig').textContent = 'Measuring…';
+    $('rFeet').textContent = ''; $('rWhere').textContent = fmtLat(lat) + ', ' + fmtLon(lon); $('rCompare').hidden = true;
+    let z;
+    try { z = await trueHeight(lon, lat, true); } catch (e) { z = null; }
+    if (token !== probeToken) return;   // a newer measurement has started
+    if (z === null) { $('rBig').textContent = 'No height data here'; live('No height data at that point.'); return; }
+    const m = Math.round(z), ft = Math.round(z * 3.28084), below = m < 0;
+    const words = below ? 'below sea level' : 'above sea level';
+    $('rBig').className = 'big ' + (below ? 'below' : 'above');
+    $('rBig').textContent = nf0.format(Math.abs(m)) + ' m ' + words;
+    $('rFeet').textContent = nf0.format(Math.abs(ft)) + ' ft ' + words;
+    let compare = '';
+    if (below && -m > EVEREST_M) compare = 'Mount Everest would fit in here with ' + nf0.format(-m - EVEREST_M) + ' m of water above its top.';
+    $('rCompare').textContent = compare; $('rCompare').hidden = !compare;
+    marks.removeAll();
+    marks.add(new Graphic({
+      geometry: new Point({ longitude: lon, latitude: lat }),
+      symbol: { type: 'point-3d', symbolLayers: [
+        { type: 'icon', size: 12, anchor: 'top', resource: { primitive: 'circle' }, material: { color: '#ffc93c' }, outline: { color: '#1d1500', size: 1.5 } },
+        { type: 'text', text: (below ? '−' : '') + nf0.format(Math.abs(m)) + ' m', size: 12, verticalAlignment: 'bottom', material: { color: '#ffffff' }, halo: { color: '#08142b', size: 1.5 }, font: { weight: 'bold' } },
+      ] },
+    }));
+    live(nf0.format(Math.abs(m)) + ' metres ' + words + ', ' + nf0.format(Math.abs(ft)) + ' feet. ' + compare);
+  }
+  view.on('click', (e) => { if (e.mapPoint) measure(e.mapPoint.longitude, e.mapPoint.latitude); });
+  const centrePoint = () => view.toMap({ x: view.width / 2, y: view.height / 2 });
+  $('centreBtn').addEventListener('click', () => {
+    const p = centrePoint();
+    if (p) measure(p.longitude, p.latitude); else live('The middle of the view is space, not the globe. Move the globe and try again.');
+  });
+
+  // ---------- Stretch control
+  async function setStretch(n) {
+    n = Math.max(1, Math.min(15, Math.round(n)));
+    if (n === stretch) return;
+    const old = stretch; stretch = n;
+    showStretch(n);
+    let zc = 0;   // keep the camera at the same height above the ground in the middle of the view
+    const c = centrePoint();
+    if (c) { try { zc = (await trueHeight(c.longitude, c.latitude, false)) || 0; } catch (e) { zc = 0; } }
+    if (stretch !== n) return;   // changed again while waiting
+    map.ground.layers.removeAll();
+    map.ground.layers.add(new StretchedElevation({ exaggeration: n, source: trueElevation }));
+    const cam = view.camera.clone(); cam.position.z += zc * (n - old); view.camera = cam;
+    live(n === 1 ? 'True scale. Heights are not stretched.' : 'Heights stretched ' + n + ' times.');
+  }
+  function showStretch(n) {
+    $('stretch').value = n;
+    $('stretchOut').textContent = '×' + n;
+    $('stretch').setAttribute('aria-valuetext', n === 1 ? 'True scale' : 'Heights stretched ' + n + ' times');
+    $('badge').textContent = n === 1 ? 'True scale (×1)' : 'Heights ×' + n;
+    $('badge').classList.toggle('true', n === 1);
+    $('stretchHint').textContent = n === 1
+      ? 'True scale: heights and depths are not stretched. At this scale most of the Earth looks almost smooth.'
+      : 'Heights and depths are stretched ' + n + ' times so the shapes are easier to see. Real mountains and trenches are much less steep.';
+  }
+  let stretchTimer = 0;
+  $('stretch').addEventListener('input', () => {
+    const n = Number($('stretch').value);
+    $('stretchOut').textContent = '×' + n;
+    clearTimeout(stretchTimer); stretchTimer = setTimeout(() => setStretch(n), 350);   // reload the ground once the slider settles
+  });
+  $('trueBtn').addEventListener('click', () => setStretch(1));
+  $('defaultBtn').addEventListener('click', () => setStretch(DEFAULT_STRETCH));
+  showStretch(stretch);
+
+  // ---------- Places model (v MODELS.places.v)
+  const list = $('places');
+  for (const p of PLACES) {
+    const li = document.createElement('li');
+    const b = document.createElement('button');
+    b.type = 'button'; b.textContent = p.name; b.dataset.id = p.id; b.setAttribute('aria-pressed', 'false');
+    b.addEventListener('click', () => flyTo(p));
+    li.appendChild(b); list.appendChild(li);
+  }
+  async function flyTo(p) {
+    for (const b of list.querySelectorAll('button')) b.setAttribute('aria-pressed', String(b.dataset.id === p.id));
+    $('placeNote').textContent = p.note;
+    let cam;
+    if (p.globe) {
+      cam = new Camera({ position: new Point({ longitude: p.lon, latitude: p.lat, z: 14000000 }), heading: 0, tilt: 0 });
+    } else {
+      let zt = 0;
+      try { zt = (await trueHeight(p.lon, p.lat, false)) || 0; } catch (e) { zt = 0; }
+      const t = p.tilt * Math.PI / 180;
+      const [lon, lat] = offset(p.lon, p.lat, (p.heading + 180) % 360, p.dist * Math.sin(t));
+      cam = new Camera({ position: new Point({ longitude: lon, latitude: lat, z: zt * stretch + p.dist * Math.cos(t) }), heading: p.heading, tilt: p.tilt });
+    }
+    try { await view.goTo(cam, { animate: !reduceMotion.matches, speedFactor: 0.8 }); } catch (e) { return; }   // interrupted by the user
+    live('Arrived at ' + p.name + '. ' + p.note);
+    if (p.measure) measure(p.lon, p.lat);
+  }
+
+  // ---------- Map colours
+  for (const r of document.querySelectorAll('input[name=bm]')) {
+    r.addEventListener('change', () => { if (r.checked) { map.basemap = basemaps[r.value]; live(r.value === 'ocean' ? 'Sea floor colours and names.' : 'Satellite picture.'); } });
+  }
+}
+
+start().catch((e) => { console.error(e); showLoadError(e && e.message ? e.message : ''); });
+</script>
+</body>
+</html>
